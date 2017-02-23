@@ -1,0 +1,33 @@
+# 109 JP
+include "109.nodoka"
+include "default2.nodoka"
+
+keymap Global
+# SansS
+mod shift += !!Space
+key R-*Space = &Ignore
+
+# –³•ÏŠ·‚ðAlt‚É
+mod alt += –³•ÏŠ·
+key *–³•ÏŠ· = *LAlt
+
+# Emacs-keybind apps
+window Skype /Skype\.exe/ : EmacsEdit
+window Krile /krile\.exe/ : EmacsEdit
+
+# StarOffice/StarSuite/OpenOffice
+window StarOffice /soffice\.exe:SALFRAME$/ : EmacsEdit
+
+# MS Word
+window MSWord /WINWORD\.EXE/ : EmacsEdit
+
+window Chrome /chrome\.exe/ : EmacsEdit
+key C-T = &Default
+key C-W = &Default
+window browser /firefox\.exe/ : EmacsEdit
+key C-T = &Default
+key C-W = &Default
+
+keymap EmacsEdit
+key C-J = &Default
+key C-Q = &Default

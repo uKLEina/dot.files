@@ -1,0 +1,1 @@
+export PATH="$PATH:/C/Program Files (x86)/JetBrains/IntelliJ IDEA Community Edition 2016.3/plugins/maven/lib/maven3/bin:/C/Program Files/Java/jdk1.8.0_112/bin:/C/Program Files/PostgreSQL/9.6/bin:/C/Users/DPC05009/Anaconda3/Scripts"

@@ -1,138 +1,0 @@
-
-40irony.el,0
-
-10popwin.el,0
-
-45evil-skk.el,81
-(defadvice update-buffer-local-cursor-colorupdate-buffer-local-cursor-color1,0
-
-30resize-window.el,0
-
-05dired.el,350
-(defvar dired-sort-order '("" "t" "S" "X")dired-sort-order7,83
-(defvar dired-sort-order-position 0)dired-sort-order-position9,229
-(defun dired-rotate-sort ()dired-rotate-sort11,267
-(define-key dired-mode-map "s" 'dired-rotate-sort)dired-mode-map20,681
-(define-key dired-mode-map (kbd "r") 'wdired-change-to-wdired-mode)dired-mode-map23,744
-
-45helm-ag.el,0
-
-linux-font.el,0
-
-20migemo.el,0
-
-30smartparens.el,0
-
-45helm-company.el,0
-
-30highlight.el,0
-
-40ripgrep.el,0
-
-30expand-region.el,0
-
-02auto-compile.el,0
-
-03autosave.el,0
-
-40yasnippet.el,0
-
-40helm.el,365
-(define-key helm-map (kbd "C-h") 'delete-backward-char)helm-map6,90
-(defun helm-occur-search-forward ()helm-occur-search-forward16,412
-(define-key helm-map (kbd "C-n") 'helm-occur-search-forward)helm-map20,519
-(defun helm-occur-search-previous ()helm-occur-search-previous22,581
-(define-key helm-map (kbd "C-p") 'helm-occur-search-previous)helm-map26,693
-
-20theme.el,0
-
-50vimrc.el,0
-
-04keybind.el,0
-
-10winner.el,42
-(defun winner-dwim (arg)winner-dwim3,17
-
-30paredit.el,0
-
-20company.el,659
-(define-key company-active-map (kbd "C-n") 'company-select-next)company-active-map13,366
-(define-key company-active-map (kbd "C-p") 'company-select-previous)company-active-map14,431
-(define-key company-search-map (kbd "C-n") 'company-select-next)company-search-map15,500
-(define-key company-search-map (kbd "C-p") 'company-select-previous)company-search-map16,565
-(define-key company-active-map (kbd "C-s") 'company-filter-candidates)company-active-map19,657
-(define-key company-active-map (kbd "C-i") 'company-complete-selection)company-active-map22,754
-(define-key emacs-lisp-mode-map (kbd "C-M-i") 'company-complete)emacs-lisp-mode-map25,904
-
-linux-path.el,0
-
-40anzu.el,0
-
-10org.el,210
-(define-key global-map (kbd "C-l o l") 'org-store-link)global-map1,0
-(define-key global-map (kbd "C-l o a") 'org-agenda)global-map2,56
-(define-key global-map (kbd "C-l o r") 'org-remember)global-map3,108
-
-flycheck_50vimrc.el,0
-
-40quickrun.el,0
-
-45flycheck-irony.el,0
-
-30region-wrap.el,0
-
-30end-mark.el,0
-
-01package.el,0
-
-linux-dired.el,0
-
-45helm-swoop.el,349
-(define-key helm-swoop-map (kbd "C-r") 'helm-previous-line)helm-swoop-map8,273
-(define-key helm-swoop-map (kbd "C-s") 'helm-next-line)helm-swoop-map9,333
-(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)isearch-mode-map12,446
-(define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)helm-swoop-map13,513
-
-45helm-etags.el,0
-
-40skk.el,139
-(define-key global-map (kbd "C-x C-j") 'skk-mode)global-map1,0
-(define-key global-map (kbd "C-x j") 'skk-auto-fill-mode)global-map2,50
-
-40evil.el,967
-(define-key evil-insert-state-map "\C-t" 'other-window-or-split)evil-insert-state-map7,124
-(define-key evil-normal-state-map "\C-t" 'other-window-or-split)evil-normal-state-map8,189
-(define-key evil-insert-state-map "\C-e" 'end-of-line)evil-insert-state-map9,254
-(define-key evil-normal-state-map "\C-e" 'end-of-line)evil-normal-state-map10,309
-(define-key evil-normal-state-map (kbd "J") (lambda ()evil-normal-state-map11,364
-(define-key evil-normal-state-map (kbd "K") (lambda ()evil-normal-state-map14,485
-(defun evil-swap-key (map key1 key2)evil-swap-key18,605
-(defun evil-open-above-without-indent (count)evil-open-above-without-indent33,1125
-(defun evil-open-below-without-indent (count)evil-open-below-without-indent45,1510
-(define-key evil-normal-state-map (kbd "M-O") 'evil-open-above-without-indent)evil-normal-state-map58,1929
-(define-key evil-normal-state-map (kbd "M-o") 'evil-open-below-without-indent)evil-normal-state-map59,2008
-
-40flycheck.el,0
-
-05customize.el,1251
-(defalias 'message-box 'message)message-box22,599
-(defalias 'yes-or-no-p 'y-or-n-p)yes-or-no-p26,740
-(defface my-face-b-1 '((t (:background "medium aquamarine"))) nil)my-face-b-154,1559
-(defface my-face-b-2 '((t (:background "gray"))) nil)my-face-b-255,1626
-(defface my-face-u-1 '((t (:foreground "SteelBlue" :underline t))) nil)my-face-u-156,1680
-(defvar my-face-b-1 'my-face-b-1)my-face-b-157,1752
-(defvar my-face-b-2 'my-face-b-2)my-face-b-258,1786
-(defvar my-face-u-1 'my-face-u-1)my-face-u-159,1820
-(defadvice font-lock-mode (before my-font-lock-mode ())font-lock-mode60,1854
-(defun iconify-emacs-when-server-is-done ()iconify-emacs-when-server-is-done80,2418
-(defun my-minibuffer-delete-parent-directory ()my-minibuffer-delete-parent-directory105,3354
-(define-key minibuffer-local-map (kbd "M-h") 'my-minibuffer-delete-parent-directory)minibuffer-local-map112,3589
-(defun my-count-lines-window ()my-count-lines-window114,3675
-(defun my-count-string-columns (str)my-count-string-columns130,4391
-(defadvice scroll-up (around scroll-up-relative activate)scroll-up136,4543
-(defadvice scroll-down (around scroll-down-relative activate)scroll-down142,4731
-(defun other-window-or-split ()other-window-or-split171,5685
-
-50python.el,0
-
-00startup.el,0
