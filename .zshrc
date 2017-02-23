@@ -22,6 +22,10 @@ watch="all"
 ## ログイン時にはすぐに表示する。
 log
 
+# history search
+bindkey '^P' history-beginning-search-backward
+bindkey '^N' history-beginning-search-forward
+
 ## 完全に削除。
 alias rr="command rm -rf"
 ## ファイル操作を確認する。
