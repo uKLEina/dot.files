@@ -10,13 +10,17 @@
 .dbus/
 .dmrc
 .emacs.d/#*#
+.emacs.d/ac-comphist.dat
 .emacs.d/auto-save-list/
 .emacs.d/backup/
 .emacs.d/history
+.emacs.d/recentf
+.emacs.d/smex-items
 .fonts/
 .gconf/
 .gitconfig
 .gnupg/
+.histfile
 .ipython/
 .jupyter/
 .local/
