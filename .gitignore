@@ -73,3 +73,4 @@ share/
 vimperator/
 vs2015/
 TAGS
+.emacs.d/server/
