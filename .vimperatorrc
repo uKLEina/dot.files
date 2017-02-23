@@ -1,0 +1,55 @@
+nnoremap U :undo<Space>
+noremap j 3j
+noremap k 3k
+nnoremap h <C-p>
+nnoremap l <C-n>
+inoremap <C-n> <Down>
+set focuscontent
+set ignorecase
+set hintchars=fjdkslaghrueiwoqptymvcxzbn
+
+" OS分岐
+" dをブラウザ標準の「タブを閉じる」にマッピング
+js<<EOM
+if(liberator.has("MacUnix")) {
+  liberator.execute("map d <M-w>");
+} else if(liberator.has("Win32")){
+  liberator.execute("map d <C-w>");
+} else {
+  liberator.execute("map d <C-w>");
+}
+EOM
+
+" C-8でstatuslineをトグル
+map <silent> <C-8> :js toggle_bottombar()<CR>
+
+:js << EOF
+function toggle_bottombar() {
+  var bb = document.getElementById('liberator-bottombar');
+  if (!bb)
+    return;
+  bb.style.height = (bb.style.height == '') ? '0px' : '';
+  bb.style.overflow = (bb.style.height == '') ? '' : 'hidden';
+}
+EOF
+
+" plugin_loader
+let g:plugin_loader_roots = "~/.vimperator/vimperator_plugins/"
+let g:plugin_loader_plugins = "_libly,feedSomeKeys_3"
+
+" feedSomeKeys
+command! -nargs=+ lazy autocmd VimperatorEnter .* <args>
+lazy fmaps -u='twitter\.com/.*' n f r t m o ? j k . g h p l c <Enter>
+
+" twitterperator
+nnoremap ,tt :<C-u>js commandline.open(":",["tw",buffer.title,buffer.URI].join(" "),modes.EX)<CR><C-a><Right><Right><Right><Space>/<Space><Left><Left><Left>
+" 読み込み完了メッセージ
+echo "vimperatorrc loaded."
+
+"============================
+" colorscheme
+"============================
+" デフォルトのヒント派手すぎ＞＜
+hi Hint font-family: Monospace; font-size: 15px; font-weight: bold; text-shadow: -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black, 1px 1px 2px black; color: #33cccc;
+hi HintElem color: gray; background-color: #a1e4e6;
+hi HintActive color: black; background-color: #ff8700;

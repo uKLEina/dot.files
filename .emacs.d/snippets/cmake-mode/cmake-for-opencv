@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: cmake-for-opencv
+# key: cvmake
+# --
+cmake_minimum_required(VERSION ${1:2.8})
+
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+include_directories(/usr/local/include/opencv2)
+include_directories(/usr/local/include/opencv)
+link_directories(/usr/local/lib)
+
+file(GLOB_RECURSE SRC_FILES "*.cpp")
+add_executable(${} \${SRC_FILES})

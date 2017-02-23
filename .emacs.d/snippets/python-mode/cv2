@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: cv2
+# key: cv2
+# --
+import cv2
