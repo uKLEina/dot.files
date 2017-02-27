@@ -34,8 +34,6 @@ alias cp="cp -i"
 alias mv="mv -i"
 
 ## 職場用
-## rsync でデータ同期
-alias rs="rsync -auvz nkob@172.17.31.121:/home/nkob/Documents/tanawari_ninshiki/resource/ /home/nkob/Documents/tanawari_ninshiki/resource/"
 
 # environments
 export EDITOR='emacsclient'
