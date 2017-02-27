@@ -40,8 +40,6 @@ alias rs="rsync -auvz nkob@172.17.31.121:/home/nkob/Documents/tanawari_ninshiki/
 # environments
 export EDITOR='emacsclient'
 export VISUAL='emacsclient'
-export PATH="/home/nkob/.cargo/bin:/home/nkob/opt/anaconda3/bin":$PATH
-export PYTHONPATH="/home/nkob/Documents/Python_Scripts/mypackage"
 
 # aliases
 setopt complete_aliases
@@ -111,3 +109,6 @@ RPROMPT=$RPROMPT'${vcs_info_msg_0_}'
 # zsh autosuggestion
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# 環境依存の内容は別ファイルに置いておく
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
