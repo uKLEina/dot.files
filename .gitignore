@@ -1,16 +1,22 @@
 # ignore all
-*
-*/
+/*
+/.*
 
 # allow any
-!.emacs.d/elisp/
-!.emacs.d/init.*
-!.emacs.d/inits/
-!.emacs.d/snippets/
-!.skk.d/
-!.tmux.conf
-!.vimperatorrc
-!_vimperatorrc
-!.zsh/
-!.zshrc
-!*.nodoka
+!/.gitignore
+!/.tmux.conf
+!/.vimperatorrc
+!/_vimperatorrc
+!/.zsh/
+!/.zshrc
+!/*.nodoka
+
+## emacs
+!/.emacs.d/
+/.emacs.d/*
+!/.emacs.d/elisp/
+!/.emacs.d/inits/
+!/.emacs.d/snippets/
+!init.el
+!init.elc
+!/.skk.d/
