@@ -20,3 +20,6 @@
 !init.el
 !init.elc
 !/.skk.d/
+/.skk.d/*
+!/.skk.d/init.el
+!/.skk.d/init.elc
