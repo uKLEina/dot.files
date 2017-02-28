@@ -17,8 +17,8 @@
 !/.emacs.d/elisp/
 !/.emacs.d/inits/
 !/.emacs.d/snippets/
-!init.el
-!init.elc
+!/.emacs.d/init.el
+!/.emacs.d/init.elc
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
