@@ -1911,7 +1911,7 @@ SKK の基本的な機能は、‘skk.el’ に収められています。一方
      SKK の学習機能のひとつで、ユーザの過去の入力から変換候補を予測しま
      す。
 
-     <https://github.com/skk-dev/ddskk/tree/master/bayesian>
+     *Note ベイズ統計を用いた学習::.
 
 ‘skk-cdb.el’
 
@@ -5763,8 +5763,8 @@ File: skk.info,  Node: ベイズ統計を用いた学習,  Prev: 候補の順序
 
 ‘skk-bayesian.el’ は、直前の履歴のみ使用する ‘skk-study.el’ に比べて、 更
 に拡張された学習機能です。ベイズ統計を用いて文脈から変換候補が選択される
-確率を 計算して候補順をソートします。‘skk-study.el’ との併用は、機能が重
-なるのでお 勧めできません。
+確率を 計算して候補順をソートします。なお、機能が重なることから
+‘skk-study.el’ と の併用はお勧めできません。
 
  動作の枠組みは emacs lisp の ‘skk-bayesian.el’ と ruby(1) スクリプト の
 ‘bskk’ が連携することで実現しています。
@@ -5772,37 +5772,47 @@ File: skk.info,  Node: ベイズ統計を用いた学習,  Prev: 候補の順序
  ‘skk-bayesian.el’ のインストールについては ‘bayesian/README.ja.md’ を 参
 照してください。
 
+ Ruby 2.4 以降を使用する場合は、DDSKK 16.2 以降に付属する
+‘bayesian/bskk’ を 使用してください。
+
  -- ユーザ変数: skk-bayesian-debug
 
      ‘non-nil’ ならば、以下のとおりデバッグ用のメッセージを表示します。
 
-     ‘skk-bayesian.el’ が吐き出すメッセージを *Messages* バッファに表示
-     します。
+        • ‘skk-bayesian.el’ が吐き出すメッセージを *Messages* バッファに
+          表示します。
 
-     ‘bskk’ サブプロセスを -d オプションで起動させます。‘bskk’ は
-     ‘$HOME/tmp/bskk.log’ にメッセージを吐き出します。
+        • ‘bskk’ サブプロセスを ‘-d’ オプションで起動させます。‘bskk’ は
+          ‘$HOME/tmp/bskk.log’ にメッセージを吐き出します。
 
-     普段は非表示である *skk-bayesian* バッファを表示するようにします。
+        • 普段は非表示である *skk-bayesian* バッファを表示するようにしま
+          す。このバッファには ‘bskk’ の出力が表示されます。
 
  -- ユーザ変数: skk-bayesian-prefer-server
 
      ‘non-nil’ ならば ‘skk-bayesian-host’ の ‘skk-bayesian-port’ に接 続
-     します。 ‘nil’ であれば bskk を emacs のサブプロセスとして立ち上げ
+     します。 ‘nil’ であれば ‘bskk’ を emacs のサブプロセスとして起動し
      ます。
 
  -- ユーザ変数: skk-bayesian-host
-     bskk サーバが稼動しているホスト名
+
+     ‘bskk’ サーバが稼動しているホスト名
 
  -- ユーザ変数: skk-bayesian-port
-     bskk サーバのポート番号
+
+     ‘bskk’ サーバのポート番号
 
  -- ユーザ変数: skk-bayesian-history-file
+     not documented
 
  -- ユーザ変数: skk-bayesian-corpus-make
+     not documented
 
  -- ユーザ変数: skk-bayesian-corpus-file
+     not documented
 
  -- Function: コマンド skk-bayesian-kill-process
+     not documented
 
    ---------- Footnotes ----------
 

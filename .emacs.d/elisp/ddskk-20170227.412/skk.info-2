@@ -2672,19 +2672,19 @@ File: skk.info,  Node: 変数索引,  Next: 関数索引,  Prev: 事項索引,  
 * skk-backup-jisyo:                      辞書の保存.          (line   6)
 * skk-backup-jisyo <1>:                  辞書ファイルの指定.  (line  31)
 * skk-bayesian-corpus-file:              ベイズ統計を用いた学習.
-                                                              (line  45)
+                                                              (line  53)
 * skk-bayesian-corpus-make:              ベイズ統計を用いた学習.
-                                                              (line  43)
+                                                              (line  50)
 * skk-bayesian-debug:                    ベイズ統計を用いた学習.
-                                                              (line  17)
+                                                              (line  20)
 * skk-bayesian-history-file:             ベイズ統計を用いた学習.
-                                                              (line  41)
+                                                              (line  47)
 * skk-bayesian-host:                     ベイズ統計を用いた学習.
-                                                              (line  35)
+                                                              (line  39)
 * skk-bayesian-port:                     ベイズ統計を用いた学習.
-                                                              (line  38)
+                                                              (line  43)
 * skk-bayesian-prefer-server:            ベイズ統計を用いた学習.
-                                                              (line  29)
+                                                              (line  33)
 * skk-byte-compile-init-file:            skk-init-fileの自動コンパイル.
                                                               (line   6)
 * skk-candidate-buffer-background-color: 変換候補一覧の表示方法.
@@ -3153,7 +3153,7 @@ File: skk.info,  Node: 関数索引,  Next: キー索引,  Prev: 変数索引,  
 * コマンド <1>:                          起動と終了.          (line  37)
 * コマンド <2>:                          起動と終了.          (line  42)
 * コマンド <3>:                          ベイズ統計を用いた学習.
-                                                              (line  47)
+                                                              (line  56)
 * コマンド <4>:                          サーバ関連.          (line  73)
 * コマンド <5>:                          アノテーションの登録.
                                                               (line   6)
@@ -3282,7 +3282,7 @@ File: skk.info,  Node: キー索引,  Prev: 関数索引,  Up: Top
 * M-x skk-annotation-remove:             アノテーションの登録.
                                                               (line   6)
 * M-x skk-bayesian-kill-process:         ベイズ統計を用いた学習.
-                                                              (line  47)
+                                                              (line  56)
 * M-x skk-count-jisyo-candidates:        変換及び個人辞書に関する統計.
                                                               (line  33)
 * M-x skk-customize:                     skk-customize による設定変更.
