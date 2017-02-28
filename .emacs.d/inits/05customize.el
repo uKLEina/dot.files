@@ -62,8 +62,8 @@
    major-mode
    '(
      ("　" 0 my-face-b-1 append)
-     ("\t" 0 my-face-b-2 prepend)
-     ("[ ]+$" 0 my-face-u-1 append)
+     ("\t" 0 my-face-u-1 prepend)
+     ("[ ]+$" 0 my-face-b-2 append)
      )))
 (ad-enable-advice 'font-lock-mode 'before 'my-font-lock-mode)
 (ad-activate 'font-lock-mode)
