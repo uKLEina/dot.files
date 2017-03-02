@@ -21,6 +21,8 @@ key *âpêî = &Default
 window Skype /Skype\.exe/ : EmacsEdit
 window Krile /krile\.exe/ : EmacsEdit
 
+window PgAdmin /pgadmin3\.exe/ : EmacsEdit
+
 # StarOffice/StarSuite/OpenOffice
 window StarOffice /soffice\.exe:SALFRAME$/ : EmacsEdit
 
