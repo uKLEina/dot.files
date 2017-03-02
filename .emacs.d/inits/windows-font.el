@@ -15,16 +15,15 @@
 ;;                   'katakana-jisx0201
 ;;                   (cons "Migu 1M" "iso10646-1"))
 
-
-;; (set-fontset-font (frame-parameter nil 'font)
-;;                   'japanese-jisx0208
-;;                   (font-spec :family "Migu 1M" :size 16))
-;; (set-fontset-font (frame-parameter nil 'font)
-;;                   'japanese-jisx0212
-;;                   (font-spec :family "Migu 1M" :size 16))
-;; (set-fontset-font (frame-parameter nil 'font)
-;;                   'katakana-jisx0201
-;;                   (font-spec :family "Migu 1M" :size 16))
+(set-fontset-font (frame-parameter nil 'font)
+                  'japanese-jisx0208
+                  (font-spec :family "Migu 1M" :size 16))
+(set-fontset-font (frame-parameter nil 'font)
+                  'japanese-jisx0212
+                  (font-spec :family "Migu 1M" :size 16))
+(set-fontset-font (frame-parameter nil 'font)
+                  'katakana-jisx0201
+                  (font-spec :family "Migu 1M" :size 16))
 
 (add-hook 'text-mode-hook
           '(lambda()
