@@ -1,9 +1,9 @@
 (set-face-attribute 'default nil
-					:family "Ricty"
-					:height 120)
+                    :family "Ricty"
+                    :height 120)
 (set-face-attribute 'variable-pitch nil
-					:family "Migu 1VS"
-					:height 120)
+                    :family "Migu 1VS"
+                    :height 105)
 
 ;; (set-fontset-font (frame-parameter nil 'font)
 ;;                   'japanese-jisx0208
@@ -27,17 +27,17 @@
 ;;                   (font-spec :family "Migu 1M" :size 16))
 
 (add-hook 'text-mode-hook
-		  '(lambda()
-			 (buffer-face-set 'variable-pitch)))
+          '(lambda()
+             (buffer-face-set 'variable-pitch)))
 (add-hook 'org-mode-hook
-		  '(lambda()
-			 (buffer-face-set 'default)))
+          '(lambda()
+             (buffer-face-set 'default)))
 (add-hook 'yatex-mode-hook
-		  '(lambda()
-			 (buffer-face-set 'default)))
+          '(lambda()
+             (buffer-face-set 'default)))
 (add-hook 'twittering-mode-hook
-		  '(lambda()
-			 (buffer-face-set 'variable-pitch)))
+          '(lambda()
+             (buffer-face-set 'variable-pitch)))
 (add-hook 'Info-mode-hook
-		  '(lambda()
-			 (buffer-face-set 'variable-pitch)))
+          '(lambda()
+             (buffer-face-set 'variable-pitch)))
