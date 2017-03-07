@@ -4,7 +4,7 @@
 
 ;; Author: Yasuyuki Oka <yasuyk@gmail.com>
 ;; Version: 0.1.1
-;; Package-Version: 20161121.2111
+;; Package-Version: 20170306.2113
 ;; URL: https://github.com/yasuyk/helm-company
 ;; Package-Requires: ((helm "1.5.9") (company "0.6.13"))
 
@@ -185,7 +185,6 @@ It is useful to narrow candidates."
   (unless company-candidates
     (company-complete))
   (when company-point
-    (company-complete-common)
     (helm :sources 'helm-source-company
           :buffer  "*helm company*"
           :candidate-number-limit helm-company-candidate-number-limit)))
