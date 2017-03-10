@@ -5,7 +5,6 @@
 (require 'helm-config)
 (define-key helm-map (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-x b") 'helm-for-files)
-(global-set-key (kbd "C-l C-b") 'helm-resume)
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (helm-autoresize-mode 1)
 

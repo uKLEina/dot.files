@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: getchild
+# key: getchild
+# --
+logger = parent_logger.getChild(inspect.currentframe().f_code.co_name)
