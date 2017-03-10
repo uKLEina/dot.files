@@ -9,11 +9,11 @@
 (define-key evil-insert-state-map "\C-e" 'end-of-line)
 (define-key evil-normal-state-map "\C-e" 'end-of-line)
 (define-key evil-normal-state-map (kbd "J") (lambda ()
-												(interactive)
-												(evil-scroll-line-down 1)))
+                                                (interactive)
+                                                (evil-scroll-line-down 1)))
 (define-key evil-normal-state-map (kbd "K") (lambda ()
-												(interactive)
-												(evil-scroll-line-up 1)))
+                                                (interactive)
+                                                (evil-scroll-line-up 1)))
 
 (defun evil-swap-key (map key1 key2)
   ;; MAP中のKEY1とKEY2を入れ替え
