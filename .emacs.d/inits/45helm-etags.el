@@ -15,3 +15,6 @@
 (global-set-key (kbd "M-,") 'helm-etags+-history-action-go-back)
 ;;go forward directly
 (global-set-key (kbd "M-/") 'helm-etags+-history-action-go-forward)
+
+;;; backward-forward
+(advice-add 'helm-etags+-select :before #'backward-forward-push-mark-wrapper)
