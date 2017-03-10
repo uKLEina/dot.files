@@ -20,7 +20,7 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (markdown-mode smartrep google-translate evil-paredit paredit vimrc-mode flycheck-irony company-irony cmake-mode irony region-bindings-mode expand-region python-mode helm-c-yasnippet yasnippet smartparens company-jedi py-autopep8 flycheck-pyflakes jedi ctags-update exec-path-from-shell helm-swoop helm-company helm-ag ddskk ripgrep helm-smex flycheck evil anzu resize-window quickrun highlight-symbol zenburn-theme migemo popwin auto-save-buffers-enhanced auto-compile init-loader))))
+    (point-undo markdown-mode smartrep google-translate evil-paredit paredit vimrc-mode flycheck-irony company-irony cmake-mode irony region-bindings-mode expand-region python-mode helm-c-yasnippet yasnippet smartparens company-jedi py-autopep8 flycheck-pyflakes jedi ctags-update exec-path-from-shell helm-swoop helm-company helm-ag ddskk ripgrep helm-smex flycheck evil anzu resize-window quickrun highlight-symbol zenburn-theme migemo popwin auto-save-buffers-enhanced auto-compile init-loader))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

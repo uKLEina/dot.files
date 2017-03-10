@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: logger
+# key: logger
+# --
+import logging
+import logging.config
+import logging.handlers
+import yaml
+
+logconfig = yaml.load(open("logconfig.yaml").read())
+logging.config.dictConfig(logconfig)
+
+main_logger = logging.getLogger(__name__)
