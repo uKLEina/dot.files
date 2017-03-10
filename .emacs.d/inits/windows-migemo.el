@@ -1,0 +1,13 @@
+(require 'migemo)
+(setq migemo-command "~/../../usr/local/bin/cmigemo.exe")
+(setq migemo-options '("-q" "--emacs" "-i" "\a"))
+(setq migemo-dictionary
+      (file-truename "~/../../usr/local/share/migemo/cp932/migemo-dict"))
+(setq migemo-user-dictionary nil)
+(setq migemo-regex-dictionary nil)
+(setq migemo-use-pattern-alist t)
+(setq migemo-use-frequent-pattern-alist t)
+(setq migemo-pattern-alist-length 1024)
+(setq migemo-coding-system 'cp932)
+(load-library "migemo")
+(migemo-init)
