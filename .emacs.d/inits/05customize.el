@@ -106,56 +106,51 @@
   "Delete one level of file path."
   (interactive)
   (let ((current-pt (point)))
-	(when (re-search-backward "/[^/]+/?" nil t)
-	  (forward-char 1)
-	  (delete-region (point) current-pt))))
+    (when (re-search-backward "/[^/]+/?" nil t)
+      (forward-char 1)
+      (delete-region (point) current-pt))))
 (define-key minibuffer-local-map (kbd "M-h") 'my-minibuffer-delete-parent-directory)
 
 (defun my-count-lines-window ()
   "Count lines relative to the selected window. The number of lines begins 0."
   (interactive)
   (let* ((window-string (buffer-substring-no-properties (window-start) (point)))
-		 (line-string-list (split-string window-string "\n"))
-		 (line-count 0)
-		 line-count-list)
-	(setq line-count (1- (length line-string-list)))
-	(unless truncate-lines      ; consider folding back
-	  ;; `line-count-list' is list of the number of physical lines which each logical line has.
-	  (setq line-count-list (mapcar #'(lambda (str)
-									   (/ (my-count-string-columns str) (window-width)))
-									line-string-list))
-	  (setq line-count (+ line-count (apply '+ line-count-list))))
-	line-count))
+         (line-string-list (split-string window-string "\n"))
+         (line-count 0)
+         line-count-list)
+    (setq line-count (1- (length line-string-list)))
+    (unless truncate-lines      ; consider folding back
+      ;; `line-count-list' is list of the number of physical lines which each logical line has.
+      (setq line-count-list (mapcar #'(lambda (str)
+                                       (/ (my-count-string-columns str) (window-width)))
+                                    line-string-list))
+      (setq line-count (+ line-count (apply '+ line-count-list))))
+    line-count))
 
 (defun my-count-string-columns (str)
   "Count columns of string. The number of column begins 0."
   (with-temp-buffer
-	(insert str)
-	(current-column)))
+    (insert str)
+    (current-column)))
 
 (defadvice scroll-up (around scroll-up-relative activate)
   "Scroll up relatively without move of cursor."
   (let ((line (my-count-lines-window)))
-	ad-do-it
-	(move-to-window-line line)))
+    ad-do-it
+    (move-to-window-line line)))
 
 (defadvice scroll-down (around scroll-down-relative activate)
   "Scroll down relatively without move of cursor."
   (let ((line (my-count-lines-window)))
-	ad-do-it
-	(move-to-window-line line)))
-
-;; bm.el - ブックマークを付ける
-(global-set-key (kbd "M-[") 'bm-previous)
-(global-set-key (kbd "M-]") 'bm-next)
-(global-set-key (kbd "M-SPC") 'bm-toggle)
+    ad-do-it
+    (move-to-window-line line)))
 
 ;;; check ip
 ;; (defun machine-ip-address (dev)
 ;;   "Return IP address of a network device."
 ;;   (let ((info (network-interface-info dev)))
-;; 	(if info
-;; 	  (format-network-address (car info) t))))
+;;  (if info
+;;    (format-network-address (car info) t))))
 
 ;; (defvar *network-interface-names* '("en1" "wlan0" "eth6")
 ;;   "Candidates for the network devices.")
@@ -163,9 +158,9 @@
 ;; (defun labp ()
 ;;   "If I'm in the lab, my IP address is:'192.168.(10|11).*'."
 ;;   (let ((ip (some #'machine-ip-address *network-interface-names*)))
-;; 	 (and ip
-;; 		  (eq 0 (or (string-match "^192\\.168\\.10\\." ip)
-;; 					(string-match "^192\\.168\\.11\\." ip))))))
+;;   (and ip
+;;        (eq 0 (or (string-match "^192\\.168\\.10\\." ip)
+;;                  (string-match "^192\\.168\\.11\\." ip))))))
 
 ;;; window
 (defun other-window-or-split ()
@@ -180,12 +175,6 @@
 
 ;;; eww
 (setq eww-search-prefix "https://www.google.co.jp/search?q=")
-;; test
-;; paredit
-(autoload 'enable-paredit-mode "paredit"
-  "Turn on pseudo-structural editing of Lisp code."
-  t)
-(add-hook 'M-mode-hook 'enable-paredit-mode)
 
 ;;; hippie expand source
 (setq hippie-expand-try-functions-list
