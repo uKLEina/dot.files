@@ -14,10 +14,9 @@
 (add-hook 'python-mode-hook
           (lambda ()
             (setq exec-path (append '("~/.virtualenvs/tanawari/Scripts") exec-path))
-            (setenv "PATH" (concat "~/.virtualenvs/tanawari/Scripts:" (getenv "PATH")))))
-(add-hook 'python-mode-hook
-          (lambda ()
-            ))
+            (setq exec-path (append '("~/.virtualenvs/tanawari/bin") exec-path))
+            (setenv "PATH" (concat "~/.virtualenvs/tanawari/Scripts:" (getenv "PATH")))
+            (setenv "PATH" (concat "~/.virtualenvs/tanawari/:bin" (getenv "PATH")))))
 (add-hook 'python-mode-hook 'jedi:setup)
 (add-hook 'python-mode-hook
           (lambda ()
