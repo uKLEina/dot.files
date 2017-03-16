@@ -13,10 +13,12 @@
 (define-key python-mode-map (kbd "C-M-i") 'jedi:complete)
 (add-hook 'python-mode-hook
           (lambda ()
-            (setq exec-path (append '("~/.virtualenvs/tanawari/Scripts") exec-path))
-            (setq exec-path (append '("~/.virtualenvs/tanawari/bin") exec-path))
-            (setenv "PATH" (concat "~/.virtualenvs/tanawari/Scripts:" (getenv "PATH")))
-            (setenv "PATH" (concat "~/.virtualenvs/tanawari/:bin" (getenv "PATH")))))
+            (cond ((file-exists-p "~/.virtualenvs/tanawari/Scripts")
+                   (setq exec-path (append '("~/.virtualenvs/tanawari/Scripts") exec-path))
+                   (setenv "PATH" (concat "~/.virtualenvs/tanawari/Scripts:" (getenv "PATH"))))
+                  ((file-exists-p "~/.virtualenvs/tanawari/bin")
+                   (setq exec-path (append '("~/.virtualenvs/tanawari/bin") exec-path))
+                   (setenv "PATH" (concat "~/.virtualenvs/tanawari/bin:" (getenv "PATH")))))))
 (add-hook 'python-mode-hook 'jedi:setup)
 (add-hook 'python-mode-hook
           (lambda ()
