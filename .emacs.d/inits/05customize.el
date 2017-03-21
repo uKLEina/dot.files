@@ -171,7 +171,7 @@
 
 (global-set-key (kbd "C-t") 'other-window-or-split)
 
-(if window-system (set-frame-parameter nil 'alpha 90))
+(if window-system (add-to-list 'default-frame-alist '(alpha . 90)))
 
 ;;; eww
 (setq eww-search-prefix "https://www.google.co.jp/search?q=")
