@@ -40,6 +40,8 @@
 (scroll-bar-mode 0)
 (menu-bar-mode 0)
 (setq require-final-newline t)
+;; デフォルト色付け
+(require 'generic-x)
 
 ;; ファイル名問い合わせで大文字小文字の区別をしない
 ;;;
