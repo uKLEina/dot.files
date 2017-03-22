@@ -1,5 +1,6 @@
 (require 'python-mode)
 
+;;; IDEてきなやついろいろ
 (require 'flycheck-pyflakes)
 (add-hook 'python-mode-hook 'flycheck-mode)
 
@@ -8,9 +9,11 @@
 (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
 
 (require 'jedi)
+;; きちゃないけどjedi用の環境を直接書いちゃう
 (setq jedi:environment-root "~/.virtualenvs/tanawari")
 (setq jedi:complete-on-dot t)
 (define-key python-mode-map (kbd "C-M-i") 'jedi:complete)
+;; pathも直接書いちゃう
 (add-hook 'python-mode-hook
           (lambda ()
             (cond ((file-exists-p "~/.virtualenvs/tanawari/Scripts")
@@ -25,10 +28,11 @@
             (setq ac-sources
                   (delete 'ac-source-words-in-same-mode-buffers ac-sources))))
 
-;;; docsting 参照をpopwinで出すようにする
+;; jediのdocstring参照をpopwinで出すようにする
 (require 'popwin)
 (push '("*jedi:doc*" :position bottom :width 30)
       popwin:special-display-config)
+
 ;;; M-. を使いたいのでevilのキーバインド解除
 (require 'evil)
 (add-hook 'python-mode-hook
