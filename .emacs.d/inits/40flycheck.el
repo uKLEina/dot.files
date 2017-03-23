@@ -1,5 +1,8 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
-;;; popwinで下側に出すようにする
+;;; エラーをツールチップで出す
+(with-eval-after-load 'flycheck
+  (flycheck-pos-tip-mode))
+;;; エラーリストはpopwinで下側に出すようにする
 (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
       popwin:special-display-config)
 ;;; デフォだとelispファイルのチェックが厳しすぎるので変更
