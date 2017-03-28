@@ -1,6 +1,16 @@
-;; ;;; windows用PATH設定
-;; ;;; windows-path.elから読み込む
-;; (setenv "PATH" "/d/data/bin:/d/data/Python/Scripts:/d/data/Python:/c/Users/DPC05009/.cargo/bin:/c/msys64/usr/local/bin:/c/msys64/mingw64/bin:/c/msys64/usr/bin:/c/Windows/system32:/c/Windows:/c/Windows/system32/Wbem:/c/Windows/system32/WindowsPowerShell/v1.0")
+;;; windows用PATH設定
+(when (string-equal system-type "windows-nt")
+  (setenv "PATH"
+          (concat
+           "C:\\msys64\\usr\\local\\bin" ";"
+           "C:\\msys64\\mingw64\\bin" ";"
+           "C:\\msys64\\usr\\bin" ";"
+           (getenv "PATH")))
+
+  (setq exec-path (append '("C:/msys64/usr/local/bin") exec-path))
+  (setq exec-path (append '("C:/msys64/mingw64/bin") exec-path))
+  (setq exec-path (append '("C:/msys64/usr/bin") exec-path)))
+
 
 ;; (setq exec-path '("d:/data/bin"))
 ;; (setq exec-path (append exec-path '("d:/data/Python/Scripts")))

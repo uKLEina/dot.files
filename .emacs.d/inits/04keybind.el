@@ -33,6 +33,8 @@
 (global-set-key (kbd "C-S-n") (lambda () (interactive) (scroll-up 1)))
 (global-set-key (kbd "C-S-p") (lambda () (interactive) (scroll-down 1)))
 
+(global-set-key (kbd "C-M-y") 'find-name-dired)
+
 ;; 自分用prefixはC-lで統一
 ;; 元のC-lはC-l C-lに
 (global-unset-key (kbd "C-l"))
