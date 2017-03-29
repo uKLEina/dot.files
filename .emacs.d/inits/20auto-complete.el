@@ -1,3 +1,4 @@
+(require 'auto-complete)
 (define-key ac-mode-map (kbd "C-M-i") 'auto-complete)
 (setq ac-use-menu-map t)
 (define-key ac-menu-map "\C-n" 'ac-next)
