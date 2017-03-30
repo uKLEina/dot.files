@@ -3,3 +3,4 @@
 (require 'flycheck-pyflakes)
 (add-hook 'python-mode-hook 'flycheck-mode)
 (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+(flycheck-add-next-checker 'python-pyflakes 'python-pylint)
