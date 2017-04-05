@@ -34,7 +34,7 @@ function toggle_bottombar() {
 EOF
 
 " plugin_loader
-let g:plugin_loader_roots = "~/.vimperator/vimperator_plugins/"
+let g:plugin_loader_roots = "~/.vimperator/vimperator-plugins/"
 let g:plugin_loader_plugins = "_libly,feedSomeKeys_3"
 
 " feedSomeKeys
