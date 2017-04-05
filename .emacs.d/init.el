@@ -20,7 +20,7 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (flycheck-pyflakes flycheck-pos-tip meghanada yaml-mode git-commit tuareg backward-forward zenburn-theme python-mode point-undo markdown-mode smartrep google-translate evil-paredit paredit vimrc-mode flycheck-irony company-irony cmake-mode irony region-bindings-mode expand-region helm-c-yasnippet smartparens company-jedi py-autopep8 jedi ctags-update exec-path-from-shell helm-swoop helm-company helm-ag ddskk ripgrep helm-smex flycheck evil anzu resize-window quickrun highlight-symbol migemo popwin auto-save-buffers-enhanced auto-compile init-loader))))
+    (flycheck-pos-tip company-quickhelp meghanada helm-company company-irony ac-helm ac-js2 js2-mode ac-php flycheck-pyflakes yaml-mode git-commit tuareg backward-forward zenburn-theme python-mode point-undo markdown-mode smartrep google-translate evil-paredit paredit vimrc-mode flycheck-irony cmake-mode irony region-bindings-mode expand-region helm-c-yasnippet smartparens py-autopep8 jedi ctags-update exec-path-from-shell helm-swoop helm-ag ddskk ripgrep helm-smex flycheck evil anzu resize-window quickrun highlight-symbol migemo popwin auto-save-buffers-enhanced auto-compile init-loader))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
