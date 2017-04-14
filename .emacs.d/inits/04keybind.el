@@ -33,11 +33,13 @@
 (global-set-key (kbd "C-S-n") (lambda () (interactive) (scroll-up 1)))
 (global-set-key (kbd "C-S-p") (lambda () (interactive) (scroll-down 1)))
 
-(global-set-key (kbd "C-M-y") 'find-name-dired)
-
 ;; 自分用prefixはC-lで統一
 ;; 元のC-lはC-l C-lに
 (global-unset-key (kbd "C-l"))
 (global-set-key (kbd "C-l C-l") 'recenter-top-bottom)
 (global-set-key (kbd "C-l C-x") 'server-edit)
 (global-set-key (kbd "C-l TAB") 'tab-to-tab-stop)
+;; find-file-at-pointは別キーバインドがいいな
+(global-set-key (kbd "C-x C-f") 'find-file)
+(global-set-key (kbd "C-l f") 'find-file-at-point)
+(global-set-key (kbd "C-l n") 'find-name-dired)
