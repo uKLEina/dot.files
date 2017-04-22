@@ -11,4 +11,4 @@
 
 (global-set-key (kbd "C-q") 'winner-dwim)
 ;; 元のC-q
-(global-set-key (kbd "C-x C-q") 'quoted-insert)
+(global-set-key (kbd "C-l C-q") 'quoted-insert)
