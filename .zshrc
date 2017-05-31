@@ -69,6 +69,7 @@ alias aptfu='apt full-upgrade'
 
 alias e='emacsclient'
 alias ps='ps auxfww'
+alias top='top -d 1'
 setopt hist_ignore_dups
 setopt share_history
 
