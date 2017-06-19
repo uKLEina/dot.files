@@ -4,7 +4,7 @@
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
 ;;;### (autoloads nil "company-meghanada" "company-meghanada.el"
-;;;;;;  (22851 35270 544714 44000))
+;;;;;;  (22855 14794 190366 617000))
 ;;; Generated autoloads from company-meghanada.el
 
 (autoload 'meghanada-company-enable "company-meghanada" "\
@@ -14,8 +14,8 @@ Enable auto completion with company.
 
 ;;;***
 
-;;;### (autoloads nil "eldoc-meghanada" "eldoc-meghanada.el" (22851
-;;;;;;  35270 556713 684000))
+;;;### (autoloads nil "eldoc-meghanada" "eldoc-meghanada.el" (22855
+;;;;;;  14794 274365 991000))
 ;;; Generated autoloads from eldoc-meghanada.el
 
 (autoload 'eldoc-meghanada-setup "eldoc-meghanada" "\
@@ -31,7 +31,7 @@ Enable eldoc for meghanada-mode.
 ;;;***
 
 ;;;### (autoloads nil "flycheck-meghanada" "flycheck-meghanada.el"
-;;;;;;  (22851 35270 568713 324000))
+;;;;;;  (22855 14794 318365 664000))
 ;;; Generated autoloads from flycheck-meghanada.el
 
 (autoload 'meghanada-flycheck-enable "flycheck-meghanada" "\
@@ -41,8 +41,8 @@ Enable flycheck for meghanada-mode.
 
 ;;;***
 
-;;;### (autoloads nil "meghanada" "meghanada.el" (22851 35270 536714
-;;;;;;  284000))
+;;;### (autoloads nil "meghanada" "meghanada.el" (22855 14794 142366
+;;;;;;  975000))
 ;;; Generated autoloads from meghanada.el
 
 (autoload 'meghanada-install-server "meghanada" "\
@@ -93,8 +93,8 @@ A better java development mode for Emacs (minor-mode).
 
 ;;;***
 
-;;;### (autoloads nil nil ("meghanada-pkg.el") (22851 35270 552713
-;;;;;;  804000))
+;;;### (autoloads nil nil ("meghanada-pkg.el") (22855 14794 234366
+;;;;;;  290000))
 
 ;;;***
 

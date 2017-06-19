@@ -3,8 +3,8 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "company" "company.el" (22851 35247 293410
-;;;;;;  916000))
+;;;### (autoloads nil "company" "company.el" (22855 17655 544280
+;;;;;;  555000))
 ;;; Generated autoloads from company.el
 
 (autoload 'company-mode "company" "\
@@ -74,8 +74,8 @@ inserted.
 
 ;;;***
 
-;;;### (autoloads nil "company-abbrev" "company-abbrev.el" (22851
-;;;;;;  35247 401407 682000))
+;;;### (autoloads nil "company-abbrev" "company-abbrev.el" (22855
+;;;;;;  17656 152273 684000))
 ;;; Generated autoloads from company-abbrev.el
 
 (autoload 'company-abbrev "company-abbrev" "\
@@ -85,8 +85,8 @@ inserted.
 
 ;;;***
 
-;;;### (autoloads nil "company-bbdb" "company-bbdb.el" (22851 35247
-;;;;;;  369408 640000))
+;;;### (autoloads nil "company-bbdb" "company-bbdb.el" (22855 17655
+;;;;;;  964275 808000))
 ;;; Generated autoloads from company-bbdb.el
 
 (autoload 'company-bbdb "company-bbdb" "\
@@ -96,8 +96,8 @@ inserted.
 
 ;;;***
 
-;;;### (autoloads nil "company-css" "company-css.el" (22851 35247
-;;;;;;  285411 156000))
+;;;### (autoloads nil "company-css" "company-css.el" (22855 17655
+;;;;;;  500281 53000))
 ;;; Generated autoloads from company-css.el
 
 (autoload 'company-css "company-css" "\
@@ -107,8 +107,8 @@ inserted.
 
 ;;;***
 
-;;;### (autoloads nil "company-dabbrev" "company-dabbrev.el" (22851
-;;;;;;  35247 329409 838000))
+;;;### (autoloads nil "company-dabbrev" "company-dabbrev.el" (22855
+;;;;;;  17655 756278 159000))
 ;;; Generated autoloads from company-dabbrev.el
 
 (autoload 'company-dabbrev "company-dabbrev" "\
@@ -119,7 +119,7 @@ dabbrev-like `company-mode' completion backend.
 ;;;***
 
 ;;;### (autoloads nil "company-dabbrev-code" "company-dabbrev-code.el"
-;;;;;;  (22851 35247 317410 197000))
+;;;;;;  (22855 17655 668279 154000))
 ;;; Generated autoloads from company-dabbrev-code.el
 
 (autoload 'company-dabbrev-code "company-dabbrev-code" "\
@@ -131,8 +131,8 @@ comments or strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-elisp" "company-elisp.el" (22851 35247
-;;;;;;  413407 323000))
+;;;### (autoloads nil "company-elisp" "company-elisp.el" (22855 17656
+;;;;;;  232272 780000))
 ;;; Generated autoloads from company-elisp.el
 
 (autoload 'company-elisp "company-elisp" "\
@@ -142,8 +142,8 @@ comments or strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-etags" "company-etags.el" (22851 35247
-;;;;;;  301410 676000))
+;;;### (autoloads nil "company-etags" "company-etags.el" (22855 17655
+;;;;;;  588280 58000))
 ;;; Generated autoloads from company-etags.el
 
 (autoload 'company-etags "company-etags" "\
@@ -153,8 +153,8 @@ comments or strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-files" "company-files.el" (22851 35247
-;;;;;;  337409 599000))
+;;;### (autoloads nil "company-files" "company-files.el" (22855 17655
+;;;;;;  796277 707000))
 ;;; Generated autoloads from company-files.el
 
 (autoload 'company-files "company-files" "\
@@ -166,8 +166,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-gtags" "company-gtags.el" (22851 35247
-;;;;;;  237412 593000))
+;;;### (autoloads nil "company-gtags" "company-gtags.el" (22855 17655
+;;;;;;  296283 358000))
 ;;; Generated autoloads from company-gtags.el
 
 (autoload 'company-gtags "company-gtags" "\
@@ -177,8 +177,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-ispell" "company-ispell.el" (22851
-;;;;;;  35247 409407 443000))
+;;;### (autoloads nil "company-ispell" "company-ispell.el" (22855
+;;;;;;  17656 188273 277000))
 ;;; Generated autoloads from company-ispell.el
 
 (autoload 'company-ispell "company-ispell" "\
@@ -188,8 +188,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-keywords" "company-keywords.el" (22851
-;;;;;;  35247 353409 119000))
+;;;### (autoloads nil "company-keywords" "company-keywords.el" (22855
+;;;;;;  17655 880276 757000))
 ;;; Generated autoloads from company-keywords.el
 
 (autoload 'company-keywords "company-keywords" "\
@@ -199,8 +199,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-nxml" "company-nxml.el" (22851 35247
-;;;;;;  377408 401000))
+;;;### (autoloads nil "company-nxml" "company-nxml.el" (22855 17656
+;;;;;;  8275 311000))
 ;;; Generated autoloads from company-nxml.el
 
 (autoload 'company-nxml "company-nxml" "\
@@ -210,8 +210,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-oddmuse" "company-oddmuse.el" (22851
-;;;;;;  35247 261411 874000))
+;;;### (autoloads nil "company-oddmuse" "company-oddmuse.el" (22855
+;;;;;;  17655 420281 957000))
 ;;; Generated autoloads from company-oddmuse.el
 
 (autoload 'company-oddmuse "company-oddmuse" "\
@@ -221,8 +221,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-semantic" "company-semantic.el" (22851
-;;;;;;  35247 245412 353000))
+;;;### (autoloads nil "company-semantic" "company-semantic.el" (22855
+;;;;;;  17655 324283 42000))
 ;;; Generated autoloads from company-semantic.el
 
 (autoload 'company-semantic "company-semantic" "\
@@ -232,8 +232,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-tempo" "company-tempo.el" (22851 35247
-;;;;;;  321410 78000))
+;;;### (autoloads nil "company-tempo" "company-tempo.el" (22855 17655
+;;;;;;  712278 656000))
 ;;; Generated autoloads from company-tempo.el
 
 (autoload 'company-tempo "company-tempo" "\
@@ -243,8 +243,8 @@ File paths with spaces are only supported inside strings.
 
 ;;;***
 
-;;;### (autoloads nil "company-xcode" "company-xcode.el" (22851 35247
-;;;;;;  393407 922000))
+;;;### (autoloads nil "company-xcode" "company-xcode.el" (22855 17656
+;;;;;;  88274 407000))
 ;;; Generated autoloads from company-xcode.el
 
 (autoload 'company-xcode "company-xcode" "\
@@ -255,7 +255,7 @@ File paths with spaces are only supported inside strings.
 ;;;***
 
 ;;;### (autoloads nil "company-yasnippet" "company-yasnippet.el"
-;;;;;;  (22851 35247 385408 161000))
+;;;;;;  (22855 17656 48274 859000))
 ;;; Generated autoloads from company-yasnippet.el
 
 (autoload 'company-yasnippet "company-yasnippet" "\
@@ -287,7 +287,7 @@ shadow backends that come after it.  Recommended usages:
 
 ;;;### (autoloads nil nil ("company-capf.el" "company-clang.el" "company-cmake.el"
 ;;;;;;  "company-eclim.el" "company-pkg.el" "company-template.el")
-;;;;;;  (22851 35247 361408 880000))
+;;;;;;  (22855 17655 920276 305000))
 
 ;;;***
 
