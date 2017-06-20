@@ -78,10 +78,10 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; server関連
-(require 'server)
-(defun iconify-emacs-when-server-is-done ()
-  (unless server-clients (iconify-frame)))
-(add-hook 'server-done-hook 'iconify-emacs-when-server-is-done)
+;; (require 'server)
+;; (defun iconify-emacs-when-server-is-done ()
+;;   (unless server-clients (iconify-frame)))
+;; (add-hook 'server-done-hook 'iconify-emacs-when-server-is-done)
 ;(defalias 'exit 'save-buffers-kill-emacs)
 
 ;; open URL in the browser
