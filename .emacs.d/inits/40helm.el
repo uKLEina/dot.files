@@ -16,13 +16,13 @@
   (interactive)
   (helm-next-line)
   (helm-execute-persistent-action))
-(define-key helm-map (kbd "C-n") 'helm-occur-search-forward)
+(define-key helm-map (kbd "C-M-n") 'helm-occur-search-forward)
 
 (defun helm-occur-search-previous ()
   (interactive)
   (helm-previous-line)
   (helm-execute-persistent-action))
-(define-key helm-map (kbd "C-p") 'helm-occur-search-previous)
+(define-key helm-map (kbd "C-M-p") 'helm-occur-search-previous)
 
 ;;; helm-smex
 (global-set-key [remap execute-extended-command] #'helm-smex)

@@ -32,11 +32,11 @@
 (push '("*jedi:doc*" :position bottom :width 30)
       popwin:special-display-config)
 
-;;; M-. を使いたいのでevilのキーバインド解除
+;;; evil fix
 (require 'evil)
 (add-hook 'python-mode-hook
           (lambda ()
-            (define-key evil-normal-state-map (kbd "M-.") nil)))
+            (evil-make-intercept-map jedi-mode-map)))
 (setq jedi:use-shortcuts t)
 
 (add-hook 'python-mode-hook #'smartparens-mode)
