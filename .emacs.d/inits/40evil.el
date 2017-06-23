@@ -57,3 +57,4 @@ The insertion will be repeated COUNT times."
 
 (define-key evil-normal-state-map (kbd "M-O") 'evil-open-above-without-indent)
 (define-key evil-normal-state-map (kbd "M-o") 'evil-open-below-without-indent)
+(define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
