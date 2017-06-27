@@ -3,8 +3,8 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "python-mode" "python-mode.el" (22851 35260
-;;;;;;  553013 671000))
+;;;### (autoloads nil "python-mode" "python-mode.el" (22865 41484
+;;;;;;  313325 543000))
 ;;; Generated autoloads from python-mode.el
 
 (autoload 'py-backward-class "python-mode" "\
@@ -216,8 +216,8 @@ Sets basic comint variables, see also versions-related stuff in `py-shell'.
 
 ;;;***
 
-;;;### (autoloads nil nil ("python-mode-pkg.el") (22851 35260 529014
-;;;;;;  390000))
+;;;### (autoloads nil nil ("python-mode-pkg.el") (22865 41484 229326
+;;;;;;  875000))
 
 ;;;***
 

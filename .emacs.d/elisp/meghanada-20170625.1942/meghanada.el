@@ -6,7 +6,7 @@
 ;; Author: Yutaka Matsubara (yutaka.matsubara@gmail.com)
 ;; Homepage: https://github.com/mopemope/meghanada-emacs
 ;; Keywords: languages java
-;; Package-Version: 0.7.13
+;; Package-Version: 0.8.1
 ;; Package-Requires: ((emacs "24.3") (yasnippet "0.6.1") (company "0.9.0") (flycheck "0.23"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -48,10 +48,11 @@
 ;; Const
 ;;
 
-(defconst meghanada-version "0.7.13")
+(defconst meghanada-version "0.8.1")
 (defconst meghanada--eot "\n;;EOT\n")
 (defconst meghanada--junit-buf-name "*meghanada-junit*")
 (defconst meghanada--task-buf-name "*meghanada-task*")
+(defconst meghanada--ref-buf-name "*meghanada-reference*")
 (defconst meghanada--install-err-buf-name "*meghanada-install-error*")
 
 ;;
@@ -351,15 +352,14 @@ function."
         meghanada--server-process)
     (setq meghanada--server-process (meghanada--start-server-process))))
 
-(defun meghanada--server-process-sentinel (process ignored)
-  "TODO: FIX DOC PROCESS IGNORED ."
+(defun meghanada--server-process-sentinel (process msg)
+  "TODO: FIX DOC PROCESS MSG ."
   (unless (process-live-p process)
     (set-process-sentinel process 'ignore)
     (set-process-filter process 'ignore)
-    (kill-buffer (process-buffer process))
     (delete-process process)
     (setq meghanada--server-process nil)
-    (error "Error:meghanada-server process stopped")))
+    (error (format "Error:meghanada-server process stopped: %s. Please check *meghanada-server-log* buffer" msg))))
 
 (defun meghanada--server-process-filter (process output)
   "TODO: FIX DOC PROCESS OUTPUT ."
@@ -461,25 +461,25 @@ function."
       meghanada--client-process
     (setq meghanada--client-process (meghanada--start-client-process))))
 
-(defun meghanada--client-process-sentinel (process ignored)
-  "TODO: FIX DOC PROCESS IGNORED."
+(defun meghanada--client-process-sentinel (process msg)
+  "TODO: FIX DOC PROCESS MSG."
   (unless (process-live-p process)
     (set-process-sentinel process 'ignore)
     (set-process-filter process 'ignore)
     (kill-buffer (process-buffer process))
     (delete-process process)
     (setq meghanada--client-process nil)
-    (error "Disconnected:meghanada-client process stopped")))
+    (error (format "Disconnected:meghanada-client process stopped: %s. Please check *meghanada-server-log* buffer" msg))))
 
-(defun meghanada--task-client-process-sentinel (process ignored)
-  "TODO: FIX DOC PROCESS IGNORED."
+(defun meghanada--task-client-process-sentinel (process msg)
+  "TODO: FIX DOC PROCESS MSG."
   (unless (process-live-p process)
     (set-process-sentinel process 'ignore)
     (set-process-filter process 'ignore)
     (kill-buffer (process-buffer process))
     (delete-process process)
     (setq meghanada--task-client-process nil)
-    (error "Disconnected:meghanada-task-client process stopped")))
+    (error (format "Disconnected:meghanada-task-client process stopped: %s. Please check *meghanada-server-log* buffer" msg))))
 
 (defun meghanada--process-client-response (process response)
   "TODO: FIX DOC PROCESS RESPONSE ."
@@ -845,6 +845,17 @@ function."
                                (buffer-file-name))
     (message "client connection not established")))
 
+(defun meghanada-diagnostic-string-async (callback)
+  "TODO: FIX DOC CALLBACK."
+  (let ((buf (buffer-file-name))
+        (tmp (meghanada--write-tmpfile)))
+    (if (and meghanada--client-process (process-live-p meghanada--client-process))
+        (meghanada--send-request "dl"
+                                 callback
+                                 buf
+                                 tmp)
+      (message "client connection not established"))))
+
 ;;
 ;; meghanada interactive-command (async)
 ;;
@@ -1011,6 +1022,21 @@ function."
         (meghanada--send-request-process "rt" meghanada--task-client-process #'meghanada--junit-callback args))
     (message "client connection not established")))
 
+(defun meghanada-exec-main ()
+  "TODO: FIX."
+  (interactive)
+  (unless (process-live-p meghanada--task-client-process)
+    (setq meghanada--task-client-process (meghanada--start-task-client-process)))
+
+  (if (and meghanada--task-client-process (process-live-p meghanada--task-client-process))
+      (let ((file (buffer-file-name)))
+        (meghanada--kill-buf meghanada--task-buf-name)
+        (meghanada--kill-buf meghanada--junit-buf-name)
+        (setq meghanada--task-buffer meghanada--task-buf-name)
+        (pop-to-buffer meghanada--task-buf-name)
+        (meghanada--send-request-process "em" meghanada--task-client-process #'meghanada--junit-callback file))
+    (message "client connection not established")))
+
 ;;
 ;; meghanada jump api
 ;;
@@ -1130,6 +1156,45 @@ function."
   "Beautify code before save."
   (when (meghanada-alive-p)
     (meghanada-code-beautify)))
+
+;;
+;; meghanada reference api
+;;
+
+(defun meghanada--reference-callback (messages)
+  "Show reference result."
+  (if messages
+      (with-current-buffer (get-buffer-create meghanada--ref-buf-name)
+        (setq buffer-read-only nil)
+        (save-excursion
+          (dolist (msg messages)
+            (insert (format "%s\n" msg))
+            (open-line 1))
+          (goto-char (point-min)))
+        (compilation-mode))
+    (progn
+      (meghanada--kill-buf meghanada--ref-buf-name)
+      (message "no reference found"))))
+
+(defun meghanada-reference ()
+  "Search for reference."
+  (interactive)
+  (if (and meghanada--server-process (process-live-p meghanada--server-process))
+      (let ((sym (meghanada--what-symbol))
+            (buf (buffer-file-name))
+            (line (meghanada--what-line))
+            (col (meghanada--what-column)))
+        (when sym
+          (progn
+            (meghanada--kill-buf meghanada--ref-buf-name)
+            (pop-to-buffer meghanada--ref-buf-name)
+            (message "searching ...")
+            (meghanada--send-request "re" #'meghanada--reference-callback
+                                     buf
+                                     line
+                                     col
+                                     (format "\"%s\"" sym)))))
+    (message "client connection not established")))
 
 ;;
 ;; meghanada-mode
