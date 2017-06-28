@@ -1,4 +1,5 @@
 (require 'flycheck)
+(require 'popwin)
 ;(add-hook 'after-init-hook #'global-flycheck-mode)
 ;;; エラーリストはpopwinで下側に出すようにする
 (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
