@@ -10,3 +10,5 @@
 (setq migemo-coding-system 'utf-8)
 (load-library "migemo")
 (migemo-init)
+
+(helm-migemo-mode 1)
