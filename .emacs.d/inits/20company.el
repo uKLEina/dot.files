@@ -1,6 +1,5 @@
+(require 'company)
 (company-quickhelp-mode +1)
-(custom-set-variables
- '(company-idle-delay 0))
 
 ;; C-n, C-pで補完候補を次/前の候補を選択
 (define-key company-active-map (kbd "C-n") 'company-select-next)

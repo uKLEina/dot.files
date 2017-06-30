@@ -4,6 +4,7 @@
   (when (memq major-mode '(c-mode c++-mode))
     'irony-mode))
 
+(require 'company)
 (eval-after-load "irony"
   '(progn
      (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))

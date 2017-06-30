@@ -1,4 +1,5 @@
 (require 'quickrun)
+(require 'popwin)
 (global-set-key (kbd "<f5>") 'quickrun)
 
 ;;; ipython
