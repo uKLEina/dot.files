@@ -1,4 +1,4 @@
-(define-package "ddskk" "20170630.317" "Simple Kana to Kanji conversion program."
+(define-package "ddskk" "20170705.533" "Simple Kana to Kanji conversion program."
   '((ccc "1.43")
     (cdb "20141201.754")))
 ;; Local Variables:
