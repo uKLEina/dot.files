@@ -3,8 +3,8 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "backward-forward" "backward-forward.el" (22722
-;;;;;;  20573 0 0))
+;;;### (autoloads nil "backward-forward" "backward-forward.el" (22884
+;;;;;;  8657 689499 563000))
 ;;; Generated autoloads from backward-forward.el
 
 (defvar backward-forward-mode nil "\

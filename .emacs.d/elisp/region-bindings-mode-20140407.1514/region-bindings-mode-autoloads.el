@@ -4,7 +4,7 @@
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
 ;;;### (autoloads nil "region-bindings-mode" "region-bindings-mode.el"
-;;;;;;  (22685 32834 365741 704000))
+;;;;;;  (22884 11718 145589 591000))
 ;;; Generated autoloads from region-bindings-mode.el
 
 (autoload 'region-bindings-mode "region-bindings-mode" "\

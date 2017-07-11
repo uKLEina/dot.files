@@ -5,7 +5,7 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(require 'init-loader "~/.emacs.d/elisp/init-loader/init-loader")
+(require 'init-loader "~/.emacs.d/elisp/init-loader-0.2/init-loader")
 (init-loader-load "~/.emacs.d/inits")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -20,7 +20,9 @@
  '(irony-additional-clang-options (quote ("-std=c++11")))
  '(package-selected-packages
    (quote
-    (helm-rtags rtags cmake-ide irony-eldoc clang-format sql-indent open-junk-file virtualenvwrapper imenu-list neotree zlc helm-gtags meghanada org plantuml-mode geben flycheck-pos-tip company-quickhelp helm-company company-irony ac-helm ac-js2 js2-mode ac-php flycheck-pyflakes yaml-mode git-commit tuareg backward-forward zenburn-theme python-mode point-undo markdown-mode smartrep google-translate evil-paredit paredit vimrc-mode flycheck-irony cmake-mode irony region-bindings-mode expand-region helm-c-yasnippet smartparens py-autopep8 jedi exec-path-from-shell helm-swoop helm-ag ddskk ripgrep helm-smex flycheck evil anzu resize-window quickrun highlight-symbol migemo popwin auto-save-buffers-enhanced auto-compile init-loader))))
+    (php-mode js2-mode use-package zlc zenburn-theme yaml-mode virtualenvwrapper vimrc-mode tuareg sql-indent smartrep smartparens ripgrep resize-window region-bindings-mode quickrun python-mode py-autopep8 popwin point-undo plantuml-mode org open-junk-file neotree migemo meghanada markdown-mode jedi irony-eldoc init-loader imenu-list highlight-symbol helm-swoop helm-smex helm-rtags helm-gtags helm-company helm-c-yasnippet helm-ag google-translate git-commit geben flycheck-pyflakes flycheck-pos-tip flycheck-irony expand-region exec-path-from-shell evil-paredit ddskk company-quickhelp company-irony cmake-mode cmake-ide clang-format backward-forward auto-save-buffers-enhanced auto-compile anzu ac-php ac-js2 ac-helm)))
+ '(rtags-display-result-backend "Helm")
+ '(rtags-popup-results-buffer t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

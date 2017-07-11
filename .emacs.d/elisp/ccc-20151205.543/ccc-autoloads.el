@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil "ccc" "ccc.el" (22674 44828 200459 284000))
+;;;### (autoloads nil "ccc" "ccc.el" (22884 8641 813711 549000))
 ;;; Generated autoloads from ccc.el
 
 (autoload 'ccc-setup "ccc" "\
