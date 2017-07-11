@@ -1,2 +1,4 @@
-(require 'popwin)
-(popwin-mode 1)
+(use-package popwin
+  :defer t
+  :commands (popwin-mode)
+  :init (popwin-mode 1))

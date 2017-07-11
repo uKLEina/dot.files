@@ -9,7 +9,8 @@
 ;;; util
 (savehist-mode 1)
 (setq-default save-place t)
-(require 'saveplace)
+(use-package saveplace
+  :defer t)
 (show-paren-mode 1)
 (display-time)
 (line-number-mode 1)
@@ -29,8 +30,9 @@
 (setq-default tab-width 4)
 (setq scroll-step 1)
 ;; when dabbrev distinguish capital and small letter
-(require 'dabbrev)
-(setq dabbrev-case-fold-search nil)
+(use-package dabbrev
+  :defer t
+  :config (setq dabbrev-case-fold-search nil))
 (setq initial-scratch-message "")
 (setq delete-auto-save-files t)
 ;; show filename and path in title bar
@@ -41,7 +43,8 @@
 (menu-bar-mode 0)
 (setq require-final-newline t)
 ;; デフォルト色付け
-(require 'generic-x)
+(use-package generic-x
+  :defer t)
 
 ;; ファイル名問い合わせで大文字小文字の区別をしない
 ;;;
@@ -77,20 +80,16 @@
 
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; server関連
-;; (require 'server)
-;; (defun iconify-emacs-when-server-is-done ()
-;;   (unless server-clients (iconify-frame)))
-;; (add-hook 'server-done-hook 'iconify-emacs-when-server-is-done)
-;(defalias 'exit 'save-buffers-kill-emacs)
 
 ;; open URL in the browser
 (ffap-bindings)
 
 ;; buffername in same filename
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-(setq uniquify-ignore-buffers "*[^*]+*")
+(use-package uniquify
+  :defer t
+  :init
+  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+  (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
 (setq backup-directory-alist '(("" . "~/.emacs.d/backup")))
@@ -124,7 +123,7 @@
     (unless truncate-lines      ; consider folding back
       ;; `line-count-list' is list of the number of physical lines which each logical line has.
       (setq line-count-list (mapcar #'(lambda (str)
-                                       (/ (my-count-string-columns str) (window-width)))
+                                        (/ (my-count-string-columns str) (window-width)))
                                     line-string-list))
       (setq line-count (+ line-count (apply '+ line-count-list))))
     line-count))
@@ -171,12 +170,14 @@
     (split-window-horizontally))
   (other-window 1))
 
-(global-set-key (kbd "C-t") 'other-window-or-split)
+(bind-key* "C-t" 'other-window-or-split)
 
 (if window-system (add-to-list 'default-frame-alist '(alpha . 90)))
 
 ;;; eww
-(setq eww-search-prefix "https://www.google.co.jp/search?q=")
+(use-package eww
+  :defer t
+  :config (setq eww-search-prefix "https://www.google.co.jp/search?q="))
 
 ;;; hippie expand source
 (setq hippie-expand-try-functions-list
@@ -185,15 +186,13 @@
         try-expand-dabbrev
         try-expand-dabbrev-all-buffers
         try-expand-dabbrev-from-kill))
+
 ;;; gdb
 ;;; 有用なバッファを開くモード
 (setq gdb-many-windows t)
-
 ;;; 変数の上にマウスカーソルを置くと値を表示
 (add-hook 'gdb-mode-hook '(lambda () (gud-tooltip-mode t)))
-
 ;;; I/O バッファを表示
 (setq gdb-use-separate-io-buffer t)
-
 ;;; t にすると mini buffer に値が表示される
 (setq gud-tooltip-echo-area nil)

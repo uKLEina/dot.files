@@ -1,5 +1,9 @@
 (require 'auto-complete)
-(define-key ac-mode-map (kbd "C-M-i") 'auto-complete)
-(setq ac-use-menu-map t)
-(define-key ac-menu-map "\C-n" 'ac-next)
-(define-key ac-menu-map "\C-p" 'ac-previous)
+(use-package auto-complete
+  :defer t
+  :config
+  (setq ac-use-menu-map t)
+  (bind-key "C-M-i" ac-mode-map)
+  (bind-keys :map ac-menu-map
+             ("C-n" . ac-next)
+             ("C-p" .ac-previous)))

@@ -1,1 +1,2 @@
-(global-set-key (kbd "C-l C-r") 'resize-window)
+(use-package resize-window
+  :bind (("C-l C-r" . resize-window)))

@@ -1,12 +1,18 @@
+(setq load-prefer-newer t)
 
+(setq package-user-dir "~/.emacs.d/elisp")
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(require 'init-loader "~/.emacs.d/elisp/init-loader-0.2/init-loader")
-(init-loader-load "~/.emacs.d/inits")
+(require 'use-package)
+
+(use-package init-loader
+  :defer t
+  :init (init-loader-load "~/.emacs.d/inits"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

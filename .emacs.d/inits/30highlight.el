@@ -1,6 +1,5 @@
-(require 'highlight-symbol)
-(setq highlight-symbol-idle-delay 0.75)
-(add-hook 'prog-mode-hook 'highlight-symbol-mode)
-(add-hook 'prog-mode-hook 'highlight-symbol-nav-mode)
-(global-set-key (kbd "M-#") 'highlight-symbol-query-replace)
-(global-set-key (kbd "C-l C-s") 'highlight-symbol)
+(use-package highlight-symbol
+  :config
+  (setq highlight-symbol-idle-delay 0.75)
+  :bind (("M-#" . highlight-symbol-query-replace)
+         ("C-l C-s" . highlight-symbol)))

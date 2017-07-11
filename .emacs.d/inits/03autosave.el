@@ -1,2 +1,2 @@
-(require 'auto-save-buffers-enhanced)
-(setq auto-save-buffers-enhanced-interval 15)
+(use-package auto-save-buffers-enhanced
+  :defer t)

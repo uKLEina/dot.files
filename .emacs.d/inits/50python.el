@@ -3,9 +3,6 @@
 
 ;;; virtualenv
 (require 'virtualenvwrapper)
-;; (require 'auto-virtualenvwrapper)
-;; (add-hook 'python-mode-hook #'auto-virtualenvwrapper-activate)
-;; (add-hook 'projectile-after-switch-project-hook #'auto-virtualenvwrapper-activate)
 
 ;;; IDEてきなやついろいろ
 (add-hook 'python-mode-hook 'flycheck-mode)
@@ -13,7 +10,7 @@
 
 (require 'py-autopep8)
 (setq py-autopep8-options '("--max-line-length=200"))
-(add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
+(define-key python-mode-map (kbd "C-l i") 'py-autopep8-buffer)
 
 (require 'jedi)
 ;;; jediの補完はPYTHONPATHを見てくれるらしい
