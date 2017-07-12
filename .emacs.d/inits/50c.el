@@ -1,5 +1,4 @@
 (use-package cc-mode
-  :defer t
   :mode (("\\.c\\'" . c-mode)
          ("\\.cpp\\'" . c++-mode)
          ("\\.h\\'" . c++-mode)
@@ -9,11 +8,11 @@
   :defer t
   :init
   (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
   (evil-make-intercept-map c++-mode-map)
-  (company-mode 1)
   (setq company-idle-delay 0)
   (bind-key "C-M-i" 'company-complete c++-mode-map)
   (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
