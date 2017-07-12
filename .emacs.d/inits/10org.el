@@ -1,4 +1,5 @@
 (use-package org
+  :defer t
   :init
   ;; reftex with org mode
   (add-hook 'org-mode-hook 'turn-on-reftex)
