@@ -10,6 +10,7 @@
 !/.zsh/
 !/.zshrc
 !/*.nodoka
+!/.aspell.conf
 !/.config/
 /.config/*
 !/.config/pep8

@@ -1,8 +1,15 @@
-;; TABで補完とか略語展開とかうまくdwimできないのでキーバインド変える&helm使う
-(require 'yasnippet)
-(require 'helm-c-yasnippet)
-(setq helm-yas-space-match-any-greedy t)
-(global-set-key (kbd "<C-tab>") 'yas-expand)
-(global-set-key (kbd "C-l y") 'helm-yas-complete)
-(push '("emacs.+/snippets/" . snippet-mode) auto-mode-alist)
-(yas-global-mode 1)
+(use-package yasnippet
+  :defer t
+  :init
+  (yas-global-mode 1)
+  :bind
+  (("<C-tab>" . yas-expand))
+  :config
+  (push '("emacs.+/snippets/" . snippet-mode) auto-mode-alist))
+
+(use-package helm-c-yasnippet
+  :defer t
+  :bind
+  (("C-l y" . helm-yas-complete))
+  :config
+  (setq helm-yas-space-match-any-greedy t))

@@ -1,38 +1,46 @@
-(require 'python-mode)
-(setq auto-mode-alist (cons '("\\.py\\'" . python-mode) auto-mode-alist))
+(use-package python-mode
+  :defer t
+  :mode (("\\.py\\'" . python-mode))
+  :config
+  (smartrep-define-key
+      python-mode-map "C-c"
+    '((">" . py-shift-right)
+      ("<" . py-shift-left)))
+  (bind-keys :map python-mode-map
+             ("C-l C-v" . venv-workon)
+             ("C-l i" . py-autopep8-buffer))
+  (when (eq system-type 'gnu/linux)
+    (setq flycheck-flake8-maximum-line-length 200)
+    (flycheck-add-next-checker 'python-flake8 'python-pylint)))
 
-;;; virtualenv
-(require 'virtualenvwrapper)
+(use-package virtualenvwrapper
+  :defer t)
 
-;;; IDEてきなやついろいろ
-(add-hook 'python-mode-hook 'flycheck-mode)
-(add-hook 'python-mode-hook #'smartparens-mode)
+(use-package py-autopep8
+  :defer t
+  :config
+  (setq py-autopep8-options '("--max-line-length=200")))
 
-(require 'py-autopep8)
-(setq py-autopep8-options '("--max-line-length=200"))
-(define-key python-mode-map (kbd "C-l i") 'py-autopep8-buffer)
+(use-package jedi
+  :defer t
+  :init
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq ac-sources
+                    (delete 'ac-source-words-in-same-mode-buffers ac-sources))))
+  :config
+  (setq jedi:complete-on-dot t)
+  (evil-make-intercept-map jedi-mode-map)
+  (setq jedi:use-shortcuts t)
+  (bind-key "C-M-i" 'jedi:complete python-mode-map)
+  (push '("*jedi:doc*" :position bottom :width 30)
+        popwin:special-display-config))
 
-(require 'jedi)
-;;; jediの補完はPYTHONPATHを見てくれるらしい
-(setq jedi:complete-on-dot t)
-(define-key python-mode-map (kbd "C-M-i") 'jedi:complete)
-(add-hook 'python-mode-hook 'jedi:setup)
-(add-hook 'python-mode-hook
-          (lambda ()
-            (setq ac-sources
-                  (delete 'ac-source-words-in-same-mode-buffers ac-sources))))
-
-;; jediのdocstring参照をpopwinで出すようにする
-(require 'popwin)
-(push '("*jedi:doc*" :position bottom :width 30)
-      popwin:special-display-config)
-
-;;; evil fix
-(require 'evil)
-(add-hook 'python-mode-hook
-          (lambda ()
-            (evil-make-intercept-map jedi-mode-map)
-            ;; (setenv "PATH" (concat (getenv "PYTHONPATH") ":" (getenv "PATH")))
-            ;; (exec-path-from-shell-copy-envs '("PATH" "VIRTUALENVWRAPPER_PYTHON" "WORKON_HOME" "PYTHONPATH"))
-            ))
-(setq jedi:use-shortcuts t)
+(use-package imenu
+  :defer t
+  :init
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq imenu-create-index-function 'py--imenu-create-index-new)
+              (setq py--imenu-create-index-p t))))

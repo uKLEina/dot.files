@@ -1,3 +1,2 @@
-;; commitメッセージ編集用色付け
-;; requireしとかないとgeneric-xが使われちゃうよ
-(require 'git-commit)
+(use-package git-commit
+  :mode (("COMMIT_EDITMSG" . git-commit-mode)))

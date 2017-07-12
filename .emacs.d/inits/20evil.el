@@ -3,10 +3,6 @@
   :init
   (evil-mode 1)
   :config
-  (add-hook 'neotree-mode-hook
-            (lambda ()
-              (evil-make-intercept-map neotree-mode-map)))
-
   ;; モードラインにevilのステートを表示、色も変更
   (use-package evil-mode-line)
 

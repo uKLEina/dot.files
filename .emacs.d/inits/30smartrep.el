@@ -1,11 +1,6 @@
-(require 'smartrep)
-(require 'python-mode)
-
-(smartrep-define-key
-    python-mode-map "C-c"
-  '((">" . py-shift-right)
-    ("<" . py-shift-left)))
-
-(smartrep-define-key
-    global-map "C-l"
-  '(("TAB" . tab-to-tab-stop)))
+(use-package smartrep
+  :commands (smartrep-define-key)
+  :config
+  (smartrep-define-key
+      global-map "C-l"
+    '(("<tab>" . tab-to-tab-stop))))

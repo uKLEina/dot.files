@@ -1,1 +1,2 @@
-(add-to-list 'auto-mode-alist '("\\vimperatorrc\\'" . vimrc-mode))
+(use-package vimrc-mode
+  :mode (("\\vimperatorrc\\'" . vimrc-mode)))

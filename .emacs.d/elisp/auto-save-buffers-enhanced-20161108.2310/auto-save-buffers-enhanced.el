@@ -113,7 +113,7 @@
 ;;;; You can customize auto-save-buffers-enhanced via the variables below
 ;;;; -------------------------------------------------------------------------
 
-(defvar auto-save-buffers-enhanced-interval 0.5
+(defvar auto-save-buffers-enhanced-interval 5
   "*Interval by the second.
 
 For that time, `auto-save-buffers-enhanced-save-buffers' is in

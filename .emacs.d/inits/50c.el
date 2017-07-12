@@ -1,40 +1,57 @@
-(require 'cc-mode)
-(require 'company)
-(require 'rtags)
-(require 'helm-rtags)
-(require 'clang-format)
-(require 'evil)
+(use-package cc-mode
+  :defer t
+  :mode (("\\.c\\'" . c-mode)
+         ("\\.cpp\\'" . c++-mode)
+         ("\\.h\\'" . c++-mode)
+         ("\\.hpp\\'" . c++-mode)))
 
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(use-package irony
+  :defer t
+  :init
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  :config
+  (evil-make-intercept-map c++-mode-map)
+  (company-mode 1)
+  (setq company-idle-delay 0)
+  (bind-key "C-M-i" 'company-complete c++-mode-map)
+  (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
+  (setq c-default-style "k&r")
+  (setq indent-tabs-mode nil)
+  (setq c-basic-offset 2))
 
-;;; c-mode-common-hook だと php-mode も入っちゃうので
-(defun c/c++-mode-hook-func ()
-  "Hook function for `c-mode' and `c++-mode'."
-  (when (memq major-mode '(c-mode c++-mode))
-    'irony-mode))
+(use-package company-irony
+  :defer t
+  :init
+  (add-hook 'irony-mode-hook
+            (lambda ()
+              (add-to-list 'company-backends 'company-irony))))
 
-(eval-after-load "irony"
-  '(progn
-     (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
-     (add-to-list 'company-backends 'company-irony)
-     (add-hook 'c-mode-hook 'c/c++-mode-hook-func)
-     (add-hook 'c++-mode-hook 'irony-mode)
-     (add-hook 'c++-mode-hook (lambda () (evil-make-intercept-map c++-mode-map)))
-     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-     (add-hook 'irony-mode-hook 'irony-eldoc)
-     (add-hook 'irony-mode-hook 'cmake-ide-setup)
-     (add-hook 'irony-mode-hook 'flycheck-mode)
-     (add-hook 'irony-mode-hook
-               (lambda ()
-                 (setq c-default-style "k&r")
-                 (setq indent-tabs-mode nil)
-                 (setq c-basic-offset 2)
-                 (company-mode 1)
-                 (setq company-idle-delay 0)))))
+(use-package irony-eldoc
+  :defer t
+  :init
+  (add-hook 'irony-mode-hook 'irony-eldoc))
 
+(use-package cmake-ide
+  :defer t
+  :init
+  (add-hook 'irony-mode-hook 'cmake-ide-setup))
 
-(define-key c++-mode-map (kbd "C-M-i") 'company-complete)
-(define-key c++-mode-map (kbd "C-l i") 'clang-format-buffer)
-(define-key c++-mode-map (kbd "M-.") 'rtags-find-symbol-at-point)
-(custom-set-variables '(rtags-display-result-backend "Helm"))
-(custom-set-variables '(rtags-popup-results-buffer t))
+(use-package flycheck-irony
+  :defer t
+  :init
+  (add-hook 'irony-mode-hook #'flycheck-irony-setup))
+
+(use-package clang-format
+  :defer t
+  :config
+  (bind-key "C-l i" 'clang-format-buffer c++-mode-map))
+
+(use-package rtags
+  :defer t
+  :config
+  (use-package helm-rtags)
+  (custom-set-variables '(rtags-display-result-backend "Helm"))
+  (custom-set-variables '(rtags-popup-results-buffer t))
+  (bind-key "M-." 'rtags-find-symbol-at-point c++-mode-map))

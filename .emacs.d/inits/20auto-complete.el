@@ -1,6 +1,7 @@
-(require 'auto-complete)
 (use-package auto-complete
   :defer t
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'auto-complete-mode)
   :config
   (setq ac-use-menu-map t)
   (bind-key "C-M-i" ac-mode-map)
