@@ -25,11 +25,9 @@
   :defer t
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (setq ac-sources
-                    (delete 'ac-source-words-in-same-mode-buffers ac-sources))))
   :config
+  (setq ac-sources
+        (delete 'ac-source-words-in-same-mode-buffers ac-sources))
   (setq jedi:complete-on-dot t)
   (evil-make-intercept-map jedi-mode-map)
   (setq jedi:use-shortcuts t)

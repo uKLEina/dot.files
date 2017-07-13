@@ -44,9 +44,11 @@ setopt complete_aliases
 
 alias sudo='sudo '
 
-alias ls='ls -hFC --color=auto --show-control-chars'
-alias la='ls -hAFC --color=auto --show-control-chars'
-alias ll='ls -hFC --color=auto --show-control-chars -l'
+alias ls='ls -hF --color=auto --show-control-chars --group-directories-first'
+alias la='ls -hFA --color=auto --show-control-chars --group-directories-first'
+alias ll='ls -hFl --color=auto --show-control-chars --group-directories-first'
+alias lal='ls -hFAl --color=auto --show-control-chars --group-directories-first'
+alias lla='ls -hFlA --color=auto --show-control-chars --group-directories-first'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
