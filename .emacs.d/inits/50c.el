@@ -47,13 +47,29 @@
 
 (use-package clang-format
   :defer t
-  :init
   )
+
+(use-package company-rtags
+  :commands (company-rtags)
+  :init
+  (add-hook 'rtags-mode-hook
+            (lambda ()
+              (when (rtags-is-indexed)
+                (setq rtags-autostart-diagnostics t)
+                (rtags-diagnostics)
+                (setq rtags-completions-enabled t)
+                (add-to-list 'company-backends 'company-rtags)))))
 
 (use-package rtags
   :defer t
+  :commands (rtags-is-indexed)
+  :init
+  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
   :config
-  (use-package helm-rtags)
-  (custom-set-variables '(rtags-display-result-backend "Helm"))
-  (custom-set-variables '(rtags-popup-results-buffer t))
-  (bind-key "M-." 'rtags-find-symbol-at-point c++-mode-map))
+  (when (rtags-is-indexed)
+    (helm-gtags-mode -1)
+    (use-package helm-rtags)
+    (custom-set-variables '(rtags-display-result-backend "Helm"))
+    (custom-set-variables '(rtags-popup-results-buffer t))
+    (unbind-key "M-." evil-normal-state-map)
+    (bind-key "M-." 'rtags-find-symbol-at-point c++-mode-map)))
