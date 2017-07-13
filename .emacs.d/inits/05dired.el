@@ -4,9 +4,9 @@
   ;; fix keybind for SKK
   (setq dired-bind-jump nil)
   (bind-key "r" 'wdired-change-to-wdired-mode dired-mode-map)
-  ;; ファイルのあるディレクトリを起点に Nautilus を開く
   (when (eq system-type 'gnu/linux)
-    (setq dired-listing-switches "-AFLDlh --group-directories-first")
+    (setq dired-listing-switches "-AFDlh --group-directories-first")
+    ;; ファイルのあるディレクトリを起点に Nautilus を開く
     (defun file-open-nautilus ()
       (interactive)
       (call-process "nautilus" nil nil nil "--no-desktop" "-n"
