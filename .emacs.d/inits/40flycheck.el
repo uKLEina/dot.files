@@ -5,6 +5,7 @@
   (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
   (add-hook 'js2-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode)
+  (add-hook 'meghanada-mode-hook 'flycheck-mode)
   :config
   (flycheck-pos-tip-mode)
   (smartrep-define-key

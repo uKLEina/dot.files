@@ -1,6 +1,7 @@
 (use-package meghanada
   :defer t
-  :init (add-hook 'java-mode-hook
+  :init
+  (add-hook 'java-mode-hook
                   (lambda ()
                     (meghanada-mode t)))
   :config
