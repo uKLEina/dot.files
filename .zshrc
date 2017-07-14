@@ -57,6 +57,7 @@ alias cp="cp -i"
 
 alias du='du -h'
 alias df='df -h'
+alias free='free -h'
 
 alias isomnt='mount -t iso9660 -o loop'
 
