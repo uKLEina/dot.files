@@ -73,3 +73,12 @@
     (custom-set-variables '(rtags-popup-results-buffer t))
     (unbind-key "M-." evil-normal-state-map)
     (bind-key "M-." 'rtags-find-symbol-at-point c++-mode-map)))
+
+(use-package company-c-headers
+  :defer t
+  :init
+  (add-hook 'company-mode-hook
+            (lambda ()
+              (add-to-list 'company-backends 'company-c-headers)))
+  :config
+  (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/"))

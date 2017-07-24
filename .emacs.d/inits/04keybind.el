@@ -39,8 +39,4 @@
 (global-set-key (kbd "C-l C-l") 'recenter-top-bottom)
 (global-set-key (kbd "C-l C-x") 'server-edit)
 (global-set-key (kbd "C-l <C-tab>") 'tab-to-tab-stop)
-;; find-file-at-pointは別キーバインドがいいな
-(global-unset-key (kbd "C-x C-f"))
-(global-set-key (kbd "C-x C-f") 'find-file)
-(global-set-key (kbd "C-l f") 'find-file-at-point)
-(global-set-key (kbd "C-l n") 'find-name-dired)
+(global-set-key (kbd "C-l C-n") 'find-name-dired)
