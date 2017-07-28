@@ -1,3 +1,4 @@
+
 (use-package cc-mode
   :mode (("\\.c\\'" . c-mode)
          ("\\.cpp\\'" . c++-mode)
@@ -11,12 +12,11 @@
   :defer t
   :init
   (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c++-mode-hook 'company-mode)
   (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'company-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
   (evil-make-intercept-map irony-mode-map)
-  (setq company-idle-delay 0)
   (bind-key "C-M-i" 'company-complete c++-mode-map)
   (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
   (setq c-default-style "k&r")
@@ -26,7 +26,7 @@
 (use-package company-irony
   :defer t
   :init
-  (add-hook 'irony-mode-hook
+  (add-hook 'company-mode-hook
             (lambda ()
               (add-to-list 'company-backends 'company-irony))))
 
@@ -61,8 +61,9 @@
                 (add-to-list 'company-backends 'company-rtags)))))
 
 (use-package rtags
+  :load-path "/usr/local/share/emacs/site-lisp/rtags/"
   :defer t
-  :commands (rtags-is-indexed)
+  :commands (rtags-is-indexed rtags-start-process-unless-running)
   :init
   (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
   :config

@@ -1,5 +1,6 @@
 (use-package yasnippet
   :defer t
+  :diminish yas-minor-mode
   :init
   (yas-global-mode 1)
   :bind

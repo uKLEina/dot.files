@@ -19,9 +19,15 @@
 (use-package ac-ispell
   :defer t)
 
+(use-package flyspell
+  :defer t
+  :diminish flyspell-mode)
+
 (use-package flyspell-correct
   :defer t
+  :diminish flyspell-correct-auto-mode
   :init
   (bind-key "C-M-;" 'flyspell-correct-word-generic)
   :config
-  (use-package flyspell-correct-helm))
+  (use-package flyspell-correct-helm)
+  (unbind-key "C-;" flyspell-mode-map))

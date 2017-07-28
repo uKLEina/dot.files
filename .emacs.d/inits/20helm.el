@@ -1,5 +1,6 @@
 (use-package helm
   :defer t
+  :diminish helm-migemo-mode
   :config
   (bind-key "C-h" 'delete-backward-char helm-map)
   (helm-autoresize-mode 1)
