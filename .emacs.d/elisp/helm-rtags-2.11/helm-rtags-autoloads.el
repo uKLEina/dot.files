@@ -3,7 +3,7 @@
 ;;; Code:
 (add-to-list 'load-path (directory-file-name (or (file-name-directory #$) (car load-path))))
 
-;;;### (autoloads nil nil ("helm-rtags.el") (22884 8595 994321 166000))
+;;;### (autoloads nil nil ("helm-rtags.el") (22906 32370 58135 502000))
 
 ;;;***
 

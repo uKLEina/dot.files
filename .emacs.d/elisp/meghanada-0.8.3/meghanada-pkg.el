@@ -1,4 +1,4 @@
-(define-package "meghanada" "0.8.2" "A better java development mode"
+(define-package "meghanada" "0.8.3" "A better java development mode"
   '((emacs "24.3")
     (yasnippet "0.6.1")
     (company "0.9.0")

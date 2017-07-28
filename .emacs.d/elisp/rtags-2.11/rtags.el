@@ -5,7 +5,7 @@
 ;; Author: Jan Erik Hanssen <jhanssen@gmail.com>
 ;;         Anders Bakken <agbakken@gmail.com>
 ;; URL: http://rtags.net
-;; Package-Version: 2.10
+;; Package-Version: 2.11
 ;; Version: 2.10
 
 ;; This file is not part of GNU Emacs.
@@ -68,8 +68,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Constants
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defconst rtags-protocol-version 122)
-(defconst rtags-package-version "2.10")
+(defconst rtags-protocol-version 124)
+(defconst rtags-package-version "2.11")
 (defconst rtags-popup-available (require 'popup nil t))
 (defconst rtags-supported-major-modes '(c-mode c++-mode objc-mode) "Major modes RTags supports.")
 (defconst rtags-verbose-results-delimiter "------------------------------------------")
@@ -283,7 +283,9 @@ the Customize interface, `rtags-set-periodic-reparse-timeout',
 
 (defcustom rtags-imenu-syntax-highlighting nil
   "Set to t to enable syntax highlight in rtags-imenu. If rtags-imenu-syntax-highlighting is set to a number this is considered the max number of lines to highlight"
-  :group 'rtags)
+  :group 'rtags
+  :type 'boolean
+  :safe 'booleanp)
 
 (defcustom rtags-wildcard-symbol-names t
   "Allow use of * and ? to match symbol names."
@@ -2734,13 +2736,13 @@ This includes both declarations and definitions."
 (defun rtags-find-symbol-current-file ()
   (interactive)
   (when (or (not (rtags-called-interactively-p)) (rtags-sandbox-id-matches))
-    (rtags-find-symbol t)))
+    (rtags-find-symbols-by-name-internal "Find rsymbol (current file)" "-F" buffer-file-name t)))
 
 ;;;###autoload
 (defun rtags-find-references-current-file ()
   (interactive)
   (when (or (not (rtags-called-interactively-p)) (rtags-sandbox-id-matches))
-    (rtags-find-references t)))
+    (rtags-find-symbols-by-name-internal "Find rreferences (current file)" "-R" buffer-file-name t)))
 
 (defun rtags-dir-filter ()
   (concat (substring buffer-file-name 0 (string-match "[^/]*/?$" buffer-file-name)) "[^/]* "))
@@ -3350,7 +3352,7 @@ This includes both declarations and definitions."
                 (set-process-sentinel rtags-diagnostics-process 'rtags-diagnostics-sentinel)
                 (set-process-query-on-exit-flag rtags-diagnostics-process nil)
                 (rtags-clear-diagnostics)
-                (rtags-schedule-buffer-list-update)))))
+                (rtags-update-buffer-list)))))
         (when (and (called-interactively-p 'any) (rtags-is-running))
           (switch-to-buffer-other-window rtags-diagnostics-buffer-name)
           (other-window 1))))))
@@ -3559,7 +3561,7 @@ other window instead of the current one."
         (facemenu-set-face "header-line" start end))
       (insert "\n\n")
       (while category
-        (add-to-list 'rtags-taglist-locations (cons (line-number-at-pos) (cdar category)))
+        (push (cons (line-number-at-pos) (cdar category)) rtags-taglist-locations)
         (let* ((text (caar category))
                (len (length text)))
           (insert " " text "\n")
@@ -3576,7 +3578,7 @@ other window instead of the current one."
     (rtags-delete-rtags-windows)
     (rtags-location-stack-push)
     (setq rtags-taglist-locations nil)
-    (let* ((fn (rtags-buffer-file-name)) functions classes variables enums macros other)
+    (let ((fn (rtags-buffer-file-name)) functions classes variables enums macros other)
       (with-temp-buffer
         (rtags-call-rc :path fn :path-filter fn "-F" "--cursor-kind" "--display-name" "--no-context")
         ;; (message (buffer-string))
@@ -3589,14 +3591,27 @@ other window instead of the current one."
                       (loc-end (match-string-no-properties 3 line))
                       (text (match-string-no-properties 4 line))
                       (type (match-string-no-properties 5 line)))
-                  (add-to-list (cond ((or (string= type "FunctionDecl") (string= type "CXXMethod")
-                                          (string= type "CXXConstructor") (string= type "CXXDestructor")) 'functions)
-                                     ((or (string= type "ClassDecl") (string= type "StructDecl")) 'classes)
-                                     ((or (string= type "VarDecl") (string= type "FieldDecl") (string= type "ParmDecl")) 'variables)
-                                     ((or (string= type "EnumDecl") (string= type "EnumConstantDecl")) 'enums)
-                                     ((or (string= type "macro definition") (string= type "include directive")) 'macros)
-                                     (t 'other))
-                               (cons (concat text ":" linenum) (concat loc-start linenum loc-end))))))
+                  (push (cons (concat text ":" linenum) (concat loc-start linenum loc-end))
+                        (cond ((or (string= type "FunctionDecl")
+                                          (string= type "CXXMethod")
+                                          (string= type "CXXConstructor")
+                                          (string= type "CXXDestructor"))
+                                      functions)
+                                     ((or (string= type "ClassDecl")
+                                          (string= type "StructDecl"))
+                                      classes)
+                                     ((or (string= type "VarDecl")
+                                          (string= type "FieldDecl")
+                                          (string= type "ParmDecl"))
+                                      variables)
+                                     ((or (string= type "EnumDecl")
+                                          (string= type "EnumConstantDecl"))
+                                      enums)
+                                     ((or (string= type "macro definition")
+                                          (string= type "include directive"))
+                                      macros)
+                                     (t
+                                      other))))))
             (forward-line))))
       (when (or functions classes variables enums macros other)
         (when (not dest-window)
@@ -4383,8 +4398,8 @@ force means do it regardless of rtags-enable-unsaved-reparsing "
   (and rtags-completions-enabled
        (memq major-mode rtags-supported-major-modes)))
 
-(defconst rtags-paren-start ?()
-  (defconst rtags-paren-end ?))
+(defconst rtags-paren-start ?\()
+(defconst rtags-paren-end ?\))
 (defun rtags-find-arg (startpos argument)
   (let ((location (cdr (assoc 'location argument))))
     (when (string-match ".*:\\([0-9]+\\):\\([0-9]+\\):?" location)
@@ -4541,52 +4556,59 @@ See `rtags-get-summary-text' for details."
 (when rtags-tooltips-enabled
   (add-hook 'tooltip-functions 'rtags-display-tooltip-function))
 
-(defun rtags-set-buffers (buffers)
+(defvar rtags-pending-dead-buffers nil)
+(defvar rtags-pending-remove-buffers-timer nil)
+(defun rtags-kill-buffer-hook ()
+  "When killing a buffer that is indexable, inform rdm of the new
+set of buffers we are visiting."
+  (when rtags-enabled
+    (let ((name (rtags-buffer-file-name)))
+      (when (and name (funcall rtags-is-indexable (current-buffer)))
+        (push name rtags-pending-dead-buffers)
+        (unless rtags-pending-remove-buffers-timer
+          (setq rtags-pending-remove-buffers-timer
+                (run-with-idle-timer 1 nil
+                                     (lambda ()
+                                       (with-temp-buffer
+                                         (insert (mapconcat 'identity rtags-pending-dead-buffers "\n"))
+                                         (setq rtags-pending-dead-buffers nil)
+                                         (setq rtags-pending-remove-buffers-timer nil)
+                                         (rtags-call-rc :noerror t :silent-query t :unsaved (current-buffer) "--remove-buffers" "-")))))))))
+  t)
+
+(add-hook 'kill-buffer-hook 'rtags-kill-buffer-hook)
+
+(defun rtags-update-buffer-list ()
   "Send the list of indexable buffers to the rtags server, rdm,
 so it knows what files may be queried which helps with responsiveness.
 "
+  (interactive)
+  ;; (message "rtags-update-buffer-list")
   (when rtags-enabled
     (with-temp-buffer
       (mapc #'(lambda (x)
                 (when (funcall rtags-is-indexable x)
                   (insert (rtags-buffer-file-name x) "\n")))
-            buffers)
+            (buffer-list))
       (when (> (point-max) 1)
         (rtags-log (concat "--set-buffers files: "
                            (combine-and-quote-strings
                             (split-string (buffer-substring-no-properties (point-min) (point-max)) "\n" t)))))
       (rtags-call-rc :noerror t :silent-query t :silent t :path t :unsaved (current-buffer) "--set-buffers" "-"))))
 
-(defun rtags-kill-buffer-hook ()
-  "When killing a buffer that is indexable, inform rdm of the new
-set of buffers we are visiting."
-  (when (and (rtags-buffer-file-name)
-             (memq major-mode rtags-supported-major-modes))
-    (unless (file-directory-p default-directory)
-      (cd "/"))
-    (rtags-set-buffers (remove (current-buffer) (buffer-list))))
-  t)
-(add-hook 'kill-buffer-hook 'rtags-kill-buffer-hook)
-
-(defvar rtags-update-buffer-list-timer nil)
-(defun rtags-update-buffer-list ()
-  (interactive)
-  ;; (message "rtags-update-buffer-list")
-  (when rtags-update-buffer-list-timer
-    (cancel-timer rtags-update-buffer-list-timer)
-    (setq rtags-update-buffer-list-timer nil))
-  (rtags-set-buffers (buffer-list)))
-
-(defun rtags-schedule-buffer-list-update ()
-  ;; (message "rtags-schedule-buffer-list-update %s" (if rtags-update-buffer-list-timer "yes" "no"))
-  (unless rtags-update-buffer-list-timer
-    (setq rtags-update-buffer-list-timer (run-with-idle-timer 1 nil #'rtags-update-buffer-list))))
-
 (defun rtags-find-file-hook ()
   (interactive)
-  (when (rtags-buffer-file-name)
-    (rtags-schedule-buffer-list-update))
-  t)
+  (condition-case nil
+      (let ((name (rtags-buffer-file-name)))
+        (and rtags-enabled
+             name
+             (funcall rtags-is-indexable (current-buffer))
+             (with-temp-buffer
+               (rtags-call-rc :noerror t :output nil :silent-query t "--add-buffers" name))))
+    (error
+     t))
+    t)
+
 (add-hook 'find-file-hook 'rtags-find-file-hook)
 
 (defun rtags-insert-include (include)
