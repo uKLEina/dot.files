@@ -4,7 +4,7 @@
          ("\\.h\\'" . c++-mode)
          ("\\.hpp\\'" . c++-mode))
   :config
-  (bind-key "C-l i" 'clang-format-buffer c++-mode-map)
+  (bind-key "C-l i" 'clang-format-region c++-mode-map)
   (evil-make-intercept-map c++-mode-map))
 
 (use-package irony
