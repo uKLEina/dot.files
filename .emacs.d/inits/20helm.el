@@ -19,6 +19,11 @@
          ("C-x b" . helm-for-files)
          ("M-y" . helm-show-kill-ring)))
 
+(use-package helm-files
+  :defer t
+  :config
+  (bind-key "TAB" 'helm-execute-persistent-action helm-find-files-map))
+
 (use-package helm-config
   :defer t)
 
