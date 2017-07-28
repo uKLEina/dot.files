@@ -20,8 +20,15 @@
       (call-process "nautilus" nil 0 nil (dired-current-directory)))
     (bind-key "e" 'dired-open-nautilus dired-mode-map))
   (when (eq system-type 'windows-nt)
-    (setq ls-lisp-dirs-first t)))
+    (setq ls-lisp-dirs-first t))
+  (use-package dired-quick-sort
+    :commands (hydra-dired-quick-sort/body)
+    :init
+    (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map)))
 
-(use-package dired-quick-sort
+(use-package all-the-icons-dired
   :defer t
-  :init (dired-quick-sort-setup))
+  :diminish all-the-icons-dired-mode
+  :init
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+  )

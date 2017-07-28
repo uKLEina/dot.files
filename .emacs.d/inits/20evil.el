@@ -3,7 +3,7 @@
   :init
   (evil-mode 1)
   :config
-  ;; モードラインにevilのステートを表示、色も変更
+  ;; ;; モードラインにevilのステートを表示、色も変更
   (use-package evil-mode-line)
 
   (defun evil-swap-key (map key1 key2)

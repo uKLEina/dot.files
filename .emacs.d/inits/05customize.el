@@ -36,11 +36,14 @@
 (setq initial-scratch-message "")
 (setq delete-auto-save-files t)
 ;; show filename and path in title bar
-(setq frame-title-format "%b (%f)")
+(setq frame-title-format
+          '(buffer-file-name "%f"
+            (dired-directory dired-directory "%b")))
 ;; hide tool bar/scroll bar/menu bar
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
 (menu-bar-mode 0)
+(display-time-mode -1)
 (setq require-final-newline t)
 ;; デフォルト色付け
 (use-package generic-x

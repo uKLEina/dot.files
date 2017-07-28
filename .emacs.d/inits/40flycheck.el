@@ -9,9 +9,10 @@
   (add-hook 'meghanada-mode-hook 'flycheck-mode)
   :config
   (flycheck-pos-tip-mode)
-  (smartrep-define-key
-      flycheck-mode-map "C-c !"
-    '(("n" . flycheck-next-error)
-      ("p" . flycheck-previous-error)))
+  ;; (smartrep-define-key
+  ;;     flycheck-mode-map "C-c !"
+  ;;   '(("n" . flycheck-next-error)
+  ;;     ("p" . flycheck-previous-error)))
   (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
-        popwin:special-display-config))
+        popwin:special-display-config)
+  )
