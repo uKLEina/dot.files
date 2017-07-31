@@ -1,6 +1,5 @@
 (use-package flycheck
   :defer t
-  :diminish flycheck-mode
   :init
   (add-hook 'irony-mode-hook 'flycheck-mode)
   (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
