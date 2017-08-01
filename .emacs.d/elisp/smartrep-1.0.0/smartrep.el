@@ -37,12 +37,12 @@
 ;; 2012-01-06 Remove unnecessary cord.
 ;; 2012-01-06 read-key is replaced read-event for compatibility. thanks @tomy_kaira !!
 ;; 2012-01-11 Support function calling form. (buzztaiki)
-;;            Call interactively when command. (buzztaiki) 
+;;            Call interactively when command. (buzztaiki)
 ;;            Support unquoted function. (buzztaiki)
 ;; 2012-01-11 new command `smartrep-restore-original-position' `smartrep-quit' (rubikitch)
 ;;            add mode line notification (rubikitch)
 ;; 2012-01-12 add mode-line-color notification
-;;            
+;;
 
 ;;; Code:
 (eval-when-compile
@@ -75,12 +75,12 @@
 
 (defvar smartrep-original-position nil
   "A cons holding the point and window-start when smartrep is invoked.")
-
-(let ((cell (or (memq 'mode-line-position mode-line-format) 
-		(memq 'mode-line-buffer-identification mode-line-format))) 
+(let ((cell (or (memq 'mode-line-position mode-line-format)
+		(memq 'mode-line-buffer-identification mode-line-format)))
       (newcdr 'smartrep-mode-line-string))
-  (unless (member newcdr mode-line-format) 
-    (setcdr cell (cons newcdr (cdr cell)))))
+  (when cell
+    (unless (member newcdr mode-line-format)
+(setcdr cell (cons newcdr (cdr cell))))))
 
 (defun smartrep-define-key (keymap prefix alist)
   (when (eq keymap global-map)
@@ -96,7 +96,7 @@
 			       oa)))
 	      (fset obj (smartrep-map alist))
 	      (define-key keymap
-		(read-kbd-macro 
+		(read-kbd-macro
 		 (concat prefix " " (car x))) obj)))
 	  alist)))
 (put 'smartrep-define-key 'lisp-indent-function 2)
@@ -155,7 +155,7 @@
   (let* ((rawform (cdr (smartrep-filter char alist)))
          (form (smartrep-unquote rawform)))
     (cond
-     ((commandp form) 
+     ((commandp form)
       (setq this-command form)
       (unwind-protect
           (call-interactively form)
@@ -173,7 +173,7 @@
     (error
      (ding)
      (message "%s" (cdr err)))))
-    
+
 
 (defun smartrep-unquote (form)
   (if (and (listp form) (memq (car form) '(quote function)))
