@@ -85,23 +85,18 @@
          (day (format " %s" (remove-padding-zero (format-time-string "%d"))))
          (hour (format " %s" (remove-padding-zero (format-time-string "%I"))))
          (minute (format-time-string "%M")))
-    (concat "    "
-            (propertize
-             (concat
-              dow
-              ","
-              month
-              day
-              ","
-              hour
-              ":"
-              minute
-              (format-time-string "%p")
-              )
-             'help-echo "Show calendar"
-             'mouse-face '(:box 1)
-             'local-map (make-mode-line-mouse-map
-                         'mouse-1 (lambda () (interactive) (calendar)))))))
+    (propertize
+     (concat
+      hour
+      ":"
+      minute
+      (format-time-string "%p")
+      )
+     'help-echo "Show calendar"
+     'mouse-face '(:box 1)
+     'local-map (make-mode-line-mouse-map
+                 'mouse-1 (lambda () (interactive) (calendar))))
+    ))
 
 (use-package all-the-icons
   :config
@@ -117,7 +112,6 @@
             (custom-modeline-flycheck-status)
             (custom-modeline-icon-vc)
             (custom-modeline-minor-mode)
-            "    "
             (custom-modeline-linum-colnum)
             (custom-modeline-datetime)
             )))))
