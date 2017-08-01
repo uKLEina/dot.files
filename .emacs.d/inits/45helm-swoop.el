@@ -4,6 +4,8 @@
          ("M-I" . helm-swoop-back-to-last-point)
          ("C-c M-i" . helm-multi-swoop)
          ("C-x M-i" . helm-multi-swoop-all))
+  :init
+  (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map)
   :config
   (setq helm-multi-swoop-edit-save t)
   (setq helm-swoop-split-with-multiple-windows nil)
@@ -14,5 +16,4 @@
   (bind-keys :map helm-swoop-map
              ("C-r" . helm-previous-line)
              ("C-s" . helm-next-line)
-             ("M-i" . helm-multi-swoop-all-from-helm-swoop))
-  (bind-key "M-i" 'helm-swoop-from-isearch isearch-mode-map))
+             ("M-i" . helm-multi-swoop-all-from-helm-swoop)))
