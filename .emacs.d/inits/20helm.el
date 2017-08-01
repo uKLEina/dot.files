@@ -9,7 +9,6 @@
     (helm-next-line)
     (helm-execute-persistent-action))
   (define-key helm-map (kbd "C-M-n") 'helm-occur-search-forward)
-
   (defun helm-occur-search-previous ()
     (interactive)
     (helm-previous-line)
@@ -39,4 +38,6 @@
   :defer t
   :bind (("M-X" . helm-smex-major-mode-commands))
   :init
-  (global-set-key [remap execute-extended-command] #'helm-smex))
+  (global-set-key [remap execute-extended-command] #'helm-smex)
+  :config
+  (custom-set-variables '(helm-smex-show-bindings t)))
