@@ -1,8 +1,8 @@
 (defun custom-modeline-modified ()
   (let* ((config-alist
-          '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken" :height 1.0 :v-adjust -0.0)
-            ("-" all-the-icons-faicon-family all-the-icons-faicon "link" :height 1.0 :v-adjust -0.0)
-            ("%" all-the-icons-octicon-family all-the-icons-octicon "lock" :height 1.0 :v-adjust 0.1)))
+          '(("*" all-the-icons-faicon-family all-the-icons-faicon "chain-broken")
+            ("-" all-the-icons-faicon-family all-the-icons-faicon "link")
+            ("%" all-the-icons-octicon-family all-the-icons-octicon "lock")))
          (result (cdr (assoc (format-mode-line "%*") config-alist))))
     (propertize (apply (cadr result) (cddr result))
                 'face `(:family ,(funcall (car result))))))
@@ -14,7 +14,6 @@
               (propertize icon
                           'help-echo (format "Major-mode: `%s`" major-mode)
                           'face `(:height 1.0 :family ,(all-the-icons-icon-family-for-buffer))
-                          'display '(raise 0.01)
                           )))))
 
 (defun custom-modeline-flycheck-status ()
@@ -42,12 +41,9 @@
 (defun -custom-modeline-github-vc ()
   (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
     (concat
-     ;; (propertize (format " %s" (all-the-icons-alltheicon "git")) 'face `(:height 1.0) 'display '(raise -0.1))
-     ;; " · "
-     (propertize (format "  %s" (all-the-icons-octicon "git-branch"))
-                 'face `(:height 1.3 :family ,(all-the-icons-octicon-family))
-                 'display '(raise -0.1))
-     (propertize (format " <%s>" branch) 'face `(:height 1.0)))))
+     (propertize (format " %s" (all-the-icons-alltheicon "git")))
+     (propertize (format "<%s>" branch))
+     )))
 
 (defun -custom-modeline-svn-vc ()
   (let ((revision (cadr (split-string vc-mode "-"))))
@@ -62,25 +58,66 @@
      ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
      (t (format "%s" vc-mode)))))
 
+(defun custom-modeline-minor-mode ()
+  (let ((minor-modes (format-mode-line minor-mode-alist)))
+    (if (eq minor-modes "")
+        ""
+      (propertize (format " (%s)" (substring minor-modes 1))))))
+
+(defun custom-modeline-linum-colnum ()
+  (format " [L%s/%s C%s]" (format-mode-line "%l") (line-number-at-pos (point-max)) (format-mode-line "%c")))
+
+(defun custom-modeline-buffer-name ()
+  (let ((buffer-name (format-mode-line "%b")))
+    (if (string= (substring buffer-name 0 1) "*")
+        (format " %s" buffer-name)
+      (format " %s%s" default-directory buffer-name))))
+
+(defun remove-padding-zero (num)
+  (if (string= (substring num 0 1) "0")
+      (substring num 1)
+    num))
+
+(defun custom-modeline-datetime ()
+  (let* ((system-time-locale "C")
+         (dow (format "%s" (format-time-string "%a")))
+         (month (format " %s" (format-time-string "%b")))
+         (day (format " %s" (remove-padding-zero (format-time-string "%d"))))
+         (hour (format " %s" (remove-padding-zero (format-time-string "%I"))))
+         (minute (format-time-string "%M")))
+    (concat "    "
+            (propertize
+             (concat
+              dow
+              ","
+              month
+              day
+              ","
+              hour
+              ":"
+              minute
+              (format-time-string "%p")
+              )
+             'help-echo "Show calendar"
+             'mouse-face '(:box 1)
+             'local-map (make-mode-line-mouse-map
+                         'mouse-1 (lambda () (interactive) (calendar)))))))
+
 (use-package all-the-icons
   :config
   (setq mode-line-format
-        '("%e"
-          (:eval
+        '((:eval
            (concat
+            "%e"
             (custom-modeline-modified)
             "(%z)"
             " %IB"
             (custom-modeline-mode-icon)
-            " "
-            default-directory
-
-            " (L%l, C%c)"
-            " %P"
+            (custom-modeline-buffer-name)
             (custom-modeline-flycheck-status)
             (custom-modeline-icon-vc)
-            ))
-          " ["
-          minor-mode-alist
-          " ]"
-          )))
+            (custom-modeline-minor-mode)
+            "    "
+            (custom-modeline-linum-colnum)
+            (custom-modeline-datetime)
+            )))))
