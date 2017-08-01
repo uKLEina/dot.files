@@ -87,12 +87,12 @@
 ;; open URL in the browser
 (ffap-bindings)
 
-;; buffername in same filename
-(use-package uniquify
-  :defer t
-  :init
-  (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
-  (setq uniquify-ignore-buffers-re "*[^*]+*"))
+;; ;; buffername in same filename
+;; (use-package uniquify
+;;   :defer t
+;;   :init
+;;   (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+;;   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
 (setq backup-directory-alist '(("" . "~/.emacs.d/backup")))
