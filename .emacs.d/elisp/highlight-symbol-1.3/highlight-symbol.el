@@ -366,7 +366,8 @@ before if NLINES is negative."
           (setq highlight-symbol symbol)
           (highlight-symbol-add-symbol-with-face symbol 'highlight-symbol-face)
           (font-lock-fontify-buffer)
-          (highlight-symbol-count))))))
+          ;; (highlight-symbol-count)
+          )))))
 
 (defun highlight-symbol-mode-remove-temp ()
   "Remove the temporary symbol highlighting."
