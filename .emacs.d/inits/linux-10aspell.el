@@ -21,7 +21,11 @@
 
 (use-package flyspell
   :defer t
-  :diminish flyspell-mode)
+  :diminish flyspell-mode
+  :config
+  (unbind-key "C-M-i" flyspell-mode-map)
+  (unbind-key "C-;" flyspell-mode-map)
+  (unbind-key "C-," flyspell-mode-map))
 
 (use-package flyspell-correct
   :defer t
