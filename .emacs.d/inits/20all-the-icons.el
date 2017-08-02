@@ -98,6 +98,15 @@
                  'mouse-1 (lambda () (interactive) (calendar))))
     ))
 
+(defun custom-modeline-python-venv ()
+  (if (string= major-mode "python-mode")
+      (let ((venv-name (if (or (not (boundp 'venv-current-name))
+                               (eq venv-current-name nil))
+                           "GLOBAL"
+                         venv-current-name)))
+        (format " [venv: %s]" venv-name))
+    ""))
+
 (use-package all-the-icons
   :config
   (setq mode-line-format
@@ -111,6 +120,7 @@
             (custom-modeline-buffer-name)
             (custom-modeline-flycheck-status)
             (custom-modeline-icon-vc)
+            (custom-modeline-python-venv)
             (custom-modeline-minor-mode)
             (custom-modeline-linum-colnum)
             (custom-modeline-datetime)
