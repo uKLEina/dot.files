@@ -109,9 +109,10 @@
 
 (use-package all-the-icons
   :config
-  (setq mode-line-format
+  (setq-default mode-line-format
         '((:eval
            (concat
+            " "
             "%e"
             (custom-modeline-modified)
             "(%z)"
