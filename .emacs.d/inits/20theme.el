@@ -33,3 +33,11 @@
 (add-hook 'evil-emacs-state-exit-hook
           (lambda ()
             (set-face-background 'mode-line "gray15")))
+(add-hook 'switch-buffer-functions
+          (lambda (prev cur)
+            (let ((mode-line-color (pcase evil-state
+                                     (`normal "gray15")
+                                     (`insert "DarkOliveGreen")
+                                     (`visual "DarkCyan")
+                                     (`emacs "BlueViolet"))))
+              (set-face-background 'mode-line mode-line-color))))
