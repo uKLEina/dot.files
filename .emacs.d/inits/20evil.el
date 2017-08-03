@@ -3,9 +3,6 @@
   :init
   (evil-mode 1)
   :config
-  ;; ;; モードラインにevilのステートを表示、色も変更
-  (use-package evil-mode-line)
-
   (defun evil-swap-key (map key1 key2)
     ;; MAP中のKEY1とKEY2を入れ替え
     "Swap KEY1 and KEY2 in MAP."
