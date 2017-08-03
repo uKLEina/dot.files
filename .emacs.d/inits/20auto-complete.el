@@ -8,6 +8,4 @@
   (custom-set-variables '(ac-delay 0.05))
   (custom-set-variables '(ac-use-menu-map t))
   (ac-set-trigger-key "C-M-i")
-  (bind-keys :map ac-menu-map
-             ("C-n" . ac-next)
-             ("C-p" .ac-previous)))
+  )
