@@ -2,6 +2,7 @@
   :bind (("<f5>" . quickrun))
   :config
   ;; ipython
+  (custom-set-variables '(quickrun-timeout-seconds nil))
   (quickrun-add-command "ipython"
                         '((:command . "ipython")
                           (:exec . "%c %s"))
