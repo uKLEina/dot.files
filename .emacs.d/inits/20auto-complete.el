@@ -1,5 +1,6 @@
-(use-package auto-complete
+(use-package auto-complete-config
   :defer t
+  :commands (ac-emacs-lisp-mode-setup)
   :init
   (add-hook 'emacs-lisp-mode-hook 'auto-complete-mode)
   :config
