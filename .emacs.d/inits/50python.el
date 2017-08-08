@@ -26,6 +26,7 @@
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   :config
+  (setenv "PYTHONPATH" "~/Documents/opencv/opencv-3.3.0/modules/python/src2")
   (setq ac-sources
         (delete 'ac-source-words-in-same-mode-buffers ac-sources))
   (setq jedi:complete-on-dot t)
