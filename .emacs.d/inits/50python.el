@@ -35,7 +35,6 @@
   :config
   (setq jedi:complete-on-dot t)
   (evil-make-intercept-map jedi-mode-map)
-  (add-to-list 'ac-sources 'ac-source-yasnippet)
   (setq jedi:use-shortcuts t)
   (push '("*jedi:doc*" :position bottom :width 30)
         popwin:special-display-config)
