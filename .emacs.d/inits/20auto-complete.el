@@ -4,9 +4,9 @@
   :init
   (add-hook 'emacs-lisp-mode-hook 'auto-complete-mode)
   :config
-  (setq-default ac-sources '(ac-source-abbrev ac-source-dictionary ac-source-words-in-same-mode-buffers))
+  (use-package ac-dabbrev)
+  (setq-default ac-sources '(ac-source-filename ac-source-dabbrev ac-source-words-in-same-mode-buffers))
   (custom-set-variables '(ac-auto-start 2))
-  (custom-set-variables '(ac-delay 0.05))
+  (custom-set-variables '(ac-delay 0.01))
   (custom-set-variables '(ac-use-menu-map t))
-  (ac-set-trigger-key "C-M-i")
   )

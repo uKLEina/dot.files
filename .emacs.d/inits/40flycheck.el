@@ -8,6 +8,8 @@
   (add-hook 'python-mode-hook 'flycheck-mode)
   (add-hook 'meghanada-mode-hook 'flycheck-mode)
   :config
+  (when (string= major-mode "emacs-lisp-mode")
+    (add-to-list 'flycheck-disabled-checkers 'emacs-lisp-checkdoc))
   (flycheck-pos-tip-mode)
   (smartrep-define-key
       flycheck-mode-map "C-c !"

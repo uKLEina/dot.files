@@ -11,10 +11,17 @@
              ("C-l i" . py-autopep8-buffer))
   (when (eq system-type 'gnu/linux)
     (setq flycheck-flake8-maximum-line-length 200)
-    (flycheck-add-next-checker 'python-flake8 'python-pylint)))
+    (flycheck-add-next-checker 'python-flake8 'python-pylint))
+  )
 
-(use-package virtualenvwrapper
-  :defer t)
+;; (use-package virtualenvwrapper
+;;   :defer t
+;;   :config
+;;   (require 'virtualenvwrapper)
+;;   (venv-initialize-interactive-shells)
+;;   (venv-initialize-eshell)
+;;   (setq venv-location "~/.virtualenvs")
+;;   )
 
 (use-package py-autopep8
   :defer t
@@ -26,15 +33,13 @@
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   :config
-  (setenv "PYTHONPATH" "~/Documents/opencv/opencv-3.3.0/modules/python/src2")
-  (setq ac-sources
-        (delete 'ac-source-words-in-same-mode-buffers ac-sources))
   (setq jedi:complete-on-dot t)
   (evil-make-intercept-map jedi-mode-map)
+  (add-to-list 'ac-sources 'ac-source-yasnippet)
   (setq jedi:use-shortcuts t)
-  (bind-key "C-M-i" 'jedi:complete python-mode-map)
   (push '("*jedi:doc*" :position bottom :width 30)
-        popwin:special-display-config))
+        popwin:special-display-config)
+  )
 
 (use-package imenu
   :defer t
