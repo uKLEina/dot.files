@@ -14,14 +14,13 @@
     (flycheck-add-next-checker 'python-flake8 'python-pylint))
   )
 
-;; (use-package virtualenvwrapper
-;;   :defer t
-;;   :config
-;;   (require 'virtualenvwrapper)
-;;   (venv-initialize-interactive-shells)
-;;   (venv-initialize-eshell)
-;;   (setq venv-location "~/.virtualenvs")
-;;   )
+(use-package virtualenvwrapper
+  :defer t
+  :config
+  (venv-initialize-interactive-shells)
+  (venv-initialize-eshell)
+  (setq venv-location "~/.virtualenvs")
+  )
 
 (use-package py-autopep8
   :defer t
