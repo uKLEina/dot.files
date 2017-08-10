@@ -32,6 +32,7 @@
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   :config
+  (custom-set-variables '(jedi:tooltip-method nil))
   (setq jedi:complete-on-dot t)
   (evil-make-intercept-map jedi-mode-map)
   (setq jedi:use-shortcuts t)
