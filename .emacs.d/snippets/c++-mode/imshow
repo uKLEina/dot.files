@@ -1,0 +1,6 @@
+# key: imshow
+# name: imshow
+# --
+cv::imshow("$1", $2);
+cv::waitKey(0);
+cv::destroyAllWindows();$0
