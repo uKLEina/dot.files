@@ -404,7 +404,7 @@
 	  ((:url . "https://github.com/leoliu/ggtags")
 	   (:keywords "tools" "convenience"))])
  (gited .
-	[(0 3 2)
+	[(0 3 3)
 	 ((emacs
 	   (24 4))
 	  (cl-lib
