@@ -73,6 +73,10 @@ alias aptfu='apt full-upgrade'
 alias e='emacsclient'
 alias ps='ps auxfww'
 alias top='top -d 1'
+eval $(thefuck --alias fk)
+export THEFUCK_REQUIRE_CONFIRMATION=false
+export THEFUCK_ALTER_HISTORY=true
+
 setopt hist_ignore_dups
 setopt share_history
 
