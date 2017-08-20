@@ -1,5 +1,7 @@
 (use-package ac-octave
   :defer t
+  :mode (("\\.ml\\'" . tuareg-mode))
+  :mode
   :init
   (add-hook 'octave-mode-hook
             (lambda ()
