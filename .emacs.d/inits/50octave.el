@@ -1,8 +1,9 @@
 (use-package ac-octave
   :defer t
-  :mode (("\\.ml\\'" . tuareg-mode))
-  :mode
+  :mode (("\\.m\\'" . octave-mode))
   :init
   (add-hook 'octave-mode-hook
             (lambda ()
-              (setq ac-sources '(ac-complete-octave)))))
+              (setq ac-sources '(ac-complete-octave))))
+  (add-hook 'octave-mode-hook 'smartparens-mode)
+  )
