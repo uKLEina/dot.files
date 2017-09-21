@@ -33,6 +33,7 @@
   :config
   (custom-set-variables '(jedi:tooltip-method nil))
   (setq jedi:complete-on-dot t)
+  (setq ac-sources '(ac-source-jedi-direct))
   (evil-make-intercept-map jedi-mode-map)
   (setq jedi:use-shortcuts t)
   (push '("*jedi:doc*" :position bottom :width 30)
