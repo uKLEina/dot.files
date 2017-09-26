@@ -26,8 +26,9 @@ log
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
 
+# PATH
+path=(/usr/local/sbin(N-/) $path)
 
-## 職場用
 
 # environments
 export EDITOR='emacsclient'
