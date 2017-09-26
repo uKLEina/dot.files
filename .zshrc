@@ -100,7 +100,7 @@ case ${UID} in
 esac
 
 # prompt
-PROMPT="%B%F{blue}%m:%f%F{green}%n%f %% %b"
+PROMPT="%B%F{blue}%m:%f%F{green}%n%f %F{white}%%%f %b"
 RPROMPT="%F{yellow}[%~]%f"
 SPROMPT="correct: %R -> %r ? [n,y,a,e]: "
 
