@@ -199,3 +199,7 @@
 (setq gdb-use-separate-io-buffer t)
 ;;; t にすると mini buffer に値が表示される
 (setq gud-tooltip-echo-area nil)
+
+;;; eshell
+(eval-after-load "esh-module"
+    '(setq eshell-modules-list (delq 'eshell-ls (delq 'eshell-unix eshell-modules-list))))
