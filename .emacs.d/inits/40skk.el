@@ -5,7 +5,17 @@
   :init
   (setq skk-user-directory "~/.skk.d")
   :config
-  (setq skk-large-jisyo "~/.skk.d/dic/SKK-JISYO.L")
+  ;; 辞書
+  ;; skkserv
+  (setq skk-server-host "127.0.0.1")
+  (setq skk-server-portnum 1178)
+  ;; (setq skk-large-jisyo "~/.skk.d/dic/SKK-JISYO.L")
+  ;; 追加の辞書
+  ;; (setq skk-extra-jisyo-file-list
+  ;;       (list "~/.skk.d/dic/SKK-JISYO.geo"
+  ;;             "~/.skk.d/dic/SKK-JISYO.jinmei"
+  ;;             "~/.skk.d/dic/SKK-JISYO.propernoun"
+  ;;             "~/.skk.d/dic/SKK-JISYO.station"))
 
   ;; 補完候補のリスト表示
   (setq skk-dcomp-activate t)
@@ -18,12 +28,6 @@
   (setq skk-auto-insert-paren t)
   ;; 変換の学習
   (require 'skk-study)
-  ;; 追加の辞書
-  (setq skk-extra-jisyo-file-list
-        (list "~/.skk.d/dic/SKK-JISYO.geo"
-              "~/.skk.d/dic/SKK-JISYO.jinmei"
-              "~/.skk.d/dic/SKK-JISYO.propernoun"
-              "~/.skk.d/dic/SKK-JISYO.station"))
   ;; 変換候補を別バッファに表示
   (setq skk-show-candidates-always-pop-to-buffer t)
   ;; アノテーションを表示(C-iでWikipediaの解説を呼べる)
