@@ -16,6 +16,8 @@ URxvt.saveLines: 100000
 URxvt.depth: 32
 URxvt.fading: 40
 urxvt*colorMode: on
+urxvt*foreground: #dfdfdf
+urxvt*background: [80]#272727
 urxvt*colorBDMode: on
 urxvt*colorBD: #f2a22b
 urxvt*colorULMode: on
@@ -27,9 +29,7 @@ urxvt*highlightSelection: true
 
 ! colorscheme
 ! based on Tango
-urxvt*foreground: #dfdfdf
-urxvt*background: [80]#272727
-
+! modified to adapt grayish background
 urxvt*color0: #000000
 urxvt*color1: #cc0000
 urxvt*color2: #4e9a06
