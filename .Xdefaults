@@ -2,29 +2,26 @@
 urxvt.iso14755: false
 urxvt.iso14755_52: false
 
-URxvt.depth: 32
-URxvt.fading: 40
-
 urxvt*geometry: 96x32
-
 urxvt*scrollBar: false
 ! urxvt*scrollBar_right: true
 ! urxvt*scrollColor: #323232
-
 urxvt*cursorColor: #eeeeee
 !urxvt*underLine: on
-
 URxvt.pointerBlank: true
-
 URxvt.visualBell: true
 URxvt.saveLines: 100000
 
 ! color
+URxvt.depth: 32
+URxvt.fading: 40
 urxvt*colorMode: on
-urxvt*colorBDMode: off
-urxvt*colorULMode: off
-! urxvt*colorBD: lightyellow
-! urxvt*colorUL: yellow
+urxvt*colorBDMode: on
+urxvt*colorBD: #f2a22b
+urxvt*colorULMode: on
+urxvt*colorUL: #7fa9e8
+urxvt*colorITMode: on
+urxvt*colorIT: #40eb84
 urxvt*dynamicColors: off
 urxvt*highlightSelection: true
 
