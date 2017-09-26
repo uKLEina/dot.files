@@ -121,7 +121,7 @@
             (custom-modeline-buffer-name)
             (custom-modeline-flycheck-status)
             (custom-modeline-icon-vc)
-            ;; (custom-modeline-python-venv)
+            (custom-modeline-python-venv)
             (custom-modeline-minor-mode)
             (custom-modeline-linum-colnum)
             (custom-modeline-datetime)
