@@ -26,12 +26,6 @@ log
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
 
-## 完全に削除。
-alias rr="command rm -rf"
-## ファイル操作を確認する。
-alias rm="rm -i"
-alias cp="cp -i"
-alias mv="mv -i"
 
 ## 職場用
 
@@ -43,6 +37,13 @@ export VISUAL='emacsclient'
 setopt complete_aliases
 
 alias sudo='sudo '
+
+## 完全に削除。
+alias rr="command rm -rf"
+## ファイル操作を確認する。
+alias rm="rm -i"
+alias cp="cp -i"
+alias mv="mv -i"
 
 alias ls='ls -hF --color=auto --show-control-chars --group-directories-first'
 alias la='ls -hFA --color=auto --show-control-chars --group-directories-first'
@@ -76,6 +77,8 @@ alias top='top -d 1'
 eval $(thefuck --alias fk)
 export THEFUCK_REQUIRE_CONFIRMATION=false
 export THEFUCK_ALTER_HISTORY=true
+
+function showfont (){ fc-match "$@" -f "%{file}" | xargs display }
 
 setopt hist_ignore_dups
 setopt share_history
