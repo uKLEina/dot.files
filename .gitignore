@@ -16,6 +16,8 @@
 !/.config/pep8
 !/.config/pylintrc
 !/.config/flake8
+!/.config/pip
+!/.config/pip/pip.conf
 
 ## emacs
 !/.emacs.d/
