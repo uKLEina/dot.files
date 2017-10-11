@@ -1,5 +1,5 @@
 (set-face-attribute 'default nil
-                    :family "Ricty"
+                    :family "Ricty Discord"
                     :height 120)
 (set-face-attribute 'variable-pitch nil
                     :family "Migu 1VS"
