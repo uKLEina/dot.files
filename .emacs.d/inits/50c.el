@@ -1,4 +1,3 @@
-
 (use-package cc-mode
   :mode (("\\.c\\'" . c-mode)
          ("\\.cpp\\'" . c++-mode)
@@ -18,7 +17,7 @@
   :config
   (evil-make-intercept-map irony-mode-map)
   (bind-key "C-M-i" 'company-complete c++-mode-map)
-  (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
+  ;; (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
   (setq c-default-style "k&r")
   (setq indent-tabs-mode nil)
   (setq c-basic-offset 2))
@@ -66,14 +65,24 @@
   :commands (rtags-is-indexed rtags-start-process-unless-running)
   :init
   (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
   :config
   (when (rtags-is-indexed)
     (helm-gtags-mode -1)
     (use-package helm-rtags)
-    (custom-set-variables '(rtags-display-result-backend "Helm"))
+    (custom-set-variables '(rtags-display-result-backend "helm"))
     (custom-set-variables '(rtags-popup-results-buffer t))
     (unbind-key "M-." evil-normal-state-map)
-    (bind-key "M-." 'rtags-find-symbol-at-point c++-mode-map)))
+    (bind-keys :map c++-mode-map
+               ("M-." . rtags-find-symbol-at-point)
+               ("M-," . rtags-location-stack-back)
+               ("M-[" . rtags-find-symbol)
+               ("M-@" . rtags-find-references))
+    (bind-keys :map c-mode-map
+               ("M-." . rtags-find-symbol-at-point)
+               ("M-," . rtags-location-stack-back)
+               ("M-[" . rtags-find-symbol)
+               ("M-@" . rtags-find-references))))
 
 (use-package company-c-headers
   :defer t
