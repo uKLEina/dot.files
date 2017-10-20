@@ -69,20 +69,21 @@
   :config
   (when (rtags-is-indexed)
     (helm-gtags-mode -1)
+    (rtags-enable-standard-keybindings)
     (use-package helm-rtags)
-    (custom-set-variables '(rtags-display-result-backend "helm"))
+    (custom-set-variables '(rtags-display-result-backend "Helm"))
     (custom-set-variables '(rtags-popup-results-buffer t))
     (unbind-key "M-." evil-normal-state-map)
     (bind-keys :map c++-mode-map
                ("M-." . rtags-find-symbol-at-point)
                ("M-," . rtags-location-stack-back)
-               ("M-[" . rtags-find-symbol)
-               ("M-@" . rtags-find-references))
+               ("M-[" . rtags-next-match)
+               ("M-@" . rtags-previous-match))
     (bind-keys :map c-mode-map
                ("M-." . rtags-find-symbol-at-point)
                ("M-," . rtags-location-stack-back)
-               ("M-[" . rtags-find-symbol)
-               ("M-@" . rtags-find-references))))
+               ("M-[" . rtags-next-match)
+               ("M-@" . rtags-previous-match))))
 
 (use-package company-c-headers
   :defer t
