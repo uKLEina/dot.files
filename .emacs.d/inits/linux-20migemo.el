@@ -1,6 +1,4 @@
 (use-package migemo
-  :init
-  (load-library "migemo")
   :config
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs"))
@@ -11,4 +9,5 @@
   ;; (setq migemo-use-frequent-pattern-alist t)
   (setq migemo-pattern-alist-length 1024)
   (setq migemo-coding-system 'utf-8)
+  (load-library "migemo")
   (migemo-init))
