@@ -4,6 +4,7 @@
 
 # allow any
 !/.gitignore
+!/.zshenv
 !/.tmux.conf
 !/.vimperatorrc
 !/_vimperatorrc
