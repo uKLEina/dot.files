@@ -26,10 +26,6 @@ log
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
 
-# PATH
-path=(/usr/local/sbin(N-/) ~/.cargo/bin(N-/) $path)
-
-
 # environments
 export EDITOR='emacsclient'
 export VISUAL='emacsclient'
