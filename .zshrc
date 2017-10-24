@@ -122,3 +122,7 @@ source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # 環境依存の内容は別ファイルに置いておく
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
+if [ $SHLVL = 1 ];then
+  tmux
+fi
