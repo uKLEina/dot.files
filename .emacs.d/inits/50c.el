@@ -8,6 +8,28 @@
   (evil-make-intercept-map c++-mode-map)
   (evil-make-intercept-map c-mode-map))
 
+(use-package rtags
+  :load-path "/usr/local/share/emacs/site-lisp/rtags/"
+  :commands (rtags-start-process-unless-running)
+  :init
+  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+  :config
+  (helm-gtags-mode -1)
+  (rtags-enable-standard-keybindings)
+  (use-package helm-rtags)
+  (custom-set-variables '(rtags-display-result-backend "Helm"))
+  (custom-set-variables '(rtags-popup-results-buffer t))
+  (unbind-key "M-." evil-normal-state-map)
+  (bind-keys
+   ("M-." . rtags-find-symbol-at-point)
+   ("M-]" . rtags-find-references-at-point)
+   ("M-," . rtags-location-stack-back)
+   ("M-[" . rtags-next-match)
+   ("M-@" . rtags-previous-match))
+  (run-hooks 'rtags-mode-hook)
+  )
+
 (use-package irony
   :defer t
   :init
@@ -46,28 +68,6 @@
 
 (use-package clang-format
   :defer t
-  )
-
-(use-package rtags
-  :load-path "/usr/local/share/emacs/site-lisp/rtags/"
-  :commands (rtags-start-process-unless-running)
-  :init
-  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
-  (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
-  :config
-  (helm-gtags-mode -1)
-  (rtags-enable-standard-keybindings)
-  (use-package helm-rtags)
-  (custom-set-variables '(rtags-display-result-backend "Helm"))
-  (custom-set-variables '(rtags-popup-results-buffer t))
-  (unbind-key "M-." evil-normal-state-map)
-  (bind-keys
-   ("M-." . rtags-find-symbol-at-point)
-   ("M-]" . rtags-find-references-at-point)
-   ("M-," . rtags-location-stack-back)
-   ("M-[" . rtags-next-match)
-   ("M-@" . rtags-previous-match))
-  (run-hooks 'rtags-mode-hook)
   )
 
 (use-package company-rtags
