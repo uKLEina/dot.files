@@ -28,6 +28,7 @@
 !/.emacs.d/snippets/
 !/.emacs.d/init.el
 !/.emacs.d/init.elc
+!/.emacs.d/custom.el
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
