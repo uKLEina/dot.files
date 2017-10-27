@@ -1,21 +1,18 @@
-(setq load-prefer-newer t)
-(setq custom-file (locate-user-emacs-file "custom.el"))
-
 ;; portable setting
 (when load-file-name
   (setq user-emacs-directory (file-name-directory load-file-name)))
 
-;; ;; package.el setting
+(setq load-prefer-newer t)
+(setq custom-file (locate-user-emacs-file "custom.el"))
+
+;; package.el setting
 (require 'package)
 (setq package-archive-priorities
       '(("melpa-stable" . 30)
         ("org" . 20)
         ("gnu" . 10)
         ("melpa" . 0)))
-
 (package-initialize)
-
-(add-to-list 'load-path (locate-user-emacs-file "elisp"))
 
 ;;; initial el-get setting
 (add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
@@ -44,7 +41,6 @@
 ;; yasnippet
 (el-get-bundle yasnippet)
 (el-get-bundle helm-c-yasnippet)
-
 
 ;; AC/Company
 (el-get-bundle auto-complete)
@@ -147,10 +143,11 @@
 ;; theme
 (el-get-bundle color-theme-zenburn)
 
-(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+(add-to-list 'el-get-recipe-path (locate-user-emacs-file "el-get-user/recipes"))
 (el-get 'sync)
 
+;; load settings
 (require 'use-package)
 (use-package init-loader
   :config
-  (init-loader-load "~/.emacs.d/inits"))
+  (init-loader-load (locate-user-emacs-file "inits")))

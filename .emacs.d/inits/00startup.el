@@ -4,4 +4,4 @@
   :init (unless (server-running-p)
           (server-start)))
 
-(add-to-list 'load-path "~/.emacs.d/elisp/")
+(add-to-list 'load-path (locate-user-emacs-file "elisp"))
