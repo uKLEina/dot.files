@@ -7,11 +7,6 @@
 
 ;; ;; package.el setting
 (require 'package)
-;; (setq package-archives
-;;       '(("gnu" . "http://elpa.gnu.org/packages/")
-;;         ("melpa-stable" . "https://stable.melpa.org/packages/")
-;;         ("melpa" . "http://melpa.org/packages/")
-;;         ("org" . "http://orgmode.org/elpa/")))
 (setq package-archive-priorities
       '(("melpa-stable" . 30)
         ("org" . 20)
@@ -21,6 +16,8 @@
 (package-initialize)
 
 (add-to-list 'load-path (locate-user-emacs-file "elisp"))
+
+;;; initial el-get setting
 (add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
 (unless (require 'el-get nil 'noerror)
   (with-current-buffer
@@ -29,6 +26,7 @@
     (goto-char (point-max))
     (eval-print-last-sexp)))
 
+;;; packages to install
 ;; evil
 (el-get-bundle evil)
 (el-get-bundle paredit)
@@ -151,7 +149,6 @@
 
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
 (el-get 'sync)
-
 
 (require 'use-package)
 (use-package init-loader
