@@ -1,4 +1,0 @@
-# key: info
-# name: console-info
-# --
-console->info("$0");

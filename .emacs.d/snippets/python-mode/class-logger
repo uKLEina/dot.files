@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: class-logger
-# key: cl
-# --
-self.logger = logging.getLogger(__name__ + "." + self.__class__.__name__)

@@ -1,5 +1,0 @@
-# key: imshow
-# name: imshow
-# --
-plt.imshow(cv2.cvtColor($1, cv2.COLOR_BGR2RGB))
-plt.show()

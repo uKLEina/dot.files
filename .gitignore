@@ -23,13 +23,10 @@
 ## emacs
 !/.emacs.d/
 /.emacs.d/*
-!/.emacs.d/elisp/
-!/.emacs.d/inits/
-!/.emacs.d/snippets/
 !/.emacs.d/init.el
-!/.emacs.d/init.elc
-!/.emacs.d/custom.el
+!/.emacs.d/inits/
+/.emacs.d/inits/*
+!/.emacs.d/inits/*.el
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
-!/.skk.d/init.elc

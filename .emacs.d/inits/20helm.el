@@ -14,7 +14,8 @@
     (helm-previous-line)
     (helm-execute-persistent-action))
   (define-key helm-map (kbd "C-M-p") 'helm-occur-search-previous)
-  (helm-migemo-mode 1)
+  (with-eval-after-load 'migemo
+    (helm-migemo-mode 1))
   :bind (("C-x C-f" . helm-find-files)
          ("C-x b" . helm-for-files)
          ("M-y" . helm-show-kill-ring)))
