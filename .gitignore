@@ -30,3 +30,6 @@
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
+!/.skk.d/dic/
+/.skk.d/dic/*
+!/.skk.d/dic/SKK-JUSYO.*
