@@ -95,7 +95,7 @@
 ;;   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
-(setq backup-directory-alist '(("" . (locate-user-emacs-file "backup"))))
+(setq backup-directory-alist '(("" . "~/.emacs.d/backup")))
 (setq auto-save-file-name-transforms `((".*" ,(locate-user-emacs-file "backup") t)))
 
 ;; move to function difinition
