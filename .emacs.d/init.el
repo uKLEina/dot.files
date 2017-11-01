@@ -82,7 +82,7 @@
 (el-get-bundle auto-save)
 (el-get-bundle flyspell-correct)
 (el-get-bundle flyspell-correct-helm :type git :url "https://github.com/d12frosted/flyspell-correct.git" :depends (flyspell-correct helm))
-(el-get-bundle git-commit-mode)
+;; (el-get-bundle git-commit-mode)
 (el-get-bundle ddskk)
 (el-get-bundle image+)
 (el-get-bundle google-this)
@@ -100,6 +100,7 @@
 (el-get-bundle imenu-list)
 (el-get-bundle highlight-symbol)
 (el-get-bundle diminish)
+(el-get-bundle magit)
 
 ;; C/C++
 (el-get-bundle irony-mode)
