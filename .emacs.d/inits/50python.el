@@ -36,7 +36,7 @@
   (setq ac-sources '(ac-source-jedi-direct))
   (evil-make-intercept-map jedi-mode-map)
   (setq jedi:use-shortcuts t)
-  (push '("*jedi:doc*" :position bottom :width 30)
+  (push '("*jedi:doc*" :position bottom :height 80)
         popwin:special-display-config)
   )
 
