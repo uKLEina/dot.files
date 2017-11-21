@@ -1,7 +1,3 @@
-;; 諸々めんどくさいのでWindowsはもうPATH全部手動で書くことにした
-;; 環境依存なので _path.el に書いておいて読みこむ
-(load "_path")
-
 ;; shell の存在を確認
 (defun skt:shell ()
   (or (executable-find "zsh")
