@@ -100,7 +100,8 @@
 (el-get-bundle imenu-list)
 (el-get-bundle highlight-symbol)
 (el-get-bundle diminish)
-(el-get-bundle magit)
+(el-get-bundle magit
+  :info nil)                            ;windows fix
 
 ;; C/C++
 (el-get-bundle irony-mode)
