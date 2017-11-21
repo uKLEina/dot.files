@@ -21,7 +21,7 @@
 ;; 2つのファイルをマージする (ediff-merge-files)
 
 (global-set-key (kbd "C-m") 'newline-and-indent)
-(global-set-key (kbd "C-h") 'delete-backward-char)
+(define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-set-key (kbd "C-;") 'hippie-expand)
 (global-set-key (kbd "C-x p") (lambda ()
                                 (interactive)
