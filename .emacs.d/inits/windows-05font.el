@@ -1,19 +1,17 @@
 (set-face-attribute 'default nil
                     :family "Consolas"
-                    :height 105)
+                    :height 110)
 (set-face-attribute 'variable-pitch nil
                     :family "Migu 1VS"
-                    :height 105)
+                    :height 110)
 
-(set-fontset-font (frame-parameter nil 'font)
-                  'japanese-jisx0208
-                  (font-spec :family "Migu 1M" :size 16))
-(set-fontset-font (frame-parameter nil 'font)
-                  'japanese-jisx0212
-                  (font-spec :family "Migu 1M" :size 16))
-(set-fontset-font (frame-parameter nil 'font)
-                  'katakana-jisx0201
-                  (font-spec :family "Migu 1M" :size 16))
+(add-to-list 'face-font-rescale-alist '("Migu 1M" . 1.1))
+(set-fontset-font nil 'japanese-jisx0208
+                  (font-spec :family "Migu 1M"))
+(set-fontset-font nil 'japanese-jisx0212
+                  (font-spec :family "Migu 1M"))
+(set-fontset-font nil 'katakana-jisx0201
+                  (font-spec :family "Migu 1M"))
 
 (add-hook 'text-mode-hook
           '(lambda()
