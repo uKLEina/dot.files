@@ -95,10 +95,11 @@
 ;;   (setq uniquify-ignore-buffers-re "*[^*]+*"))
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
-(setq backup-directory-alist '(("" . "~/.emacs.d/backup")))
-(when (eq system-type 'gnu/linux)
-  (setq auto-save-file-name-transforms `((".*" ,(locate-user-emacs-file "backup") t)))
-  )
+(setq backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
+(setq auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
+;; バックアップまでの間隔も短くする
+(setq auto-save-timeout 15)
+(setq auto-save-interval 60)
 
 ;; move to function difinition
 ;; C-x F -> 関数定義へ移動
