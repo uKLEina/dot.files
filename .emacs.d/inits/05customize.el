@@ -1,4 +1,4 @@
-(setq set-mark-command-repeat-pop t);カーソルを移動したあとC-u C-SPC(連打)で戻れる
+(setq set-mark-command-repeat-pop t); カーソルを移動したあとC-u C-SPC(連打)で戻れる
 
 ;;; language environment
 (set-language-environment "Japanese")
@@ -37,8 +37,8 @@
 (setq delete-auto-save-files t)
 ;; show filename and path in title bar
 (setq frame-title-format
-          '(buffer-file-name "%f"
-            (dired-directory dired-directory "%b")))
+      '(buffer-file-name "%f"
+                         (dired-directory dired-directory "%b")))
 ;; hide tool bar/scroll bar/menu bar
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
@@ -96,7 +96,9 @@
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
 (setq backup-directory-alist '(("" . "~/.emacs.d/backup")))
-(setq auto-save-file-name-transforms `((".*" ,(locate-user-emacs-file "backup") t)))
+(when (eq system-type 'gnu/linux)
+  (setq auto-save-file-name-transforms `((".*" ,(locate-user-emacs-file "backup") t)))
+  )
 
 ;; move to function difinition
 ;; C-x F -> 関数定義へ移動
@@ -202,4 +204,4 @@
 
 ;;; eshell
 (eval-after-load "esh-module"
-    '(setq eshell-modules-list (delq 'eshell-ls (delq 'eshell-unix eshell-modules-list))))
+  '(setq eshell-modules-list (delq 'eshell-ls (delq 'eshell-unix eshell-modules-list))))
