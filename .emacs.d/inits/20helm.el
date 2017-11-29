@@ -42,3 +42,6 @@
   (global-set-key [remap execute-extended-command] #'helm-smex)
   :config
   (custom-set-variables '(helm-smex-show-bindings t)))
+
+(use-package helm-descbinds
+  :config (helm-descbinds-mode))

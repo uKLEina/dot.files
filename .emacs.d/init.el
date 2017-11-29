@@ -37,6 +37,7 @@
 (el-get-bundle helm-smex :type git :url "https://github.com/ptrv/helm-smex.git" :depends (helm smex))
 (el-get-bundle helm-gtags)
 (el-get-bundle helm-themes)
+(el-get-bundle helm-descbinds)
 
 ;; yasnippet
 (el-get-bundle yasnippet)
