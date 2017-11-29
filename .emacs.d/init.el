@@ -101,8 +101,10 @@
 (el-get-bundle imenu-list)
 (el-get-bundle highlight-symbol)
 (el-get-bundle diminish)
-(el-get-bundle magit
-  :info nil)                            ;windows fix
+(if (eq system-type 'windows-nt)
+    (el-get-bundle magit
+      :info nil)                        ;windows fix
+  (el-get-bundle magit))
 
 ;; C/C++
 (el-get-bundle irony-mode)
@@ -116,7 +118,7 @@
 
 ;; PHP
 (el-get-bundle php-mode)
-;(el-get-bundle geben)
+                                        ;(el-get-bundle geben)
 (el-get-bundle ac-php)
 
 ;; Python
