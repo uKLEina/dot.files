@@ -71,7 +71,7 @@
   (let ((buffer-name (format-mode-line "%b")))
     (if (string= (substring buffer-name 0 1) "*")
         (format " %s" buffer-name)
-      (format " %s%s" default-directory buffer-name))))
+      (format " %s" buffer-name))))
 
 (defun remove-padding-zero (num)
   (if (string= (substring num 0 1) "0")
@@ -124,5 +124,4 @@
             (custom-modeline-python-venv)
             (custom-modeline-minor-mode)
             (custom-modeline-linum-colnum)
-            (custom-modeline-datetime)
             )))))
