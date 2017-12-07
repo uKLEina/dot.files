@@ -17,6 +17,8 @@
                 (local-set-key (kbd "M-@") 'rtags-find-references)
                 (local-set-key (kbd "M-,") 'rtags-location-stack-back))))
   :config
+  (company-mode-on)
+  (auto-complete-mode -1)
   (evil-make-overriding-map c-mode-base-map)
   (evil-make-overriding-map c++-mode-map)
   (evil-make-overriding-map c-mode-map)
@@ -27,7 +29,8 @@
   (use-package company-rtags)
   (eval-after-load 'company
     '(add-to-list 'company-backends 'company-rtags))
-  (use-package flycheck-rtags))
+  (use-package flycheck-rtags)
+  )
 
 (use-package irony
   :defer t
@@ -36,10 +39,8 @@
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async)
+  (company-mode-on)
+  (auto-complete-mode -1)
   (use-package company-irony)
   (company-irony-setup-begin-commands)
   (use-package company-irony-c-headers)
