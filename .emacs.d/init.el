@@ -110,7 +110,7 @@
 (el-get-bundle irony-mode)
 (el-get-bundle irony-eldoc)
 (el-get-bundle company-irony)
-(el-get-bundle company-c-headers)
+(el-get-bundle company-irony-c-headers :type git :url "https://github.com/hotpxl/company-irony-c-headers.git")
 (el-get-bundle flycheck-irony)
 (el-get-bundle clang-format)
 (el-get-bundle cmake-ide)
