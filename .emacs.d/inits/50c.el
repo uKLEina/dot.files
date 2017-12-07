@@ -1,91 +1,50 @@
-(use-package cc-mode
-  :mode (("\\.c\\'" . c-mode)
-         ("\\.cpp\\'" . c++-mode)
-         ("\\.h\\'" . c++-mode)
-         ("\\.hpp\\'" . c++-mode))
-  :config
-  (bind-key "C-l i" 'clang-format-region c++-mode-map)
-  (evil-make-intercept-map c++-mode-map)
-  (evil-make-intercept-map c-mode-map))
-
 (use-package rtags
   :load-path "/usr/local/share/emacs/site-lisp/rtags/"
-  :commands (rtags-start-process-unless-running)
   :init
-  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
   (add-hook 'c-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'c++-mode-hook 'rtags-start-process-unless-running)
+  (add-hook 'objc-mode-hook 'rtags-start-process-unless-running)
+  (defun my-flycheck-rtags-setup ()
+    (flycheck-select-checker 'rtags)
+    (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
+    (setq-local flycheck-check-syntax-automatically nil))
+  (add-hook 'c-mode-common-hook #'my-flycheck-rtags-setup)
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (rtags-is-indexed)
+                (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
+                (local-set-key (kbd "M-;") 'rtags-find-symbol)
+                (local-set-key (kbd "M-@") 'rtags-find-references)
+                (local-set-key (kbd "M-,") 'rtags-location-stack-back))))
   :config
-  (helm-gtags-mode -1)
-  (rtags-enable-standard-keybindings)
-  (use-package helm-rtags)
-  (custom-set-variables '(rtags-display-result-backend "Helm"))
-  (custom-set-variables '(rtags-popup-results-buffer t))
-  (unbind-key "M-." evil-normal-state-map)
-  (bind-keys
-   ("M-." . rtags-find-symbol-at-point)
-   ("M-]" . rtags-find-references-at-point)
-   ("M-," . rtags-location-stack-back)
-   ("M-[" . rtags-next-match)
-   ("M-@" . rtags-previous-match))
-  (run-hooks 'rtags-mode-hook)
-  )
+  (evil-make-overriding-map c-mode-base-map)
+  (evil-make-overriding-map c++-mode-map)
+  (evil-make-overriding-map c-mode-map)
+  (custom-set-variables
+   '(rtags-completions-enabled t)
+   '(rtags-autostart-diagnostics t)
+   '(rtags-display-result-backend "Helm"))
+  (use-package company-rtags)
+  (eval-after-load 'company
+    '(add-to-list 'company-backends 'company-rtags))
+  (use-package flycheck-rtags))
 
 (use-package irony
   :defer t
   :init
   (add-hook 'c++-mode-hook 'irony-mode)
   (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'company-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
-  (evil-make-intercept-map irony-mode-map)
-  (bind-key "C-M-i" 'company-complete c++-mode-map)
-  ;; (custom-set-variables '(irony-additional-clang-options '("-std=c++11")))
-  (setq c-default-style "k&r")
-  (setq indent-tabs-mode nil)
-  (setq c-basic-offset 2)
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async)
   (use-package company-irony)
-  (add-to-list 'company-backends 'company-irony)
-  )
-
-(use-package irony-eldoc
-  :defer t
-  :init
-  (add-hook 'irony-mode-hook 'irony-eldoc)
-  )
-
-(use-package cmake-ide
-  :defer t
-  :init
-  (add-hook 'irony-mode-hook 'cmake-ide-setup)
-  )
-
-(use-package flycheck-irony
-  :defer t
-  :init
-  (add-hook 'irony-mode-hook #'flycheck-irony-setup)
-  )
-
-(use-package clang-format
-  :defer t
-  )
-
-(use-package company-rtags
-  :commands (company-rtags)
-  :init
-  (add-hook 'rtags-mode-hook
-            (lambda ()
-              (setq rtags-autostart-diagnostics t)
-              (rtags-diagnostics)
-              (setq rtags-completions-enabled t)
-              (add-to-list 'company-backends 'company-rtags)))
-  )
-
-(use-package company-c-headers
-  :defer t
-  :init
-  (add-hook 'company-mode-hook
-            (lambda ()
-              (add-to-list 'company-backends 'company-c-headers)))
-  :config
-  (add-to-list 'company-c-headers-path-system "/usr/include/c++/6/"))
+  (company-irony-setup-begin-commands)
+  (use-package company-irony-c-headers)
+  (eval-after-load 'company
+    '(add-to-list 'company-backends '(company-irony-c-headers company-irony) ))
+  (use-package flycheck-irony)
+  (eval-after-load 'flycheck
+    '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))

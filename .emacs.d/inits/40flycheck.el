@@ -2,7 +2,8 @@
   :defer t
   :diminish flycheck-mode
   :init
-  (add-hook 'irony-mode-hook 'flycheck-mode)
+  (add-hook 'c++-mode-hook 'flycheck-mode)
+  (add-hook 'c-mode-hook 'flycheck-mode)
   (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
   (add-hook 'js2-mode-hook 'flycheck-mode)
   (add-hook 'python-mode-hook 'flycheck-mode)

@@ -31,11 +31,11 @@
   :init
   (add-hook 'python-mode-hook 'jedi:setup)
   :config
-  (custom-set-variables '(jedi:tooltip-method nil))
-  (setq jedi:complete-on-dot t)
   (setq ac-sources '(ac-source-jedi-direct))
   (evil-make-intercept-map jedi-mode-map)
-  (setq jedi:use-shortcuts t)
+  (custom-set-variables '(jedi:use-shortcuts t)
+                        '(jedi:completion-on-dot t)
+                        '(jedi:tooltip-method nil))
   (push '("*jedi:doc*" :position bottom :height 80)
         popwin:special-display-config)
   )

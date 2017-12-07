@@ -1,7 +1,7 @@
 (use-package company
   :defer t
   :config
-  (setq company-idle-delay 0)
+  (custom-set-variables '(company-idle-delay 0))
   (company-quickhelp-mode +1)
   (bind-keys :map company-active-map
              ;; C-n, C-pで次/前の補完候補を選択
