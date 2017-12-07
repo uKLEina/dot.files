@@ -2,7 +2,6 @@
   :defer t
   :init
   (add-hook 'python-mode-hook 'helm-gtags-mode)
-  (add-hook 'c++-mode-hook 'helm-gtags-mode)
   :config
   (setq
    helm-gtags-auto-update t
