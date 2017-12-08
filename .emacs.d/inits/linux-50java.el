@@ -1,10 +1,11 @@
 (use-package meghanada
   :defer t
+  :commands
+  (meghanada-mode)
   :init
   (add-hook 'java-mode-hook
                   (lambda ()
-                    (meghanada-mode t)))
+                    (meghanada-mode t)
+                    (smartparens-mode t)))
   :config
-  (evil-make-intercept-map meghanada-mode-map)
-  (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)
-  (define-key meghanada-mode-map (kbd "C-M-i") 'company-complete))
+  (evil-make-overriding-map meghanada-mode-map))
