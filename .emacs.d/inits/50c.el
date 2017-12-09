@@ -44,3 +44,10 @@
   (use-package flycheck-irony)
   (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
   )
+
+
+(use-package clang-format
+  :defer t
+  :init
+  (bind-key "C-l i" 'clang-format-buffer c++-mode-map)
+  (bind-key "C-l i" 'clang-format-buffer c-mode-map))
