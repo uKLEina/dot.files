@@ -113,7 +113,6 @@
 (el-get-bundle company-irony-c-headers :type git :url "https://github.com/hotpxl/company-irony-c-headers.git")
 (el-get-bundle flycheck-irony)
 (el-get-bundle clang-format)
-(el-get-bundle cmake-ide)
 (el-get-bundle cmake-mode)
 
 ;; PHP
