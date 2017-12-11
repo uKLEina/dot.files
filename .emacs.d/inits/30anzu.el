@@ -1,12 +1,8 @@
 (use-package anzu
-  :defer t
   :init
   (global-anzu-mode 1)
-  :bind
-  (("M-%" . anzu-query-replace)
-   ("C-M-%" . anzu-query-replace-regexp)
-   ("M-#" . anzu-query-replace-at-cursor-thing))
   :config
+  (bind-key "M-#" 'anzu-query-replace-at-cursor-thing)
   (custom-set-variables
    '(anzu-mode-lighter "")
    '(anzu-deactivate-region t)
