@@ -1,3 +1,3 @@
 (use-package expand-region
-  :bind (("C-~" . er/expand-region)
-         ("C-=" . er/contract-region)))
+  :bind (("C-M-]" . er/expand-region)
+         ("C-M-:" . er/contract-region)))
