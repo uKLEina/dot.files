@@ -11,7 +11,11 @@
       (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
       (local-set-key (kbd "M-;") 'rtags-find-symbol)
       (local-set-key (kbd "M-@") 'rtags-find-references)
-      (local-set-key (kbd "M-,") 'rtags-location-stack-back)))
+      (local-set-key (kbd "M-,") 'rtags-location-stack-back)
+      (local-set-key (kbd "C-M-.") 'rtags-next-match)
+      (local-set-key (kbd "C-M-,") 'rtags-next-match)
+      )
+    )
   (add-hook 'c-mode-hook #'c/c++-mode-setup)
   (add-hook 'c++-mode-hook #'c/c++-mode-setup)
   :config
@@ -21,12 +25,13 @@
   (evil-make-overriding-map c-mode-map)
   (custom-set-variables
    '(rtags-completions-enabled t)
-   '(rtags-autostart-diagnostics t)
-   '(rtags-display-result-backend "Helm"))
+   '(rtags-autostart-diagnostics t))
   (use-package company-rtags)
   (eval-after-load 'company
     '(add-to-list 'company-backends 'company-rtags))
-  (use-package flycheck-rtags))
+  (use-package flycheck-rtags)
+  (push '("*RTags*" :position bottom :noselect t)
+        popwin:special-display-config))
 
 (use-package irony
   :defer t
