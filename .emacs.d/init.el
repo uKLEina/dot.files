@@ -144,7 +144,6 @@
 (el-get-bundle sql-indent)
 (el-get-bundle vimrc-mode)
 (el-get-bundle plantuml-mode)
-(el-get-bundle org-mode)
 (el-get-bundle markdown-mode)
 
 ;; theme
