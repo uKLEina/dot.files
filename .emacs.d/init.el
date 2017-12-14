@@ -9,7 +9,6 @@
 (require 'package)
 (setq package-archive-priorities
       '(("melpa-stable" . 30)
-        ("org" . 20)
         ("gnu" . 10)
         ("melpa" . 0)))
 (package-initialize)
