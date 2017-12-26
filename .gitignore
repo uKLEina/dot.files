@@ -20,6 +20,7 @@
 !/.config/pip
 !/.config/pip/pip.conf
 !/.themes/
+!/.latexmkrc
 
 ## emacs
 !/.emacs.d/
