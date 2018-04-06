@@ -34,7 +34,6 @@
 (el-get-bundle helm-swoop)
 (el-get-bundle smex)
 (el-get-bundle helm-smex :type git :url "https://github.com/ptrv/helm-smex.git" :depends (helm smex))
-(el-get-bundle helm-gtags)
 (el-get-bundle helm-themes)
 (el-get-bundle helm-descbinds)
 
@@ -123,13 +122,14 @@
 (el-get-bundle ac-php)
 
 ;; Python
-(el-get-bundle python-mode)
-(el-get-bundle jedi)
-(el-get-bundle py-autopep8)
-(el-get-bundle flycheck-pyflakes :type git :url "https://github.com/Wilfred/flycheck-pyflakes.git" :depends flycheck)
-(el-get-bundle virtualenvwrapper)
-(el-get-bundle cython-mode)
-(el-get-bundle flycheck-cython :type git :url "https://github.com/lbolla/emacs-flycheck-cython.git" :depends flycheck)
+;; (el-get-bundle python-mode)
+;; (el-get-bundle jedi)
+;; (el-get-bundle py-autopep8)
+;; (el-get-bundle flycheck-pyflakes :type git :url "https://github.com/Wilfred/flycheck-pyflakes.git" :depends flycheck)
+;; (el-get-bundle virtualenvwrapper)
+;; (el-get-bundle cython-mode)
+;; (el-get-bundle flycheck-cython :type git :url "https://github.com/lbolla/emacs-flycheck-cython.git" :depends flycheck)
+(el-get-bundle elpy)
 
 ;; JS
 (el-get-bundle js2-mode)
