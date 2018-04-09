@@ -122,14 +122,9 @@
 (el-get-bundle ac-php)
 
 ;; Python
-;; (el-get-bundle python-mode)
-;; (el-get-bundle jedi)
-;; (el-get-bundle py-autopep8)
-;; (el-get-bundle flycheck-pyflakes :type git :url "https://github.com/Wilfred/flycheck-pyflakes.git" :depends flycheck)
-;; (el-get-bundle virtualenvwrapper)
-;; (el-get-bundle cython-mode)
-;; (el-get-bundle flycheck-cython :type git :url "https://github.com/lbolla/emacs-flycheck-cython.git" :depends flycheck)
 (el-get-bundle elpy)
+(el-get-bundle cython-mode)
+(el-get-bundle flycheck-cython :type git :url "https://github.com/lbolla/emacs-flycheck-cython.git" :depends flycheck)
 
 ;; JS
 (el-get-bundle js2-mode)
