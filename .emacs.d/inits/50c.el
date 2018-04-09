@@ -18,7 +18,6 @@
   (add-hook 'c-mode-hook #'c/c++-mode-setup)
   (add-hook 'c++-mode-hook #'c/c++-mode-setup)
   :config
-  (company-mode-on)
   (evil-make-overriding-map c++-mode-map)
   (evil-make-overriding-map c-mode-map)
   (custom-set-variables
@@ -38,7 +37,6 @@
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
-  (company-mode-on)
   (auto-complete-mode -1)
   (use-package company-irony)
   (company-irony-setup-begin-commands)

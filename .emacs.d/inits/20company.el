@@ -1,6 +1,7 @@
 (use-package company
   :defer t
-  :commands (company-mode-on)
+  :init
+  (add-hook 'after-init-hook 'global-company-mode)
   :config
   (custom-set-variables '(company-idle-delay 0)
                         '(company-minimum-prefix-length 2)
