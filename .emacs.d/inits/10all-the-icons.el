@@ -100,10 +100,10 @@
 
 (defun custom-modeline-python-venv ()
   (if (string= major-mode "python-mode")
-      (let ((venv-name (if (or (not (boundp 'venv-current-name))
-                               (eq venv-current-name nil))
+      (let ((venv-name (if (or (not (boundp 'pyvenv-virtual-env-name))
+                               (eq pyvenv-virtual-env-name nil))
                            "GLOBAL"
-                         venv-current-name)))
+                         pyvenv-virtual-env-name)))
         (format " [venv: %s]" venv-name))
     ""))
 
