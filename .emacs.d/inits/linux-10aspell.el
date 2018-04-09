@@ -4,11 +4,7 @@
   :config
   (setq-default ispell-program-name "aspell")
   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+"))
-  (ac-ispell-setup)
   )
-
-(use-package ac-ispell
-  :defer t)
 
 (use-package flyspell
   :defer t

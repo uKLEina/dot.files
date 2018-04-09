@@ -41,12 +41,7 @@
 (el-get-bundle yasnippet)
 (el-get-bundle helm-c-yasnippet)
 
-;; AC/Company
-(el-get-bundle auto-complete)
-(el-get-bundle ac-dabbrev)
-(el-get-bundle ac-helm)
-(el-get-bundle ac-octave)
-(el-get-bundle ac-ispell :type git :url "https://github.com/syohex/emacs-ac-ispell.git" :depends auto-complete)
+;; Company
 (el-get-bundle company-mode)
 (el-get-bundle company-quickhelp)
 (el-get-bundle helm-company)
@@ -81,14 +76,13 @@
 (el-get-bundle auto-save)
 (el-get-bundle flyspell-correct)
 (el-get-bundle flyspell-correct-helm :type git :url "https://github.com/d12frosted/flyspell-correct.git" :depends (flyspell-correct helm))
-;; (el-get-bundle git-commit-mode)
 (el-get-bundle ddskk)
 (el-get-bundle image+)
 (el-get-bundle google-this)
 (el-get-bundle google-translate)
 (el-get-bundle smartparens)
 (el-get-bundle migemo)
-(el-get-bundle ripgrep)
+(el-get-bundle ripgrep :type git :url "https://github.com/nlamirault/ripgrep.el.git")
 (el-get-bundle resize-window)
 (el-get-bundle region-bindings-mode)
 (el-get-bundle quickrun)
@@ -96,7 +90,7 @@
 (el-get-bundle open-junk-file)
 (el-get-bundle neotree)
 (el-get-bundle init-loader)
-(el-get-bundle imenu-list)
+(el-get-bundle imenu-list :type git :url "https://github.com/bmag/imenu-list.git")
 (el-get-bundle highlight-symbol)
 (el-get-bundle diminish)
 (if (eq system-type 'windows-nt)
@@ -118,8 +112,6 @@
 
 ;; PHP
 (el-get-bundle php-mode)
-                                        ;(el-get-bundle geben)
-(el-get-bundle ac-php)
 
 ;; Python
 (el-get-bundle elpy)
@@ -128,7 +120,6 @@
 
 ;; JS
 (el-get-bundle js2-mode)
-(el-get-bundle ac-js2)
 
 ;; other modes
 (el-get-bundle meghanada :type git :url "https://github.com/mopemope/meghanada-emacs.git" :depends (yasnippet company-mode flycheck))
