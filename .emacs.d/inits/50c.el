@@ -54,3 +54,10 @@
   :init
   (bind-key "C-l i" 'clang-format-buffer c++-mode-map)
   (bind-key "C-l i" 'clang-format-buffer c-mode-map))
+
+(use-package hideif
+  :defer t
+  :init
+  (add-hook 'c++-mode-hook 'hide-ifdef-mode)
+  (add-hook 'c-mode-hook 'hide-ifdef-mode)
+  )
