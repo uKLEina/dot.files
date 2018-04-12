@@ -37,7 +37,6 @@
   (add-hook 'c-mode-hook 'irony-mode)
   (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
   :config
-  (auto-complete-mode -1)
   (use-package company-irony)
   (company-irony-setup-begin-commands)
   (use-package company-irony-c-headers)
