@@ -42,7 +42,9 @@
 ;; hide tool bar/scroll bar/menu bar
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
-(menu-bar-mode 1)
+(when (display-graphic-p)
+  (menu-bar-mode 1)
+  (menu-bar-mode 0))
 (display-time-mode +1)
 (setq require-final-newline t)
 ;; デフォルト色付け
