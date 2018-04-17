@@ -18,8 +18,8 @@ ln -s ~/dot.files/.themes/Numix ~/.themes/Numix
 ln -s ~/dot.files/.zsh ~/.zsh
 ln -s ~/dot.files/.zshrc ~/.zshrc
 touch .bash_profile
-echo "export PATH=\"$HOME/.cargo/bin:$PATH\"" >> ~/.bash_profile
-echo "export PATH=\"$HOME/.cargo/bin:$PATH\"" >> ~/.profile
+echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.bash_profile
+echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.profile
 ln -s ~/dot.files/.tmux.conf ~/.tmux.conf
 
 # scripts
