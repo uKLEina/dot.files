@@ -1,8 +1,16 @@
+(defun c/c++-mode-setup ()
+  "hook function to setup `c-mode' and `c++-mode'."
+  (projectile-mode)
+  (hs-minor-mode 1)
+  )
+(add-hook 'c-mode-hook #'c/c++-mode-setup)
+(add-hook 'c++-mode-hook #'c/c++-mode-setup)
+
 (use-package rtags
   :load-path "/usr/local/share/emacs/site-lisp/rtags/"
   :init
-  (defun c/c++-mode-setup ()
-    "hook function for `c-mode' and `c++-mode'."
+  (defun c/c++-mode-rtags-setup ()
+    "hook function to setup rtags things for `c-mode' and `c++-mode'."
     (rtags-start-process-unless-running)
     (flycheck-select-checker 'rtags)
     (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
@@ -14,12 +22,9 @@
       (local-set-key (kbd "C-M-.") 'rtags-next-match)
       (local-set-key (kbd "C-M-,") 'rtags-next-match)
       )
-    (projectile-mode)
-    (bind-key "C-l p f" 'helm-projectile-find-file-dwim c++-mode-map)
-    (bind-key "C-l p f" 'helm-projectile-find-file-dwim c-mode-map)
     )
-  (add-hook 'c-mode-hook #'c/c++-mode-setup)
-  (add-hook 'c++-mode-hook #'c/c++-mode-setup)
+  (add-hook 'c-mode-hook #'c/c++-mode-rtags-setup)
+  (add-hook 'c++-mode-hook #'c/c++-mode-rtags-setup)
   :config
   (evil-make-overriding-map c++-mode-map)
   (evil-make-overriding-map c-mode-map)
@@ -48,12 +53,12 @@
   (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)
   )
 
-
 (use-package clang-format
   :defer t
   :init
   (bind-key "C-l i" 'clang-format-buffer c++-mode-map)
-  (bind-key "C-l i" 'clang-format-buffer c-mode-map))
+  (bind-key "C-l i" 'clang-format-buffer c-mode-map)
+  )
 
 (use-package hideif
   :defer t
