@@ -4,7 +4,6 @@
 
 # allow any
 !/.gitignore
-!/.zshenv
 !/.tmux.conf
 !/.vimperatorrc
 !/_vimperatorrc
@@ -30,6 +29,8 @@
 !/.emacs.d/inits/
 /.emacs.d/inits/*
 !/.emacs.d/inits/*.el
+!/.emacs.d/snippets/
+!/.emacs.d/snippets/*
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
