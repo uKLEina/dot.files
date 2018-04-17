@@ -21,6 +21,7 @@
 !/.themes/
 !/.latexmkrc
 !/bin
+!/linux_setup.sh
 
 ## emacs
 !/.emacs.d/
