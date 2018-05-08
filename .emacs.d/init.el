@@ -99,6 +99,7 @@
   (el-get-bundle magit))
 (el-get-bundle evil-mc :type git :url "https://github.com/gabesoft/evil-mc.git" :depends (evil))
 (el-get-bundle visual-regexp-steroids)
+(el-get-bundle zoom-frm :depends (frame-cmds))
 
 
 ;; C/C++
@@ -120,6 +121,10 @@
 
 ;; JS
 (el-get-bundle js2-mode)
+
+;; Kotlin
+(el-get-bundle kotlin-mode)
+(el-get-bundle flycheck-kotlin :type git :url "https://github.com/whirm/flycheck-kotlin.git" :depends flycheck)
 
 ;; other modes
 (el-get-bundle meghanada :type git :url "https://github.com/mopemope/meghanada-emacs.git" :depends (yasnippet company-mode flycheck))
