@@ -1,5 +1,6 @@
-(use-package zoom-frame
+(use-package zoom-frm
   :defer t
+  :commands (zoom-in/out)
   :init
   (define-key ctl-x-map [(control ?+)] 'zoom-in/out)
   (define-key ctl-x-map [(control ?-)] 'zoom-in/out)
