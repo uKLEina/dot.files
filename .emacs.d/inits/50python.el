@@ -9,4 +9,6 @@
   (bind-key "C-l C-v" 'pyvenv-workon elpy-mode)
   (when (eq system-type 'gnu/linux)
     (flycheck-add-next-checker 'python-flake8 'python-pylint))
+  (push '("*Python Doc*" :position bottom :width 30 :noselect t)
+        popwin:special-display-config)
   )
