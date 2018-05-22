@@ -1,5 +1,24 @@
 #!/bin/bash
 
+# remove old files
+rm -fr ~/.config/pip
+rm -f ~/.config/pep8
+rm -f ~/.config/flake8
+rm -f ~/.config/pylintrc
+rm -fr ~/.emacs.d
+rm -fr ~/.skk.d
+rm -fr ~/.themes/Numix/gnome-shell
+rm -fr ~/.zsh
+rm -fr ~/bin
+rm -f ~/.aspell.conf
+rm -f ~/.gitignore
+rm -f ~/.gitmodules
+rm -f ~/.latexmkrc
+rm -f ~/.tmux.conf
+rm -f ~/.zshrc
+rm -f ~/hhkb.nodoka
+rm -f ~/nihongo.nodoka
+
 # .config/
 ln -s ~/dot.files/.config/pip ~/.config/pip
 ln -s ~/dot.files/.config/flake8 ~/.config/flake8
