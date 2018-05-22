@@ -121,6 +121,9 @@
 ;; JS
 (el-get-bundle js2-mode)
 
+;; TeX
+(el-get-bundle auctex)
+
 ;; other modes
 (el-get-bundle meghanada :type git :url "https://github.com/mopemope/meghanada-emacs.git" :depends (yasnippet company-mode flycheck))
 (el-get-bundle powershell)

@@ -3,4 +3,4 @@ $bibtex = 'pbibtex %O %B';
 $dvipdf = 'dvipdfmx %O -o %D %S';
 $makeindex = 'mendex %O -o %D %S';
 $max_repeat = 100;
-$pdf_previewer = 'evince -reuse-instance %O %S';
+$pdf_previewer = 'zathura -reuse-instance %O %S';
