@@ -69,6 +69,7 @@ alias aptug='apt upgrade'
 alias aptfu='apt full-upgrade'
 
 alias e='emacsclient'
+alias ke='emacsclient -e "(kill-emacs)"'
 alias ps='ps auxfww'
 alias top='top -d 1'
 eval $(thefuck --alias fk)
