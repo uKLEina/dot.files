@@ -5,6 +5,7 @@
   (remove-hook 'elpy-modules 'elpy-module-flymake)
   (custom-set-variables '(elpy-rpc-python-command "python3")
                         '(python-shell-interpreter "python3"))
+  (add-hook 'python-mode-hook #'electric-operator-mode)
   :config
   (bind-key "C-l C-v" 'pyvenv-workon elpy-mode)
   (when (eq system-type 'gnu/linux)
