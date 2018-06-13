@@ -131,6 +131,10 @@
 (el-get-bundle kotlin-mode)
 (el-get-bundle flycheck-kotlin :type git :url "https://github.com/whirm/flycheck-kotlin.git" :depends flycheck)
 
+;; Common Lisp
+(el-get-bundle slime)
+(el-get-bundle slime-company)
+
 ;; other modes
 (el-get-bundle meghanada :type git :url "https://github.com/mopemope/meghanada-emacs.git" :depends (yasnippet company-mode flycheck))
 (el-get-bundle powershell)
