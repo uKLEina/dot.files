@@ -140,7 +140,7 @@
 (el-get-bundle vimrc-mode)
 (el-get-bundle plantuml-mode)
 (el-get-bundle markdown-mode)
-(el-get-bundle matlab-mode)
+(el-get-bundle matlab-mode :type elpa)
 
 ;; theme
 (el-get-bundle color-theme-zenburn)
