@@ -31,5 +31,4 @@
   :diminish all-the-icons-dired-mode
   :init
   (add-hook 'dired-mode-hook #'all-the-icons-dired-mode)
-  (advice-add #'all-the-icons-dired-mode :after (lambda () (font-lock-mode 0)))
   )

@@ -109,6 +109,7 @@
 
 (use-package all-the-icons
   :config
+  (use-package font-lock+)
   (setq-default mode-line-format
         '((:eval
            (concat
