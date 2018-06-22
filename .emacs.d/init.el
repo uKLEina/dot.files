@@ -145,6 +145,7 @@
 (el-get-bundle plantuml-mode)
 (el-get-bundle markdown-mode)
 (el-get-bundle matlab-mode :type elpa)
+(el-get-bundle graphviz-dot-mode)
 
 ;; theme
 (el-get-bundle color-theme-zenburn)
