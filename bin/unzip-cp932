@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use Archive::Zip;
+use Encode;
+use Encode::Guess qw/CP932/;
+
+my $zip = Archive::Zip->new($ARGV[0]) or die;
+
+#print $ARGV[1];
+chdir $ARGV[1];
+
+for ($zip->members) {
+    $zip->extractMember($_, encode('UTF-8', decode('CP932', $_->fileName)));
+}
