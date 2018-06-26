@@ -1,2 +1,2 @@
 #!/bin/bash
-emacs -batch -f batch-byte-compile /home/nkob/.emacs.d/inits/*.el
+emacs -batch -f batch-byte-compile $HOME/.emacs.d/inits/*.el
