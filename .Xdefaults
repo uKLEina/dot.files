@@ -1,0 +1,65 @@
+! disable keycap picture insert mode
+urxvt.iso14755: false
+urxvt.iso14755_52: false
+
+urxvt*geometry: 96x32
+urxvt*scrollBar: false
+! urxvt*scrollBar_right: true
+! urxvt*scrollColor: #323232
+urxvt*cursorColor: #eeeeee
+!urxvt*underLine: on
+URxvt.pointerBlank: true
+URxvt.visualBell: false
+URxvt.saveLines: 100000
+
+! color
+URxvt.depth: 32
+URxvt.fading: 40
+urxvt*colorMode: on
+urxvt*foreground: #dfdfdf
+urxvt*background: [80]#272727
+urxvt*colorBDMode: on
+urxvt*colorBD: #f2a22b
+urxvt*colorULMode: on
+urxvt*colorUL: #7fa9e8
+urxvt*colorITMode: on
+urxvt*colorIT: #40eb84
+urxvt*dynamicColors: off
+urxvt*highlightSelection: true
+
+! colorscheme
+! based on Tango
+! modified to adapt grayish background
+urxvt*color0: #000000
+urxvt*color1: #cc0000
+urxvt*color2: #4e9a06
+urxvt*color3: #c4a000
+urxvt*color4: #3465a4
+urxvt*color5: #75507b
+urxvt*color6: #06989a
+urxvt*color7: #d3d7cf
+urxvt*color8: #757773
+urxvt*color9: #ef2929
+urxvt*color10: #8ae234
+urxvt*color11: #fce94f
+urxvt*color12: #729fcf
+urxvt*color13: #ad7fa8
+urxvt*color14: #34e2e2
+urxvt*color15: #eeeeec
+
+! font
+urxvt*font: xft:Ricty Discord:pixelsize=32:antialias=true:hinting=true
+urxvt*boldFont: xft:Ricty Discord:pixelsize=32:antialias=true:bold:hinting=true
+urxvt*italicFont: xft:Ricty Discord:pixelsize=32:antialias=true:italic:autohint=true:hinting=true
+urxvt*bolditalicFont: xft:Ricty Discord:pixelsize=32:antialias=true:bold:italic:autohint=true:hinting=true
+urxvt*letterSpace: -1
+
+urxvt*urlLauncher: /usr/bin/firefox
+
+Xft.dpi: 144
+Xft.autohint: 0
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
