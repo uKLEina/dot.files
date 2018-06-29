@@ -55,6 +55,7 @@
 (el-get-bundle helm-projectile)
 
 ;; UI
+(el-get-bundle font-lock+ :type emacswiki)
 (el-get-bundle all-the-icons)
 (el-get-bundle all-the-icons-dired :type git :url "https://github.com/jtbm37/all-the-icons-dired.git" :depends all-the-icons)
 (el-get-bundle spaceline)
@@ -73,7 +74,7 @@
 (el-get-bundle sudo-edit)
 (el-get-bundle dired-quick-sort)
 (el-get-bundle auto-compile)
-(el-get-bundle auto-save)
+(el-get-bundle auto-save :type emacswiki)
 (el-get-bundle flyspell-correct)
 (el-get-bundle flyspell-correct-helm :type git :url "https://github.com/d12frosted/flyspell-correct.git" :depends (flyspell-correct helm))
 (el-get-bundle ddskk)
@@ -83,7 +84,7 @@
 (el-get-bundle smartparens)
 (el-get-bundle migemo)
 (el-get-bundle ripgrep :type git :url "https://github.com/nlamirault/ripgrep.el.git")
-(el-get-bundle resize-window)
+(el-get-bundle resize-window :type git :url "https://github.com/dpsutton/resize-window.git")
 (el-get-bundle region-bindings-mode)
 (el-get-bundle quickrun)
 (el-get-bundle popwin)
@@ -99,7 +100,7 @@
   (el-get-bundle magit))
 (el-get-bundle evil-mc :type git :url "https://github.com/gabesoft/evil-mc.git" :depends (evil))
 (el-get-bundle visual-regexp-steroids)
-(el-get-bundle zoom-frm :depends (frame-cmds))
+(el-get-bundle zoom-frm :type emacswiki :depends (frame-cmds))
 (el-get-bundle names :type git :url "https://github.com/Malabarba/names.git")
 
 (el-get-bundle electric-operator :type git :url "https://github.com/davidshepherd7/electric-operator.git")
