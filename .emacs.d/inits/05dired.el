@@ -1,6 +1,9 @@
 (use-package dired
   :defer t
   :config
+  (use-package dired-x)
+  (setq-default dired-omit-files-p t) ; Buffer-local variable
+  (bind-key "C-l C-o" 'dired-omit-mode dired-mode-map)
   ;; fix keybind for SKK
   (setq dired-bind-jump nil)
   (bind-key "r" 'wdired-change-to-wdired-mode dired-mode-map)
