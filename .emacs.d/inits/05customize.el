@@ -39,12 +39,9 @@
 (setq frame-title-format
       '(buffer-file-name "%f"
                          (dired-directory dired-directory "%b")))
-;; hide tool bar/scroll bar/menu bar
+;; hide tool bar/scroll bar
 (tool-bar-mode 0)
 (scroll-bar-mode 0)
-(when (display-graphic-p)
-  (menu-bar-mode 1)
-  (menu-bar-mode 0))
 (display-time-mode +1)
 (setq require-final-newline t)
 ;; デフォルト色付け
