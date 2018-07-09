@@ -3,7 +3,7 @@
   :config
   (use-package dired-x)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-  (setq-default dired-omit-files-p t) ; Buffer-local variable
+  (setq-default dired-omit-files-p nil) ; Buffer-local variable
   (bind-key "C-l C-o" 'dired-omit-mode dired-mode-map)
   ;; fix keybind for SKK
   (setq dired-bind-jump nil)
