@@ -1,5 +1,6 @@
-(use-package init-auto-save
-  :defer t
+(use-package super-save
   :config
-  (auto-save-enable)
-  (setq auto-save-slient t))
+  (super-save-mode +1)
+  :custom
+  (super-save-auto-save-when-idle t)
+  )

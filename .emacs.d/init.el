@@ -74,6 +74,7 @@
 (el-get-bundle sudo-edit)
 (el-get-bundle dired-quick-sort)
 (el-get-bundle auto-compile)
+(el-get-bundle super-save :type git :url "https://github.com/bbatsov/super-save.git")
 (el-get-bundle auto-save :type emacswiki)
 (el-get-bundle flyspell-correct)
 (el-get-bundle flyspell-correct-helm :type git :url "https://github.com/d12frosted/flyspell-correct.git" :depends (flyspell-correct helm))
