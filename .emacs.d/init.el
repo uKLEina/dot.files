@@ -75,7 +75,6 @@
 (el-get-bundle dired-quick-sort)
 (el-get-bundle auto-compile)
 (el-get-bundle super-save :type git :url "https://github.com/bbatsov/super-save.git")
-(el-get-bundle auto-save :type emacswiki)
 (el-get-bundle flyspell-correct)
 (el-get-bundle flyspell-correct-helm :type git :url "https://github.com/d12frosted/flyspell-correct.git" :depends (flyspell-correct helm))
 (el-get-bundle ddskk)
@@ -101,8 +100,6 @@
   (el-get-bundle magit))
 (el-get-bundle evil-mc :type git :url "https://github.com/gabesoft/evil-mc.git" :depends (evil))
 (el-get-bundle visual-regexp-steroids)
-(el-get-bundle zoom-frm :type emacswiki :depends (frame-cmds))
-(el-get-bundle names :type git :url "https://github.com/Malabarba/names.git")
 
 (el-get-bundle electric-operator :type git :url "https://github.com/davidshepherd7/electric-operator.git")
 
