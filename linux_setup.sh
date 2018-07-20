@@ -16,6 +16,7 @@ rm -f ~/.gitmodules
 rm -f ~/.latexmkrc
 rm -f ~/.tmux.conf
 rm -f ~/.zshrc
+rm -f ~/.zshenv
 rm -f ~/hhkb.nodoka
 rm -f ~/nihongo.nodoka
 
@@ -36,6 +37,7 @@ ln -s ~/dot.files/.themes/Numix ~/.themes/Numix
 # shell
 ln -s ~/dot.files/.zsh ~/.zsh
 ln -s ~/dot.files/.zshrc ~/.zshrc
+ln -s ~/dot.files/.zshenv ~/.zshenv
 touch .bash_profile
 echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.bash_profile
 echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.profile
