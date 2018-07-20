@@ -23,6 +23,7 @@
 !/bin
 !/linux_setup.sh
 !/.Xdefaults
+!/.zshenv
 
 ## emacs
 !/.emacs.d/
