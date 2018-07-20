@@ -18,11 +18,14 @@
 !/.config/flake8
 !/.config/pip
 !/.config/pip/pip.conf
+!/.config/alacritty
+!/.config/alacritty/alacritty.yml
 !/.themes/
 !/.latexmkrc
 !/bin
 !/linux_setup.sh
 !/.Xdefaults
+!/.zshenv
 
 ## emacs
 !/.emacs.d/
