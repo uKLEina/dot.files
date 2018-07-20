@@ -16,14 +16,17 @@ rm -f ~/.gitmodules
 rm -f ~/.latexmkrc
 rm -f ~/.tmux.conf
 rm -f ~/.zshrc
+rm -f ~/.zshenv
 rm -f ~/hhkb.nodoka
 rm -f ~/nihongo.nodoka
+rm -fr ~/.config/alacritty
 
 # .config/
 ln -s ~/dot.files/.config/pip ~/.config/pip
 ln -s ~/dot.files/.config/flake8 ~/.config/flake8
 ln -s ~/dot.files/.config/pep8 ~/.config/pep8
 ln -s ~/dot.files/.config/pylintrc ~/.config/pylintrc
+ln -s ~/dot.files/.config/alacritty ~/.config/alacritty
 
 # Emacs
 ln -s ~/dot.files/.emacs.d ~/.emacs.d
@@ -36,6 +39,7 @@ ln -s ~/dot.files/.themes/Numix ~/.themes/Numix
 # shell
 ln -s ~/dot.files/.zsh ~/.zsh
 ln -s ~/dot.files/.zshrc ~/.zshrc
+ln -s ~/dot.files/.zshenv ~/.zshenv
 touch .bash_profile
 echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.bash_profile
 echo "export PATH=\"$HOME/.cargo/bin:\$PATH\"" >> ~/.profile
