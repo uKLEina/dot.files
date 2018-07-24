@@ -134,6 +134,11 @@
 (el-get-bundle slime)
 (el-get-bundle slime-company)
 
+;; Rust
+(el-get-bundle rust-mode)
+(el-get-bundle emacs-racer :depends (f))
+(el-get-bundle flycheck-rust)
+
 ;; other modes
 (el-get-bundle meghanada :type git :url "https://github.com/mopemope/meghanada-emacs.git" :depends (yasnippet company-mode flycheck))
 (el-get-bundle powershell)
