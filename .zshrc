@@ -31,7 +31,7 @@ export EDITOR='emacsclient'
 export VISUAL='emacsclient'
 
 # aliases
-setopt complete_aliases
+setopt completealiases
 
 alias sudo='sudo '
 
