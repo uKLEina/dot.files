@@ -107,6 +107,7 @@
 (el-get-bundle names :type git :url "https://github.com/Malabarba/names.git")
 (el-get-bundle electric-operator :type git :url "https://github.com/davidshepherd7/electric-operator.git")
 (el-get-bundle recentf-ext)
+(el-get-bundle rainbow-delimiters)
 
 ;; C/C++
 (el-get-bundle irony-mode)
