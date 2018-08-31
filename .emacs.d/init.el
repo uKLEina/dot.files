@@ -108,6 +108,7 @@
 (el-get-bundle electric-operator :type git :url "https://github.com/davidshepherd7/electric-operator.git")
 (el-get-bundle recentf-ext)
 (el-get-bundle rainbow-delimiters)
+(el-get-bundle delight)
 
 ;; C/C++
 (el-get-bundle irony-mode)

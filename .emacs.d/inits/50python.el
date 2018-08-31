@@ -28,4 +28,5 @@
   ;; always pop Docsting window on bottom
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
         popwin:special-display-config)
+  :diminish highlight-indentation-mode
   )

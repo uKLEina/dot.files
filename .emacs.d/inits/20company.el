@@ -19,4 +19,7 @@
   (bind-keys :map company-search-map
              ;; C-n, C-pで次/前の補完候補を選択
              ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)))
+             ("C-p" . company-select-previous))
+  (use-package delight)
+  (delight 'company-mode " Company" 'company)
+  )

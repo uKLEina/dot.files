@@ -1,7 +1,6 @@
 (use-package helm
   :defer t
-  ;; :diminish helm-migemo-mode
-  :diminish
+  :diminish helm-migemo-mode
   :config
   (bind-key "C-h" 'delete-backward-char helm-map)
   (helm-autoresize-mode 1)
@@ -31,6 +30,7 @@
 
 (use-package helm-mode
   :defer t
+  :diminish helm-mode
   :config
   ;; fuzzy matching
   (custom-set-variables '(helm-mode-fuzzy-match t)
