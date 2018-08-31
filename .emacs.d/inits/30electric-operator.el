@@ -1,3 +1,4 @@
 (use-package electric-operator
-  :defer t
+  :init
+  (add-hook 'python-mode-hook #'electric-operator-mode)
   )
