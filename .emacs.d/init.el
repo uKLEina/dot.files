@@ -7,6 +7,10 @@
 
 ;; package.el setting
 (require 'package)
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")))
 (setq package-archive-priorities
       '(("melpa-stable" . 30)
         ("gnu" . 10)
@@ -152,6 +156,7 @@
 (el-get-bundle matlab-mode :type elpa)
 (el-get-bundle graphviz-dot-mode)
 (el-get-bundle pandoc-mode)
+(el-get-bundle pdf-tools)
 
 ;; theme
 (el-get-bundle color-theme-zenburn)
