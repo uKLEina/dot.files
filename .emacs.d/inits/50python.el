@@ -7,7 +7,6 @@
                         '(python-shell-interpreter "python3"))
   (defun python-mode-setup ()
     "hook function for `python-mode'."
-    (auto-complete-mode -1)
     (electric-operator-mode +1))
   (add-hook 'python-mode-hook 'python-mode-setup)
   :config
