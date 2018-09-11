@@ -21,8 +21,10 @@
 
   ;; enable checkers after switching venv
   (defun enable_linters (&rest args)
-    (flycheck-disable-checker 'python-flake8 t)
-    (flycheck-disable-checker 'python-pylint t))
+    (setq flycheck-disabled-checkers
+          (remq 'python-pylint
+                (remq 'python-flake8 flycheck-disabled-checkers)))
+    (flycheck-buffer))
   (advice-add 'pyvenv-workon :after #'enable_linters)
 
   ;; always pop Docsting window on bottom
