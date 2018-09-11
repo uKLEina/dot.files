@@ -31,6 +31,7 @@
 !/.emacs.d/
 /.emacs.d/*
 !/.emacs.d/init.el
+!/.emacs.d/init_wsl.el
 !/.emacs.d/inits/
 /.emacs.d/inits/*
 !/.emacs.d/inits/*.el
