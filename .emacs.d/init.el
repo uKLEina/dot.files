@@ -109,6 +109,7 @@
 (el-get-bundle recentf-ext)
 (el-get-bundle rainbow-delimiters)
 (el-get-bundle delight)
+(el-get-bundle csv-mode)
 
 ;; C/C++
 (el-get-bundle irony-mode)
