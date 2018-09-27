@@ -9,5 +9,4 @@
   (add-hook 'java-mode-hook 'java-mode-setup)
   :config
   (bind-key "C-l i" 'meghanada-code-beautify meghanada-mode-map)
-  (evil-make-overriding-map meghanada-mode-map)
-  (flycheck-select-checker 'meghanada-live))
+  (evil-make-overriding-map meghanada-mode-map))
