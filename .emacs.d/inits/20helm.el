@@ -22,8 +22,9 @@
 
 (use-package helm-files
   :defer t
-  :config
-  (bind-key "TAB" 'helm-execute-persistent-action helm-find-files-map))
+  :custom
+  (helm-find-files-ignore-thing-at-point t)
+  )
 
 (use-package helm-config
   :defer t)
