@@ -69,7 +69,6 @@
 (el-get-bundle use-package)
 (el-get-bundle smartrep)
 (el-get-bundle anzu)
-(el-get-bundle end-mark :type http :url "https://raw.githubusercontent.com/tarao/elisp/master/end-mark.el")
 (el-get-bundle zlc)
 (el-get-bundle switch-buffer-functions)
 (el-get-bundle exec-path-from-shell)
