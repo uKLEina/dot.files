@@ -20,3 +20,8 @@
 (add-hook 'Info-mode-hook
           '(lambda()
              (buffer-face-set 'variable-pitch)))
+
+(defun set-face-font-height (size)
+  (interactive "nSize: ")
+  (set-face-attribute 'default nil
+                      :height size))
