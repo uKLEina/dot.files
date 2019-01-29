@@ -4,6 +4,8 @@
 (set-face-attribute 'variable-pitch nil
                     :family "Migu 1VS"
                     :height 105)
+(set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
+(set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))
 
 (add-hook 'text-mode-hook
           '(lambda()
