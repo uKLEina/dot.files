@@ -43,6 +43,7 @@
 
 ;; yasnippet
 (el-get-bundle yasnippet)
+(el-get-bundle yasnippet-snippets)
 (el-get-bundle helm-c-yasnippet)
 
 ;; Company
