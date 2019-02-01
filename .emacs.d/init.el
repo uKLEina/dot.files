@@ -128,6 +128,10 @@
 (el-get-bundle cython-mode)
 (el-get-bundle flycheck-cython :type git :url "https://github.com/lbolla/emacs-flycheck-cython.git" :depends flycheck)
 
+;; Julia
+(el-get-bundle julia-mode :type elpa)
+(el-get-bundle ess :type elpa)
+
 ;; JS
 (el-get-bundle js2-mode)
 
