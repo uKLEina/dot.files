@@ -72,8 +72,9 @@ alias e='emacsclient'
 alias ke='emacsclient -e "(kill-emacs)"'
 alias ps='ps auxfww'
 alias top='top -d 1'
-eval $(thefuck --alias fk)
-export THEFUCK_REQUIRE_CONFIRMATION=false
+eval $(thefuck --alias)
+alias ha='fuck'
+export THEFUCK_REQUIRE_CONFIRMATION=true
 export THEFUCK_ALTER_HISTORY=true
 
 function showfont (){ fc-match "$@" -f "%{file}" | xargs display }
@@ -85,7 +86,6 @@ setopt share_history
 setopt auto_cd
 setopt auto_pushd
 
-setopt correct
 setopt list_packed
 setopt nolistbeep
 setopt noautoremoveslash
