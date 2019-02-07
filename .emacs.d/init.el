@@ -51,10 +51,6 @@
 (el-get-bundle company-quickhelp)
 (el-get-bundle helm-company)
 
-;; Auto-Complete
-;; Basically I prefer Company but some Languages doesn't have Company backend but Auto-Complete one.
-(el-get-bundle auto-complete)
-
 ;; flycheck
 (el-get-bundle flycheck)
 (el-get-bundle flycheck-pos-tip)
