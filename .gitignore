@@ -23,6 +23,8 @@
 !/.themes/
 !/.latexmkrc
 !/bin
+chromedriver
+geckodriver
 !/linux_setup.sh
 !/.Xdefaults
 !/.zshenv
