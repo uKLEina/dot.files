@@ -9,6 +9,7 @@
 !/_vimperatorrc
 !/.zsh/
 !/.zshrc
+!/.zshrc.local.wsl
 !/*.nodoka
 !/.aspell.conf
 !/.config/
