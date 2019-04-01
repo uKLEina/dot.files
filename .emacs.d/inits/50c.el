@@ -2,7 +2,6 @@
   "hook function to setup `c-mode' and `c++-mode'."
   (projectile-mode)
   (hs-minor-mode 1)
-  (auto-complete-mode -1)
   )
 (add-hook 'c-mode-hook #'c/c++-mode-setup)
 (add-hook 'c++-mode-hook #'c/c++-mode-setup)
@@ -21,6 +20,16 @@
       (local-set-key (kbd "M-@") 'rtags-find-references)
       (local-set-key (kbd "C-M-.") 'rtags-next-match)
       (local-set-key (kbd "C-M-,") 'rtags-next-match)
+      (custom-set-variables
+       '(rtags-completions-enabled t)
+       '(rtags-autostart-diagnostics t))
+      (use-package company-rtags)
+      (eval-after-load 'company
+        '(add-to-list 'company-backends 'company-rtags))
+      (use-package flycheck-rtags)
+      (flycheck-select-checker 'rtags)
+      (push '("*RTags*" :position bottom :noselect t)
+            popwin:special-display-config)
       )
     )
   (add-hook 'c-mode-hook #'c/c++-mode-rtags-setup)
@@ -28,17 +37,6 @@
   :config
   (evil-make-overriding-map c++-mode-map)
   (evil-make-overriding-map c-mode-map)
-  (when (rtags-is-indexed)
-    (custom-set-variables
-     '(rtags-completions-enabled t)
-     '(rtags-autostart-diagnostics t))
-    (use-package company-rtags)
-    (eval-after-load 'company
-      '(add-to-list 'company-backends 'company-rtags))
-    (use-package flycheck-rtags)
-    (flycheck-select-checker 'rtags)
-    (push '("*RTags*" :position bottom :noselect t)
-          popwin:special-display-config))
   )
 
 (use-package irony
