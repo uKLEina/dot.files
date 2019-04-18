@@ -4,6 +4,7 @@
 (setq load-prefer-newer t)
 (setq custom-file (locate-user-emacs-file "custom.el"))
 
+
 (require 'package)
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -185,10 +186,13 @@
   :config
   (super-save-mode +1))
 
-(use-package zenburn-theme
+(use-package doom-themes
   :ensure t
   :config
-  (load-theme 'zenburn t))
+  (load-theme 'doom-dracula t)
+  (custom-set-variables '(window-divider-default-right-width 10))
+  (window-divider-mode +1)
+  )
 
 (use-package doom-modeline
   :ensure t
@@ -276,38 +280,62 @@
   (setq doom-modeline-checker-simple-format nil)
   (setq doom-modeline-bar-width 10)
   ;; mode-line color as evil state
-  ;; normal: BG Gray
+  ;; normal: BG-Alt
   (add-hook 'evil-normal-state-entry-hook
             (lambda ()
-              (set-face-background 'mode-line "#2b2b2b")))
+              (set-face-background 'mode-line (doom-color 'bg-alt))))
   ;; insert: Green
   (add-hook 'evil-insert-state-entry-hook
             (lambda ()
-              (set-face-background 'mode-line "#4f6f4f")))
+              (set-face-background 'mode-line (doom-darken (doom-color 'green) 0.5))))
   (add-hook 'evil-insert-state-exit-hook
             (lambda ()
-              (set-face-background 'mode-line "#2b2b2b")))
+              (set-face-background 'mode-line (doom-color 'bg-alt))))
   ;; visual: Blue
   (add-hook 'evil-visual-state-entry-hook
             (lambda ()
-              (set-face-background 'mode-line "#4c7073")))
+              (set-face-background 'mode-line (doom-color 'dark-blue))))
   (add-hook 'evil-visual-state-exit-hook
             (lambda ()
-              (set-face-background 'mode-line "#2b2b2b")))
+              (set-face-background 'mode-line (doom-color 'bg-alt))))
   ;; emacs: Red
   (add-hook 'evil-emacs-state-entry-hook
             (lambda ()
-              (set-face-background 'mode-line "#8c5353")))
+              (set-face-background 'mode-line (doom-color 'magenta))))
   (add-hook 'evil-emacs-state-exit-hook
             (lambda ()
-              (set-face-background 'mode-line "#2b2b2b")))
-  :custom-face
-  (doom-modeline-bar ((t (:background "#656555"))))) ; fg gray
+              (set-face-background 'mode-line (doom-color 'bg-alt))))
+  )
 
 (use-package paredit
   :ensure t
   :hook
-  (emacs-lisp-mode . enable-paredit-mode))
+  (emacs-lisp-mode . enable-paredit-mode)
+  :init
+  ;; Evil compatibility fix
+  (defun evil-end-of-line-p ()
+    (let ((offset (if (evil-emacs-state-p)
+                      0
+                    1)))
+      (eq (- (line-end-position) offset)  (point))))
+
+  (defun evil-beginning-of-line-p ()
+    (eq (line-beginning-position) (point)))
+
+  (defun evil-paredit-forward (origfun arg)
+    (funcall origfun)
+    (unless (evil-emacs-state-p)
+      (backward-char)))
+
+  (defun evil-paredit-backward (origfun arg)
+    (if (evil-end-of-line-p)
+        (forward-line)
+      (forward-char))
+    (funcall origfun))
+
+  (advice-add 'paredit-forward :around #'evil-paredit-forward)
+  (advice-add 'paredit-backward :around #'evil-paredit-backward)
+  )
 
 (use-package posframe
   :ensure t
@@ -388,13 +416,12 @@
     (helm-migemo-mode +1))
   )
 
-(defun helm-find-files-all-the-icons (arg)
-  (let ((disp (car arg))
-        (file (cdr arg)))
-    (cons (format "%s\t%s" (all-the-icons-icon-for-file disp) disp) file)))
-(advice-add 'helm-ff-filter-candidate-one-by-one :filter-return #'helm-find-files-all-the-icons)
+;; (defun helm-find-files-all-the-icons (arg)
+;;   (let ((disp (car arg))
+;;         (file (cdr arg)))
+;;     (cons (format "%s\t%s" (all-the-icons-icon-for-file disp) disp) file)))
+;; (advice-add 'helm-ff-filter-candidate-one-by-one :filter-return #'helm-find-files-all-the-icons)
 
-;; need smex for consel-M-x history
 (use-package smex :ensure t)
 (use-package helm-smex
   :ensure t
@@ -404,11 +431,27 @@
   :custom
   (helm-smex-show-bindings t))
 
+(use-package helm-ag
+  :ensure t
+  :defer t
+  :custom
+  (helm-ag-base-command "rg --vimgrep --no-heading")
+  (helm-ag-insert-at-point 'symbol)
+  :bind
+  (("C-M-G" . 'helm-ag))
+  :config
+  (defun helm-projectile-ag ()
+    "Projectileと連携"
+    (interactive)
+    (helm-ag (projectile-project-root))))
+
 (use-package helm-rg
   :ensure t
-  :custom
-  (helm-rg-base-command '("rg" "--vimgrep" "--no-heading" "--color=always"))
-  :bind (("C-M-g" . helm-rg)))
+  ;; :custom
+  ;; (helm-rg-default-extra-args '("--vimgrep" "--no-heading"))
+  :bind
+  (("C-M-g" . 'helm-rg))
+  )
 
 (use-package helm-swoop
   :ensure t
@@ -480,6 +523,9 @@
   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   :hook
   (prog-mode . flycheck-mode)
+  :custom
+  (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
+  (flycheck-idle-change-delay 2)
   :config
   (use-package flycheck-pos-tip :ensure t)
   (flycheck-pos-tip-mode +1)
@@ -501,9 +547,6 @@
   (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
   (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
   :custom
-  ;; never use python2 :D
-  (elpy-rpc-python-command "python3")
-  (python-shell-interpreter "python3")
   ;; remove flymake from modules
   (elpy-modules '(elpy-module-sane-defaults
                   elpy-module-company
@@ -512,7 +555,12 @@
                   elpy-module-pyvenv
                   elpy-module-yasnippet
                   elpy-module-django))
+  (python-shell-interpreter "jupyter")
+  (python-shell-interpreter-args "console --simple-prompt")
+  (python-shell-prompt-detect-failure-warning nil)
   :config
+  (add-to-list 'python-shell-completion-native-disabled-interpreters
+               "jupyter")
   (bind-key "C-l C-v" 'pyvenv-workon elpy-mode)
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
@@ -527,8 +575,24 @@
                 (remq 'python-flake8 flycheck-disabled-checkers)))
     (flycheck-buffer))
   (advice-add 'pyvenv-workon :after #'enable-linters)
+
+  ;; kill existing Python processes before switching venv
+  ;; so that you can re-run Python of current environment
+  (defun kill-python-processes (&rest args)
+    (let ((kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions)))
+      (dolist (process (process-list))
+        (when (string-match-p (regexp-quote "python") (format "%s" process))
+          (kill-buffer (format "%s" (process-buffer process)))))))
+
+  (advice-add 'pyvenv-deactivate :after #'kill-python-processes)
+  (advice-add 'pyvenv-activate :before #'kill-python-processes)
+  (advice-add 'pyvenv-workon :before #'kill-python-processes)
+
   ;; always pop Docsting window on bottom
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
+        popwin:special-display-config)
+  ;; always pop Python interpreter window on bottom
+  (push '("*Python*" :position bottom :width 30)
         popwin:special-display-config)
   )
 
@@ -706,6 +770,9 @@
   :custom
   (highlight-symbol-idle-delay 0.5)
   (highlight-symbol-occurrence-message '(explicit))
+  :custom-face
+  ;; auto highlight darker for Doom Dracula theme
+  (highlight-symbol-face ((t (:background "#181921"))))
   :bind
   ("C-l C-s" . highlight-symbol))
 
@@ -765,6 +832,7 @@
 
 (use-package projectile
   :ensure t
+  :commands (projectile-project-root)
   :bind (("C-l p e" . projectile-mode)))
 
 (use-package helm-projectile
@@ -1287,4 +1355,5 @@
     :ensure t
     :defer t
     :hook
-    (java-mode . meghanada-mode)))
+    (java-mode . meghanada-mode))
+  )
