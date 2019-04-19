@@ -4,7 +4,6 @@
 (setq load-prefer-newer t)
 (setq custom-file (locate-user-emacs-file "custom.el"))
 
-
 (require 'package)
 (setq package-archives
       '(("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -20,7 +19,8 @@
       '((all-the-icons . "melpa")
         (highlight-symbol . "melpa")
         (esup . "melpa")
-        (direx . "melpa")))
+        (direx . "melpa")
+        (multi-term . "melpa")))
 
 (unless (require 'use-package nil t)
   (package-refresh-contents)
@@ -106,8 +106,7 @@
    major-mode
    '(("　" 0 f-bg-aquamarine append)
      ("\t" 0 f-ub-steelblue prepend)
-     ("[ ]+$" 0 f-bg-gray append)
-     )))
+     ("[ ]+$" 0 f-bg-gray append))))
 (advice-add 'font-lock-mode :before #'visible-spaces)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -162,7 +161,7 @@
     (move-to-window-line line)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; packages
+; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package server
   :config
@@ -191,8 +190,7 @@
   :config
   (load-theme 'doom-dracula t)
   (custom-set-variables '(window-divider-default-right-width 10))
-  (window-divider-mode +1)
-  )
+  (window-divider-mode +1))
 
 (use-package doom-modeline
   :ensure t
@@ -304,8 +302,7 @@
               (set-face-background 'mode-line (doom-color 'magenta))))
   (add-hook 'evil-emacs-state-exit-hook
             (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  )
+              (set-face-background 'mode-line (doom-color 'bg-alt)))))
 
 (use-package paredit
   :ensure t
@@ -334,8 +331,7 @@
     (funcall origfun))
 
   (advice-add 'paredit-forward :around #'evil-paredit-forward)
-  (advice-add 'paredit-backward :around #'evil-paredit-backward)
-  )
+  (advice-add 'paredit-backward :around #'evil-paredit-backward))
 
 (use-package posframe
   :ensure t
@@ -413,8 +409,7 @@
     (helm-descbinds-mode +1))
   (helm-autoresize-mode +1)
   (with-eval-after-load 'migemo
-    (helm-migemo-mode +1))
-  )
+    (helm-migemo-mode +1)))
 
 ;; (defun helm-find-files-all-the-icons (arg)
 ;;   (let ((disp (car arg))
@@ -438,7 +433,7 @@
   (helm-ag-base-command "rg --vimgrep --no-heading")
   (helm-ag-insert-at-point 'symbol)
   :bind
-  (("C-M-G" . 'helm-ag))
+  (("C-M-S-g" . 'helm-ag))
   :config
   (defun helm-projectile-ag ()
     "Projectileと連携"
@@ -447,11 +442,8 @@
 
 (use-package helm-rg
   :ensure t
-  ;; :custom
-  ;; (helm-rg-default-extra-args '("--vimgrep" "--no-heading"))
   :bind
-  (("C-M-g" . 'helm-rg))
-  )
+  (("C-M-g" . 'helm-rg)))
 
 (use-package helm-swoop
   :ensure t
@@ -467,8 +459,7 @@
   (helm-swoop-split-direction 'split-window-vertically)
   (helm-swoop-speed-or-color t)
   (helm-swoop-move-to-line-cycle t)
-  (helm-swoop-use-line-number-face t)
-  )
+  (helm-swoop-use-line-number-face t))
 
 (use-package company
   :ensure t
@@ -558,43 +549,24 @@
   (python-shell-interpreter "jupyter")
   (python-shell-interpreter-args "console --simple-prompt")
   (python-shell-prompt-detect-failure-warning nil)
+  ;; (elpy-shell-display-buffer-after-send t)
   :config
-  (add-to-list 'python-shell-completion-native-disabled-interpreters
-               "jupyter")
-  (bind-key "C-l C-v" 'pyvenv-workon elpy-mode)
+  (define-key inferior-python-mode-map (kbd "C-c C-z") 'elpy-shell-switch-to-buffer)
+  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+  (bind-key "C-l C-v" #'pyvenv-workon elpy-mode)
+  (add-hook 'pyvenv-post-activate-hooks #'pyvenv-restart-python)
+
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
   ;; so add pylint after it
   (when (eq system-type 'gnu/linux)
     (flycheck-add-next-checker 'python-flake8 'python-pylint))
 
-  ;; enable checkers and update PATH after switching venv
-  (defun enable-linters (&rest args)
-    (setq flycheck-disabled-checkers
-          (remq 'python-pylint
-                (remq 'python-flake8 flycheck-disabled-checkers)))
-    (flycheck-buffer))
-  (advice-add 'pyvenv-workon :after #'enable-linters)
-
-  ;; kill existing Python processes before switching venv
-  ;; so that you can re-run Python of current environment
-  (defun kill-python-processes (&rest args)
-    (let ((kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions)))
-      (dolist (process (process-list))
-        (when (string-match-p (regexp-quote "python") (format "%s" process))
-          (kill-buffer (format "%s" (process-buffer process)))))))
-
-  (advice-add 'pyvenv-deactivate :after #'kill-python-processes)
-  (advice-add 'pyvenv-activate :before #'kill-python-processes)
-  (advice-add 'pyvenv-workon :before #'kill-python-processes)
-
-  ;; always pop Docsting window on bottom
+  ;; popwin
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
         popwin:special-display-config)
-  ;; always pop Python interpreter window on bottom
-  (push '("*Python*" :position bottom :width 30)
-        popwin:special-display-config)
-  )
+  (push '(inferior-python-mode :position bottom :width 30)
+        popwin:special-display-config))
 
 ;;; dired
 (use-package dired
@@ -693,7 +665,6 @@
   :bind
   ("C-;" . imenu-list-smart-toggle))
 
-
 (use-package winner
   :init
   (winner-mode +1)
@@ -772,7 +743,7 @@
   (highlight-symbol-occurrence-message '(explicit))
   :custom-face
   ;; auto highlight darker for Doom Dracula theme
-  (highlight-symbol-face ((t (:background "#181921"))))
+  (highlight-symbol-face ((t (:background "#1b1d26"))))
   :bind
   ("C-l C-s" . highlight-symbol))
 
@@ -892,8 +863,7 @@
   (add-hook 'c++-mode-hook #'c/c++-mode-rtags-setup)
   :config
   (evil-make-overriding-map c++-mode-map)
-  (evil-make-overriding-map c-mode-map)
-  )
+  (evil-make-overriding-map c-mode-map))
 
 (use-package irony
   :ensure t
@@ -1356,4 +1326,12 @@
     :defer t
     :hook
     (java-mode . meghanada-mode))
-  )
+
+  (use-package multi-term
+    :ensure t
+    :bind (("C-l !" . multi-term-next))
+    :custom
+    (multi-term-program "/usr/bin/zsh")
+    :init
+    (push '(term-mode :position bottom :width 60)
+        popwin:special-display-config)))
