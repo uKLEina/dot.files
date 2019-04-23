@@ -569,6 +569,7 @@
         popwin:special-display-config))
 
 ;;; dired
+(use-package lv :ensure t :defer t)
 (use-package dired
   :defer t
   :custom
@@ -823,10 +824,6 @@
   :ensure t
   :bind (("C-l y" . ivy-yasnippet)))
 
-(use-package realgud
-  :ensure t
-  :defer t)
-
 ;;; C
 (defun c/c++-mode-setup ()
   "Hook function to setup `c-mode' and `c++-mode'."
@@ -1024,11 +1021,6 @@
          ("\\.mly\\'" . tuareg-mode)
          ("\\.mll\\'" . tuareg-mode)
          ("\\.mlp\\'" . tuareg-mode)))
-
-(use-package pdf-view
-  :ensure pdf-tools
-  :init
-  (pdf-loader-install))
 
 (define-generic-mode 'poe-filter-mode
   ;; Comments
