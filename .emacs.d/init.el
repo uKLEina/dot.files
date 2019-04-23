@@ -190,7 +190,8 @@
   :config
   (load-theme 'doom-dracula t)
   (custom-set-variables '(window-divider-default-right-width 10))
-  (window-divider-mode +1))
+  (window-divider-mode +1)
+  (doom-themes-set-faces 'doom-dracula (helm-ff-directory :weight 'bold :foreground orange)))
 
 (use-package doom-modeline
   :ensure t
