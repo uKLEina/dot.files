@@ -189,9 +189,20 @@
   :ensure t
   :config
   (load-theme 'doom-dracula t)
+  (enable-theme 'doom-dracula)
+  (doom-themes-set-faces 'doom-dracula
+    (helm-ff-directory :weight 'bold :foreground (doom-color 'cyan)))
+  (doom-themes-set-faces 'doom-dracula
+    (font-lock-variable-name-face :foreground (doom-color 'cyan)))
   (custom-set-variables '(window-divider-default-right-width 10))
   (window-divider-mode +1)
-  (doom-themes-set-faces 'doom-dracula (helm-ff-directory :weight 'bold :foreground orange)))
+  )
+
+
+;; (use-package zenburn-theme
+;;   :ensure t
+;;   :config
+;;   (load-theme 'zenburn t))
 
 (use-package doom-modeline
   :ensure t
