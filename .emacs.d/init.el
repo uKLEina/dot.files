@@ -20,7 +20,8 @@
         (highlight-symbol . "melpa")
         (esup . "melpa")
         (direx . "melpa")
-        (multi-term . "melpa")))
+        (multi-term . "melpa")
+        (highlight-indentation . "melpa")))
 
 (unless (require 'use-package nil t)
   (package-refresh-contents)
@@ -276,7 +277,7 @@
   (setq doom-modeline-minor-modes t)
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-checker-simple-format nil)
-  (setq doom-modeline-bar-width 10)
+  ;; (setq doom-modeline-bar-width 10)
   ;; mode-line color as evil state
   ;; normal: BG-Alt
   (add-hook 'evil-normal-state-entry-hook
@@ -527,6 +528,13 @@
   (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
         popwin:special-display-config))
 
+(use-package highlight-indentation
+  :ensure t
+  :defer t
+  :hook
+  (python-mode-hook . highlight-indentation-mode)
+  :custom-face
+  (highlight-indentation-face ((t (:background "#1b1d26")))))
 (use-package elpy
   :ensure t
   :defer t
@@ -537,6 +545,7 @@
   (add-hook 'python-mode-hook 'elpy-mode)
   (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
   (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
+  (setq elpy-enabled-p t)
   :custom
   ;; remove flymake from modules
   (elpy-modules '(elpy-module-sane-defaults
@@ -549,7 +558,6 @@
   (python-shell-interpreter "jupyter")
   (python-shell-interpreter-args "console --simple-prompt")
   (python-shell-prompt-detect-failure-warning nil)
-  ;; (elpy-shell-display-buffer-after-send t)
   :config
   (define-key inferior-python-mode-map (kbd "C-c C-z") 'elpy-shell-switch-to-buffer)
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
@@ -893,7 +901,11 @@
 (use-package js2-mode
   :ensure t
   :defer t
-  :mode (("\\.js\\'" . js2-mode)))
+  :mode (("\\.js\\'" . js2-mode))
+  :hook
+  (js2-mode . tern-mode)
+  :config
+  (add-to-list 'company-backends 'company-tern))
 
 (use-package slime
   :ensure t
