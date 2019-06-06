@@ -331,19 +331,22 @@
   (defun evil-beginning-of-line-p ()
     (eq (line-beginning-position) (point)))
 
-  (defun evil-paredit-forward (origfun arg)
+  (defun evil-forward-par (origfun arg)
     (funcall origfun)
     (unless (evil-emacs-state-p)
       (backward-char)))
 
-  (defun evil-paredit-backward (origfun arg)
+  (defun evil-backward-par (origfun arg)
     (if (evil-end-of-line-p)
         (forward-line)
       (forward-char))
     (funcall origfun))
 
-  (advice-add 'paredit-forward :around #'evil-paredit-forward)
-  (advice-add 'paredit-backward :around #'evil-paredit-backward))
+  (advice-add 'paredit-forward :around #'evil-forward-par)
+  (advice-add 'paredit-backward :around #'evil-backward-par)
+  ;; (advice-add 'forward-sexp :around #'evil-forward-par)
+  ;; (advice-add 'backward-sexp :around #'evil-backward-par)
+  )
 
 (use-package posframe
   :ensure t
@@ -353,6 +356,13 @@
   :ensure t
   :custom
   (evil-echo-state nil)
+  :init
+  (defun evil-swap-key (map key1 key2)
+    "Swap KEY1 and KEY2 in MAP."
+    (let ((def1 (lookup-key map key1))
+          (def2 (lookup-key map key2)))
+      (define-key map key1 def2)
+      (define-key map key2 def1)))
   :config
   (evil-mode 1)
   (bind-keys :map evil-normal-state-map
@@ -367,7 +377,10 @@
              ("C-t" . other-window-or-split)
              :map evil-insert-state-map
              ("C-t" . other-window-or-split)
-             ("C-e" . end-of-line)))
+             ("C-e" . end-of-line))
+  (evil-swap-key evil-motion-state-map "j" "gj")
+  (evil-swap-key evil-motion-state-map "k" "gk")
+  )
 
 (use-package which-key
   :ensure t
