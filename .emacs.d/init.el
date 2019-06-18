@@ -288,34 +288,14 @@
   :config
   (setq doom-modeline-minor-modes t)
   (setq doom-modeline-major-mode-color-icon t)
-  (setq doom-modeline-checker-simple-format nil)
-  ;; (setq doom-modeline-bar-width 10)
-  ;; mode-line color as evil state
-  ;; normal: BG-Alt
-  (add-hook 'evil-normal-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; insert: Green
-  (add-hook 'evil-insert-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-darken (doom-color 'green) 0.5))))
-  (add-hook 'evil-insert-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; visual: Blue
-  (add-hook 'evil-visual-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'dark-blue))))
-  (add-hook 'evil-visual-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; emacs: Red
-  (add-hook 'evil-emacs-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'magenta))))
-  (add-hook 'evil-emacs-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt)))))
+  (setq doom-modeline-checker-simple-format nil))
+
+(add-to-list 'load-path "~/.emacs.d/elisp")
+(use-package evil-mode-line
+  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                  (visual . ,(doom-color 'dark-blue))
+                                  (emacs . ,(doom-color 'magenta)))))
 
 (use-package paredit
   :ensure t
@@ -581,9 +561,11 @@
                   elpy-module-pyvenv
                   elpy-module-yasnippet
                   elpy-module-django))
-  (python-shell-interpreter "jupyter")
-  (python-shell-interpreter-args "console --simple-prompt")
-  (python-shell-prompt-detect-failure-warning nil)
+  ;; (python-shell-interpreter "jupyter")
+  ;; (python-shell-interpreter-args "console --simple-prompt")
+  ;; (python-shell-prompt-detect-failure-warning nil)
+  (python-shell-interpreter "python")
+  (python-shell-interpreter-args "-i")
   :config
   (define-key inferior-python-mode-map (kbd "C-c C-z") 'elpy-shell-switch-to-buffer)
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
@@ -1304,9 +1286,16 @@
   :ensure t
   :init
   (dashboard-setup-startup-hook)
+  (defun dashboard-jump-to-recent-files ()
+    (interactive)
+    (let ((search-label "Recent Files:"))
+      (unless (search-forward search-label (point-max) t)
+        (search-backward search-label (point-min) t))
+      (back-to-indentation)))
   :config
   (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
   (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
+  (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
   )
 
 ;;; Linux specific setup
