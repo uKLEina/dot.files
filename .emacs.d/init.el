@@ -568,7 +568,8 @@
   ;; so manually enable all elpy features
   (add-hook 'python-mode-hook 'elpy-modules-global-init)
   (add-hook 'python-mode-hook 'elpy-mode)
-  (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
+  ;; (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
+  (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc-restart)
   (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
   (setq elpy-enabled-p t)
   :custom
@@ -588,6 +589,7 @@
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
   (bind-key "C-l C-v" #'pyvenv-workon elpy-mode)
   (add-hook 'pyvenv-post-activate-hooks #'pyvenv-restart-python)
+  (add-hook 'pyvenv-post-activate-hooks (lambda () (flycheck-select-checker 'python-flake8)))
 
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
