@@ -580,9 +580,11 @@
                   elpy-module-pyvenv
                   elpy-module-yasnippet
                   elpy-module-django))
-  (python-shell-interpreter "jupyter")
-  (python-shell-interpreter-args "console --simple-prompt")
-  (python-shell-prompt-detect-failure-warning nil)
+  ;; (python-shell-interpreter "jupyter")
+  ;; (python-shell-interpreter-args "console --simple-prompt")
+  ;; (python-shell-prompt-detect-failure-warning nil)
+  (python-shell-interpreter "python")
+  (python-shell-interpreter-args "-i")
   :config
   (define-key inferior-python-mode-map (kbd "C-c C-z") 'elpy-shell-switch-to-buffer)
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
@@ -1302,9 +1304,16 @@
   :ensure t
   :init
   (dashboard-setup-startup-hook)
+  (defun dashboard-jump-to-recent-files ()
+    (interactive)
+    (let ((search-label "Recent Files:"))
+      (unless (search-forward search-label (point-max) t)
+        (search-backward search-label (point-min) t))
+      (back-to-indentation)))
   :config
   (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
   (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
+  (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
   )
 
 ;;; Linux specific setup
