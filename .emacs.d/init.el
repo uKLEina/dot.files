@@ -292,30 +292,38 @@
   ;; (setq doom-modeline-bar-width 10)
   ;; mode-line color as evil state
   ;; normal: BG-Alt
-  (add-hook 'evil-normal-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; insert: Green
-  (add-hook 'evil-insert-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-darken (doom-color 'green) 0.5))))
-  (add-hook 'evil-insert-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; visual: Blue
-  (add-hook 'evil-visual-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'dark-blue))))
-  (add-hook 'evil-visual-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt))))
-  ;; emacs: Red
-  (add-hook 'evil-emacs-state-entry-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'magenta))))
-  (add-hook 'evil-emacs-state-exit-hook
-            (lambda ()
-              (set-face-background 'mode-line (doom-color 'bg-alt)))))
+  ;; (add-hook 'evil-normal-state-entry-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'bg-alt))))
+  ;; ;; insert: Green
+  ;; (add-hook 'evil-insert-state-entry-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-darken (doom-color 'green) 0.5))))
+  ;; (add-hook 'evil-insert-state-exit-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'bg-alt))))
+  ;; ;; visual: Blue
+  ;; (add-hook 'evil-visual-state-entry-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'dark-blue))))
+  ;; (add-hook 'evil-visual-state-exit-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'bg-alt))))
+  ;; ;; emacs: Red
+  ;; (add-hook 'evil-emacs-state-entry-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'magenta))))
+  ;; (add-hook 'evil-emacs-state-exit-hook
+  ;;           (lambda ()
+  ;;             (set-face-background 'mode-line (doom-color 'bg-alt))))
+  )
+
+(add-to-list 'load-path "~/.emacs.d/elisp")
+(use-package evil-mode-line
+  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                  (visual . ,(doom-color 'dark-blue))
+                                  (emacs . ,(doom-color 'magenta)))))
 
 (use-package paredit
   :ensure t
