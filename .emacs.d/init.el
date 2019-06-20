@@ -23,13 +23,12 @@
 (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
 
 (unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
+ (with-current-buffer
+     (url-retrieve-synchronously
+      "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
+   (goto-char (point-max))
+   (eval-print-last-sexp)))
 
-(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
 
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
@@ -356,13 +355,13 @@
   (evil-swap-key evil-motion-state-map "k" "gk"))
 
 (use-package evil-mode-line
-  :init
-  (el-get-bundle mode-line-color :type github :pkgname "tarao/elisp" :features mode-line-color)
-  (el-get-bundle evil-mode-line :type github :pkgname "tarao/evil-plugins" :features evil-mode-line)
-  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
-                                  (visual . ,(doom-color 'dark-blue))
-                                  (emacs . ,(doom-color 'magenta)))))
+ :init
+ (el-get-bundle mode-line-color :type github :pkgname "tarao/elisp" :features mode-line-color)
+ (el-get-bundle evil-mode-line :type github :pkgname "tarao/evil-plugins" :features evil-mode-line)
+ :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                 (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                 (visual . ,(doom-color 'dark-blue))
+                                 (emacs . ,(doom-color 'magenta)))))
 
 (use-package which-key
   :ensure t
@@ -1347,4 +1346,6 @@
     :init
     (push '(term-mode :position bottom :width 60)
         popwin:special-display-config)))
+
+(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
 (el-get 'sync)
