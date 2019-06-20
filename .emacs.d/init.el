@@ -15,14 +15,6 @@
         ("gnu" . 10)))
 (package-initialize)
 
-;; (setq package-pinned-packages
-;;       '((all-the-icons . "melpa")
-;;         (highlight-symbol . "melpa")
-;;         (esup . "melpa")
-;;         (direx . "melpa")
-;;         (multi-term . "melpa")
-;;         (highlight-indentation . "melpa")))
-
 (unless (require 'use-package nil t)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -191,19 +183,13 @@
   :config
   (load-theme 'doom-dracula t)
   (enable-theme 'doom-dracula)
+  (with-eval-after-load 'helm-files
+    (doom-themes-set-faces 'doom-dracula
+      '(helm-ff-directory :weight 'bold :foreground (doom-color 'cyan))))
   (doom-themes-set-faces 'doom-dracula
-    (helm-ff-directory :weight 'bold :foreground (doom-color 'cyan)))
-  (doom-themes-set-faces 'doom-dracula
-    (font-lock-variable-name-face :foreground (doom-color 'cyan)))
+    '(font-lock-variable-name-face :foreground (doom-color 'cyan)))
   (custom-set-variables '(window-divider-default-right-width 10))
-  (window-divider-mode +1)
-  )
-
-
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :config
-;;   (load-theme 'zenburn t))
+  (window-divider-mode +1))
 
 (use-package doom-modeline
   :ensure t
@@ -265,9 +251,11 @@
           (propertize (format " [%s]" venv-name) 'face '(:foreground "#f0dfaf" :weight bold)))
       ""))
 
-  (doom-modeline-def-modeline 'simple
-    '(bar evil-state matches remote-host buffer-info  pdf-pages linum-colnum)
-    '(projectile-project-name python-venv vcs checker fancy-battery datetime))
+  (with-eval-after-load 'evil-mode
+    (doom-modeline-def-modeline 'simple
+      '(bar evil-state matches remote-host buffer-info  pdf-pages linum-colnum)
+      '(projectile-project-name python-venv vcs checker fancy-battery datetime)))
+
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple buffer-size)
     '(major-mode minor-modes buffer-encoding))
@@ -324,10 +312,7 @@
     (funcall origfun))
 
   (advice-add 'paredit-forward :around #'evil-forward-par)
-  (advice-add 'paredit-backward :around #'evil-backward-par)
-  ;; (advice-add 'forward-sexp :around #'evil-forward-par)
-  ;; (advice-add 'backward-sexp :around #'evil-backward-par)
-  )
+  (advice-add 'paredit-backward :around #'evil-backward-par))
 
 (use-package posframe
   :ensure t
@@ -360,8 +345,7 @@
              ("C-t" . other-window-or-split)
              ("C-e" . end-of-line))
   (evil-swap-key evil-motion-state-map "j" "gj")
-  (evil-swap-key evil-motion-state-map "k" "gk")
-  )
+  (evil-swap-key evil-motion-state-map "k" "gk"))
 
 (use-package which-key
   :ensure t
@@ -416,12 +400,6 @@
   (helm-autoresize-mode +1)
   (with-eval-after-load 'migemo
     (helm-migemo-mode +1)))
-
-;; (defun helm-find-files-all-the-icons (arg)
-;;   (let ((disp (car arg))
-;;         (file (cdr arg)))
-;;     (cons (format "%s\t%s" (all-the-icons-icon-for-file disp) disp) file)))
-;; (advice-add 'helm-ff-filter-candidate-one-by-one :filter-return #'helm-find-files-all-the-icons)
 
 (use-package smex :ensure t)
 (use-package helm-smex
@@ -548,7 +526,6 @@
   ;; so manually enable all elpy features
   (add-hook 'python-mode-hook 'elpy-modules-global-init)
   (add-hook 'python-mode-hook 'elpy-mode)
-  ;; (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc--disconnect)
   (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc-restart)
   (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
   (setq elpy-enabled-p t)
@@ -561,9 +538,6 @@
                   elpy-module-pyvenv
                   elpy-module-yasnippet
                   elpy-module-django))
-  ;; (python-shell-interpreter "jupyter")
-  ;; (python-shell-interpreter-args "console --simple-prompt")
-  ;; (python-shell-prompt-detect-failure-warning nil)
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
   :config
@@ -1263,7 +1237,6 @@
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
 
-(use-package )
 
 (use-package diminish
   :ensure t
