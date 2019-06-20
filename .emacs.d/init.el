@@ -292,14 +292,6 @@
   (setq doom-modeline-checker-simple-format nil))
 
 ;; (add-to-list 'load-path "~/.emacs.d/elisp")
-(use-package evil-mode-line
-  :init
-  (el-get-bundle mode-line-color :url "https://github.com/tarao/elisp.git" :features mode-line-color)
-  (el-get-bundle evil-mode-line :url "https://github.com/tarao/evil-plugins.git" :features evil-mode-line)
-  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
-                                  (visual . ,(doom-color 'dark-blue))
-                                  (emacs . ,(doom-color 'magenta)))))
 
 (use-package paredit
   :ensure t
@@ -362,6 +354,15 @@
              ("C-e" . end-of-line))
   (evil-swap-key evil-motion-state-map "j" "gj")
   (evil-swap-key evil-motion-state-map "k" "gk"))
+
+(use-package evil-mode-line
+  :init
+  (el-get-bundle mode-line-color :url "https://github.com/tarao/elisp.git" :features mode-line-color)
+  (el-get-bundle evil-mode-line :url "https://github.com/tarao/evil-plugins.git" :features evil-mode-line)
+  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                  (visual . ,(doom-color 'dark-blue))
+                                  (emacs . ,(doom-color 'magenta)))))
 
 (use-package which-key
   :ensure t
