@@ -30,7 +30,7 @@
     (eval-print-last-sexp)))
 
 (add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-(el-get 'sync)
+
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
@@ -1347,3 +1347,4 @@
     :init
     (push '(term-mode :position bottom :width 60)
         popwin:special-display-config)))
+(el-get 'sync)
