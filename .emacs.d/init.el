@@ -19,6 +19,19 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+;;; el-get
+(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
+
+(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+(el-get 'sync)
+
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "C-l"))
@@ -278,8 +291,11 @@
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-checker-simple-format nil))
 
-(add-to-list 'load-path "~/.emacs.d/elisp")
+;; (add-to-list 'load-path "~/.emacs.d/elisp")
 (use-package evil-mode-line
+  :init
+  (el-get-bundle mode-line-color :url "https://github.com/tarao/elisp.git" :features mode-line-color)
+  (el-get-bundle evil-mode-line :url "https://github.com/tarao/evil-plugins.git" :features evil-mode-line)
   :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
                                   (insert . ,(doom-darken (doom-color 'green) 0.5))
                                   (visual . ,(doom-color 'dark-blue))
