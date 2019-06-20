@@ -175,6 +175,7 @@
 
 (use-package auto-compile
   :ensure t
+  :pin melpa-stable
   :defer t
   :init
   (auto-compile-on-load-mode)
