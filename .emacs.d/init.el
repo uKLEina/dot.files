@@ -10,18 +10,18 @@
         ("melpa" . "https://melpa.org/packages/")
         ("gnu" . "https://elpa.gnu.org/packages/")))
 (setq package-archive-priorities
-      '(("melpa-stable" . 30)
-        ("melpa" . 20)
+      '(("melpa" . 30)
+        ("melpa-stable" . 20)
         ("gnu" . 10)))
 (package-initialize)
 
-(setq package-pinned-packages
-      '((all-the-icons . "melpa")
-        (highlight-symbol . "melpa")
-        (esup . "melpa")
-        (direx . "melpa")
-        (multi-term . "melpa")
-        (highlight-indentation . "melpa")))
+;; (setq package-pinned-packages
+;;       '((all-the-icons . "melpa")
+;;         (highlight-symbol . "melpa")
+;;         (esup . "melpa")
+;;         (direx . "melpa")
+;;         (multi-term . "melpa")
+;;         (highlight-indentation . "melpa")))
 
 (unless (require 'use-package nil t)
   (package-refresh-contents)
@@ -1262,6 +1262,8 @@
   :mode (("\\README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode)))
+
+(use-package )
 
 (use-package diminish
   :ensure t
