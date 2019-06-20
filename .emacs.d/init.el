@@ -357,8 +357,8 @@
 
 (use-package evil-mode-line
   :init
-  (el-get-bundle mode-line-color :url "https://github.com/tarao/elisp.git" :features mode-line-color)
-  (el-get-bundle evil-mode-line :url "https://github.com/tarao/evil-plugins.git" :features evil-mode-line)
+  (el-get-bundle mode-line-color :type github :pkgname "tarao/elisp" :features mode-line-color)
+  (el-get-bundle evil-mode-line :type github :pkgname "tarao/evil-plugins" :features evil-mode-line)
   :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
                                   (insert . ,(doom-darken (doom-color 'green) 0.5))
                                   (visual . ,(doom-color 'dark-blue))
