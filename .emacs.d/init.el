@@ -19,18 +19,6 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;;; el-get
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
-
-(unless (require 'el-get nil 'noerror)
- (with-current-buffer
-     (url-retrieve-synchronously
-      "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-   (goto-char (point-max))
-   (eval-print-last-sexp)))
-
-
-
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "C-l"))
@@ -357,8 +345,17 @@
 
 (use-package evil-mode-line
  :init
- (el-get-bundle mode-line-color :type github :pkgname "tarao/elisp" :features mode-line-color)
- (el-get-bundle evil-mode-line :type github :pkgname "tarao/evil-plugins" :features evil-mode-line)
+ (use-package url)
+ (let* ((site-lisp-dir "~/.emacs.d/elisp")
+        (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
+        (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
+   (unless (file-directory-p site-lisp-dir)
+     (mkdir site-lisp-dir))
+   (add-to-list 'load-path site-lisp-dir)
+   (unless (file-exists-p mode-line-color-file)
+     (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
+   (unless (file-exists-p evil-mode-line-file)
+     (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)))
  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
                                  (visual . ,(doom-color 'dark-blue))
@@ -1347,6 +1344,3 @@
     :init
     (push '(term-mode :position bottom :width 60)
         popwin:special-display-config)))
-
-(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
-(el-get 'sync)
