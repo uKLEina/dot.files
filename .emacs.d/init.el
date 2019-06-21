@@ -157,6 +157,14 @@
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package server
+  :init
+  (when (eq system-type 'gnu/linux)
+    (defun raise-frame-with-wmctrl (&optional frame)
+      (call-process "wmctrl" nil nil nil "-i" "-R"
+                    (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
+    (advice-add 'raise-frame :after #'raise-frame-with-wmctrl)
+    (add-hook 'server-switch-hook #'raise-frame)
+    (add-hook 'server-done-hook #'iconify-frame))
   :config
   (unless (server-running-p)
     (server-start)))
