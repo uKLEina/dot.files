@@ -252,7 +252,12 @@
           (propertize (format " [%s]" venv-name) 'face '(:foreground "#f0dfaf" :weight bold)))
       ""))
 
-  (with-eval-after-load 'evil-mode
+
+
+  (with-eval-after-load 'evil
+    (doom-modeline-def-segment evil-state
+      "Display current Evil State."
+      evil-state)
     (doom-modeline-def-modeline 'simple
       '(bar evil-state matches remote-host buffer-info  pdf-pages linum-colnum)
       '(projectile-project-name python-venv vcs checker fancy-battery datetime)))
