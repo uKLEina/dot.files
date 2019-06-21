@@ -279,8 +279,6 @@
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-checker-simple-format nil))
 
-;; (add-to-list 'load-path "~/.emacs.d/elisp")
-
 (use-package paredit
   :ensure t
   :hook
