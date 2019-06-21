@@ -1196,7 +1196,6 @@
   )
 
 (use-package org
-  :mode (("\\.org\\'" . org-mode))
   :init
   ;; reftex with org mode
   (add-hook 'org-mode-hook 'turn-on-reftex)
@@ -1240,15 +1239,15 @@
 
 (use-package yaml-mode
   :ensure t
-  :mode (("\\.yml\\'" . yaml-mode)
-         ("\\.yaml\\'" . yaml-mode)))
+  :defer t)
 
 (use-package markdown-mode
   :ensure t
-  :mode (("\\README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode)))
+  :defer t)
 
+(use-package dockerfile-mode
+  :ensure t
+  :defer t)
 
 (use-package diminish
   :ensure t
