@@ -699,7 +699,9 @@
 
 (use-package magit
   :ensure t
-  :bind (("C-l m s" . magit-status)))
+  :bind (("C-l m s" . magit-status)
+         ("C-l m l c" . magit-log-current)
+         ("C-l m l b" . magit-log-buffer-file)))
 
 (use-package rainbow-delimiters
   :ensure t
