@@ -22,6 +22,7 @@ rm -f ~/nihongo.nodoka
 rm -fr ~/.config/alacritty
 
 # .config/
+mkdir -p ~/.config
 ln -s ~/dot.files/.config/pip ~/.config/pip
 ln -s ~/dot.files/.config/flake8 ~/.config/flake8
 ln -s ~/dot.files/.config/pep8 ~/.config/pep8
