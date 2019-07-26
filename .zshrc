@@ -78,6 +78,7 @@ export THEFUCK_REQUIRE_CONFIRMATION=true
 export THEFUCK_ALTER_HISTORY=true
 
 alias dcip="docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1"
+alias dcls="docker container ls"
 
 function showfont (){ fc-match "$@" -f "%{file}" | xargs display }
 
@@ -93,11 +94,6 @@ setopt nolistbeep
 setopt noautoremoveslash
 
 export LANG=ja_JP.UTF-8
-case ${UID} in
-0)
-    LANG=C
-    ;;
-esac
 
 # prompt
 PROMPT="%B%F{blue}%m:%f%F{green}%n%f %F{white}%%%f %b"
