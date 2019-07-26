@@ -77,6 +77,8 @@ alias ha='fuck'
 export THEFUCK_REQUIRE_CONFIRMATION=true
 export THEFUCK_ALTER_HISTORY=true
 
+alias dcip="docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1"
+
 function showfont (){ fc-match "$@" -f "%{file}" | xargs display }
 
 setopt hist_ignore_dups
