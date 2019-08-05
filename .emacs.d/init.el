@@ -701,7 +701,9 @@
 
 (use-package magit
   :ensure t
-  :bind (("C-l m s" . magit-status)))
+  :bind (("C-l m s" . magit-status)
+         ("C-l m l c" . magit-log-current)
+         ("C-l m l b" . magit-log-buffer-file)))
 
 (use-package rainbow-delimiters
   :ensure t
@@ -750,7 +752,9 @@
   ((c-mode-common emacs-lisp-mode java-mode lisp-mode perl-mode sh-mode python-mode) . hs-minor-mode)
   :bind
   (:map hs-minor-mode-map
-        ("C-l h" . hs-toggle-hiding)))
+        ("C-l h t" . hs-toggle-hiding)
+        ("C-l h a" . hs-hide-all)
+        ("C-l s a" . hs-show-all)))
 
 (use-package highlight-symbol
   :ensure t
@@ -1346,7 +1350,9 @@
     :ensure t
     :defer t
     :hook
-    (java-mode . meghanada-mode))
+    (java-mode . meghanada-mode)
+    :config
+    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration))
 
   (use-package multi-term
     :ensure t
