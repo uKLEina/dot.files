@@ -163,8 +163,10 @@
       (call-process "wmctrl" nil nil nil "-i" "-R"
                     (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
     (advice-add 'raise-frame :after #'raise-frame-with-wmctrl)
+    (defun iconify-emacs-when-server-is-done ()
+      (unless server-clients (iconify-frame)))
     (add-hook 'server-switch-hook #'raise-frame)
-    (add-hook 'server-done-hook #'iconify-frame))
+    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   :config
   (unless (server-running-p)
     (server-start)))
