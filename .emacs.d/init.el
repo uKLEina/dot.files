@@ -630,8 +630,19 @@
 
 (use-package direx
   :ensure t
+  :init
+  (defun my/direx-open ()
+    (interactive)
+    (or (ignore-errors
+          (direx-project:jump-to-project-root-other-window))
+        (direx:jump-to-directory-other-window)))
+  (defun my/direx-dwim ()
+    (interactive)
+    (if (derived-mode-p 'direx:direx-mode)
+        (kill-buffer)
+      (my/direx-open)))
   :bind
-  (("<f8>" . direx:jump-to-directory-other-window))
+  (("<f8>" . my/direx-dwim))
   :config
   (push '(direx:direx-mode :position left :width 40 :dedicated t)
         popwin:special-display-config)
