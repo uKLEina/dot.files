@@ -1242,12 +1242,11 @@
   (unless (boundp 'org-latex-classes)
     (setq org-latex-classes nil))
   (setq org-latex-pdf-process '("latexmk %f"))
-  (setq org-latex-default-class "jsarticle")
+  (setq org-latex-default-class "bxjsarticle")
   ;; org-latex-classes
   (add-to-list 'org-latex-classes
-               '("jsarticle"
-                 "\\documentclass[12pt,a4j,uplatex]{jsarticle}
-                 [NO-DEFAULT-PACKAGES] [PACKAGES] [EXTRA]"
+               '("bxjsarticle"
+                 "\\documentclass[dvipdfmx,12pt,uplatex]{bxjsarticle}"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
