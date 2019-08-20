@@ -33,8 +33,7 @@
 (set-default 'buffer-file-coding-system 'utf-8)
 
 (savehist-mode 1)
-(setq-default save-place t)
-(use-package saveplace)
+(save-place-mode +1)
 (display-time)
 (line-number-mode 1)
 (column-number-mode 1)
@@ -1130,22 +1129,19 @@
 
 (use-package tex-jp
   :ensure auctex
-  :defer t
+  :after tex-mode
   :custom
   (TeX-auto-save t)
   (TeX-parse-self t)
+  (TeX-default-mode 'japanese-latex-mode)
   (japanese-TeX-engine-default 'uptex)
+  (japanese-LaTeX-default-style "jsarticle")
   (TeX-engine 'uptex)
   (TeX-PDF-from-DVI "Dvipdfmx")
-  (japanese-LaTeX-default-style "bxjsarticle")
   (TeX-view-program-list '(("Evince" "/usr/bin/evince %o")))
   (TeX-view-program-selection '((output-pdf "Evince")))
   (TeX-source-correlate-method 'synctex)
   (TeX-source-correlate-start-server t)
-  :hook
-  ((LaTeX-mode . japanese-latex-mode)
-   (LaTeX-mode . TeX-source-correlate-mode)
-   (LaTeX-mode . LaTeX-math-mode))
   :init
   (add-hook 'LaTeX-mode-hook
             (function (lambda ()
@@ -1216,14 +1212,20 @@
                                        "wine cmd /c start AcroRd32.exe %s.pdf"
                                        TeX-run-discard-or-function t t :help "Run Adobe Acrobat Reader DC")))))
   :config
+  (TeX-source-correlate-mode +1)
+  (use-package pdf-sync)
+  (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
   (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
     (delq (assoc command TeX-command-list) TeX-command-list))
-  (use-package reftex-aux
-    :hook
-    (LaTeX-mode . turn-on-reftex)
-    :custom
-    (reftex-plug-into-AUCTeX t))
+  (LaTeX-math-mode +1)
+  (turn-on-reftex)
   )
+
+;; (use-package reftex-aux
+;;   :defer t
+;;   :after (tex-jp)
+;;   :custom
+;;   (reftex-plug-into-AUCTeX t))
 
 (use-package org
   :init
@@ -1246,7 +1248,7 @@
   ;; org-latex-classes
   (add-to-list 'org-latex-classes
                '("bxjsarticle"
-                 "\\documentclass[dvipdfmx,12pt,uplatex]{bxjsarticle}"
+                 "\\documentclass[autodetect-engine,dvipdfmx-if-dvi,ja=standard,a4paper,12pt]{bxjsarticle}"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -1319,6 +1321,12 @@
     :ensure t
     :config
     (exec-path-from-shell-initialize))
+
+  (use-package pdf-tools
+    :ensure t
+    :defer t
+    :init
+    (pdf-loader-install))
 
   (set-face-attribute 'default nil
                       :family "Ricty Discord"

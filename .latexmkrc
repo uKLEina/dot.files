@@ -1,5 +1,5 @@
-$latex  = 'uplatex -src-specials -synctex=1 -interaction=nonstopmode';
-$pdflatex  = 'uplatex -src-specials -interaction=nonstopmode';
+$latex  = 'uplatex -shell-escape -src-specials -synctex=1 -interaction=batchmode';
+$pdflatex  = 'uplatex -shell-escape -src-specials -interaction=nonstopmode';
 $bibtex = 'upbibtex';
 $dvipdf  = 'dvipdfmx %O -o %D %S';
 $makeindex  = 'mendex %O -o %D %S';
