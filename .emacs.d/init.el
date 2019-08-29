@@ -225,8 +225,11 @@
 
   (doom-modeline-def-segment linum-colnum
     "Display current linum/colnum"
-    (propertize (format " Ln %s/%s, Col %s" (format-mode-line "%l") (line-number-at-pos (point-max)) (format-mode-line "%c"))
-                'face `(:foreground "#8cd0d3" :weight bold)))
+    (propertize (format " Ln %s/%s, Col %s"
+                        (format-mode-line "%l")
+                        (line-number-at-pos (point-max))
+                        (format-mode-line "%c"))
+                'face '(:foreground "#8cd0d3" :weight bold)))
 
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
@@ -253,7 +256,7 @@
 
   (doom-modeline-def-segment python-venv
     "Display current python venv name"
-    (if (string= major-mode "python-mode")
+    (if (eq major-mode 'python-mode)
         (let ((venv-name (if (or (not (boundp 'pyvenv-virtual-env-name))
                                  (eq pyvenv-virtual-env-name nil))
                              "GLOBAL"
@@ -261,14 +264,13 @@
           (propertize (format " [%s]" venv-name) 'face '(:foreground "#f0dfaf" :weight bold)))
       ""))
 
-
-
   (with-eval-after-load 'evil
-    (doom-modeline-def-segment evil-state
+    (doom-modeline-def-segment evil-state-seg
       "Display current Evil State."
-      evil-state)
+      (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
+                  'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
-      '(bar evil-state matches remote-host buffer-info  pdf-pages linum-colnum)
+      '(bar evil-state-seg matches remote-host buffer-info  pdf-pages linum-colnum)
       '(projectile-project-name python-venv vcs checker fancy-battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
