@@ -165,7 +165,8 @@
     (defun iconify-emacs-when-server-is-done ()
       (unless server-clients (iconify-frame)))
     (add-hook 'server-switch-hook #'raise-frame)
-    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+    ;; (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
+    )
   :config
   (unless (server-running-p)
     (server-start)))
@@ -1316,6 +1317,7 @@
   (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
   (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
   )
+
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
