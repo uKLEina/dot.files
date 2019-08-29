@@ -717,12 +717,12 @@
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
   :init
-  (defun surpress-iconify (origfun &rest arg)
-    (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
-    (funcall origfun arg)
-    ;; (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
-    )
-  (advice-add 'magit-run-git-with-editor :around #'surpress-iconify))
+  (defun surpress-iconify (&rest arg)
+    (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+  (defun apply-iconify (&rest arg)
+    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+  (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
+  (advice-add 'with-editor-finish :after #'apply-iconify))
 
 (use-package rainbow-delimiters
   :ensure t
