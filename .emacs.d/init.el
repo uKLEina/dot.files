@@ -716,7 +716,7 @@
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
-  :config
+  :init
   (defun surpress-iconify (origfun &rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
     (funcall origfun arg)
