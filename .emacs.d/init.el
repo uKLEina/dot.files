@@ -165,8 +165,7 @@
     (defun iconify-emacs-when-server-is-done ()
       (unless server-clients (iconify-frame)))
     (add-hook 'server-switch-hook #'raise-frame)
-    ;; (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
-    )
+    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   :config
   (unless (server-running-p)
     (server-start)))
@@ -716,7 +715,13 @@
   :ensure t
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
-         ("C-l m l b" . magit-log-buffer-file)))
+         ("C-l m l b" . magit-log-buffer-file))
+  :config
+  (defun surpress-iconify (origfun &rest arg)
+    (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
+    (funcall origfun arg)
+    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+  (advice-add 'magit-run-git-with-editor :around #'surpress-iconify))
 
 (use-package rainbow-delimiters
   :ensure t
