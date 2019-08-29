@@ -720,7 +720,8 @@
   (defun surpress-iconify (origfun &rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
     (funcall origfun arg)
-    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+    ;; (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
+    )
   (advice-add 'magit-run-git-with-editor :around #'surpress-iconify))
 
 (use-package rainbow-delimiters
