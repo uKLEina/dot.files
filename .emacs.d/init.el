@@ -219,8 +219,10 @@
   (doom-modeline-def-segment projectile-project-name
     "Display Projectile project name"
     (if (and (boundp 'projectile-mode) projectile-mode)
-        (propertize (format " Project: %s" (projectile-default-project-name (projectile-project-root)))
-                    'face `(:foreground "#8cd0d3" :weight bold))
+        (propertize (format " [%s]" (projectile-default-project-name (projectile-project-root)))
+                    'face (if (doom-modeline--active)
+                              '(:foreground "#8cd0d3" :weight bold)
+                            'mode-line-inactive))
       ""))
 
   (doom-modeline-def-segment linum-colnum
@@ -229,7 +231,9 @@
                         (format-mode-line "%l")
                         (line-number-at-pos (point-max))
                         (format-mode-line "%c"))
-                'face '(:foreground "#8cd0d3" :weight bold)))
+                'face (if (doom-modeline--active)
+                          '(:foreground "#8cd0d3" :weight bold)
+                        'mode-line-inactive)))
 
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
@@ -261,7 +265,10 @@
                                  (eq pyvenv-virtual-env-name nil))
                              "GLOBAL"
                            pyvenv-virtual-env-name)))
-          (propertize (format " [%s]" venv-name) 'face '(:foreground "#f0dfaf" :weight bold)))
+          (propertize (format " [%s]" venv-name)
+                      'face (if (doom-modeline--active)
+                                '(:foreground "#f0dfaf" :weight bold)
+                              'mode-line-inactive)))
       ""))
 
   (with-eval-after-load 'evil
@@ -322,7 +329,10 @@
     (funcall origfun))
 
   (advice-add 'paredit-forward :around #'evil-forward-par)
-  (advice-add 'paredit-backward :around #'evil-backward-par))
+  (advice-add 'paredit-backward :around #'evil-backward-par)
+  ;; (advice-add 'forward-sexp :around #'evil-forward-par)
+  ;; (advice-add 'backward-sexp :around #'evil-backward-par)
+  )
 
 (use-package posframe
   :ensure t
@@ -358,22 +368,22 @@
   (evil-swap-key evil-motion-state-map "k" "gk"))
 
 (use-package evil-mode-line
- :init
- (use-package url)
- (let* ((site-lisp-dir "~/.emacs.d/elisp")
-        (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
-        (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
-   (unless (file-directory-p site-lisp-dir)
-     (mkdir site-lisp-dir))
-   (add-to-list 'load-path site-lisp-dir)
-   (unless (file-exists-p mode-line-color-file)
-     (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
-   (unless (file-exists-p evil-mode-line-file)
-     (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)))
- :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-                                 (insert . ,(doom-darken (doom-color 'green) 0.5))
-                                 (visual . ,(doom-color 'dark-blue))
-                                 (emacs . ,(doom-color 'magenta)))))
+  :init
+  (use-package url)
+  (let* ((site-lisp-dir "~/.emacs.d/elisp")
+         (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
+         (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
+    (unless (file-directory-p site-lisp-dir)
+      (mkdir site-lisp-dir))
+    (add-to-list 'load-path site-lisp-dir)
+    (unless (file-exists-p mode-line-color-file)
+      (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
+    (unless (file-exists-p evil-mode-line-file)
+      (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)))
+  :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                  (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                  (visual . ,(doom-color 'dark-blue))
+                                  (emacs . ,(doom-color 'magenta)))))
 
 (use-package which-key
   :ensure t
@@ -546,6 +556,7 @@
   (python-mode-hook . highlight-indentation-mode)
   :custom-face
   (highlight-indentation-face ((t (:background "#1b1d26")))))
+
 (use-package elpy
   :ensure t
   :defer t
@@ -573,7 +584,13 @@
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
   (bind-key "C-l C-v" #'pyvenv-workon elpy-mode)
   (add-hook 'pyvenv-post-activate-hooks #'pyvenv-restart-python)
-  (add-hook 'pyvenv-post-activate-hooks (lambda () (flycheck-select-checker 'python-flake8)))
+  (defun enable-python-checkers ()
+    (flycheck-reset-enabled-checker 'python-flake8)
+    (flycheck-reset-enabled-checker 'python-pylint)
+    (flycheck-select-checker 'python-flake8))
+  (add-hook 'pyvenv-post-activate-hooks #'enable-python-checkers)
+  (add-hook 'pyvenv-post-activate-hooks #'python-mode)
+  (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
 
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
@@ -1124,11 +1141,11 @@
 (use-package racer
   :ensure t
   :hook
-  ((rust-mode . racer-mode-hook)
+  ((rust-mode . racer-mode)
    (racer-mode . eldoc-mode)
    (racer-mode . company-mode))
   :config
-  (bind-key "M-." 'racer-find-definition rust-mode-map))
+  (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
 
 (use-package flycheck-rust
   :ensure t
@@ -1389,4 +1406,4 @@
     (multi-term-program "/usr/bin/zsh")
     :init
     (push '(term-mode :position bottom :width 60)
-        popwin:special-display-config)))
+          popwin:special-display-config)))
