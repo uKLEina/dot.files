@@ -388,7 +388,9 @@
 (use-package which-key
   :ensure t
   :hook
-  (after-init . which-key-mode))
+  (after-init . which-key-mode)
+  :config
+  (which-key-setup-side-window-right))
 
 (use-package migemo
   :ensure t
@@ -584,13 +586,13 @@
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
   (bind-key "C-l C-v" #'pyvenv-workon elpy-mode)
   (add-hook 'pyvenv-post-activate-hooks #'pyvenv-restart-python)
-  (defun enable-python-checkers ()
-    (flycheck-reset-enabled-checker 'python-flake8)
-    (flycheck-reset-enabled-checker 'python-pylint)
-    (flycheck-select-checker 'python-flake8))
-  (add-hook 'pyvenv-post-activate-hooks #'enable-python-checkers)
-  (add-hook 'pyvenv-post-activate-hooks #'python-mode)
-  (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
+  ;; (defun enable-python-checkers ()
+  ;;   (flycheck-reset-enabled-checker 'python-flake8)
+  ;;   (flycheck-reset-enabled-checker 'python-pylint)
+  ;;   (flycheck-select-checker 'python-flake8))
+  ;; (add-hook 'pyvenv-post-activate-hooks #'enable-python-checkers)
+  ;; (add-hook 'pyvenv-post-activate-hooks #'python-mode)
+  ;; (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
 
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
@@ -1372,7 +1374,10 @@
   (defun set-face-font-height (size)
     (interactive "nSize: ")
     (set-face-attribute 'default nil
+                        :height size)
+    (set-face-attribute 'variable-pitch nil
                         :height size))
+
   (use-package ispell
     :defer t
     :custom
