@@ -16,8 +16,6 @@ URxvt.saveLines: 100000
 URxvt.depth: 32
 URxvt.fading: 40
 urxvt*colorMode: on
-urxvt*foreground: #dfdfdf
-urxvt*background: [80]#272727
 urxvt*colorBDMode: on
 urxvt*colorBD: #f2a22b
 urxvt*colorULMode: on
@@ -28,24 +26,26 @@ urxvt*dynamicColors: off
 urxvt*highlightSelection: true
 
 ! colorscheme
-! based on Tango
-! modified to adapt grayish background
-urxvt*color0: #000000
-urxvt*color1: #cc0000
-urxvt*color2: #4e9a06
-urxvt*color3: #c4a000
-urxvt*color4: #3465a4
-urxvt*color5: #75507b
-urxvt*color6: #06989a
-urxvt*color7: #d3d7cf
-urxvt*color8: #757773
-urxvt*color9: #ef2929
-urxvt*color10: #8ae234
-urxvt*color11: #fce94f
-urxvt*color12: #729fcf
-urxvt*color13: #ad7fa8
-urxvt*color14: #34e2e2
-urxvt*color15: #eeeeec
+! Dracula Xresources palette
+! slightly modified to lighter color 8 for transparent background
+*.foreground: #F8F8F2
+*.background: [90]#282A36
+*.color0:     #000000
+*.color1:     #FF5555
+*.color2:     #50FA7B
+*.color3:     #F1FA8C
+*.color4:     #BD93F9
+*.color5:     #FF79C6
+*.color6:     #8BE9FD
+*.color7:     #BFBFBF
+*.color8:     #666666
+*.color9:     #FF6E67
+*.color10:    #5AF78E
+*.color11:    #F4F99D
+*.color12:    #CAA9FA
+*.color13:    #FF92D0
+*.color14:    #9AEDFE
+*.color15:    #E6E6E6
 
 ! font
 urxvt*font: xft:Ricty Discord:pixelsize=32:antialias=true:hinting=true
