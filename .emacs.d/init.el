@@ -1396,19 +1396,11 @@
   (use-package autodisass-java-bytecode
     :ensure t
     :defer t)
+
   (use-package meghanada
     :ensure t
     :defer t
     :hook
     (java-mode . meghanada-mode)
     :config
-    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration))
-
-  (use-package multi-term
-    :ensure t
-    :bind (("C-l !" . multi-term-next))
-    :custom
-    (multi-term-program "/usr/bin/zsh")
-    :init
-    (push '(term-mode :position bottom :width 60)
-          popwin:special-display-config)))
+    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration)))
