@@ -561,38 +561,24 @@
 
 (use-package elpy
   :ensure t
-  :defer t
   :init
-  ;; never use `elpy-enable' because it slows Emacs startup time :(
-  ;; so manually enable all elpy features
-  (add-hook 'python-mode-hook 'elpy-modules-global-init)
-  (add-hook 'python-mode-hook 'elpy-mode)
-  (add-hook 'pyvenv-post-activate-hooks 'elpy-rpc-restart)
-  (add-hook 'inferior-python-mode-hook 'elpy-shell--enable-output-filter)
-  (setq elpy-enabled-p t)
+  (advice-add 'python-mode :before 'elpy-enable)
+  (remove-hook 'elpy-modules 'elpy-module-flymake)
   :custom
-  ;; remove flymake from modules
-  (elpy-modules '(elpy-module-sane-defaults
-                  elpy-module-company
-                  elpy-module-eldoc
-                  elpy-module-highlight-indentation
-                  elpy-module-pyvenv
-                  elpy-module-yasnippet
-                  elpy-module-django))
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
+  :bind
+  (:map
+   elpy-mode-map
+   ("C-l C-v" . pyvenv-workon)
+   :map
+   inferior-python-mode-map
+   ("C-c C-z" . elpy-shell-switch-to-buffer))
   :config
-  (define-key inferior-python-mode-map (kbd "C-c C-z") 'elpy-shell-switch-to-buffer)
   (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
-  (bind-key "C-l C-v" #'pyvenv-workon elpy-mode)
-  (add-hook 'pyvenv-post-activate-hooks #'pyvenv-restart-python)
-  ;; (defun enable-python-checkers ()
-  ;;   (flycheck-reset-enabled-checker 'python-flake8)
-  ;;   (flycheck-reset-enabled-checker 'python-pylint)
-  ;;   (flycheck-select-checker 'python-flake8))
-  ;; (add-hook 'pyvenv-post-activate-hooks #'enable-python-checkers)
-  ;; (add-hook 'pyvenv-post-activate-hooks #'python-mode)
-  ;; (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
+  ;; re-enable python-mode after switch venv to enable flycheck checkers
+  (add-hook 'pyvenv-post-activate-hooks #'python-mode)
+  (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
 
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
