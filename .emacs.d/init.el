@@ -567,6 +567,7 @@
   :custom
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
+  (elpy-rpc-virtualenv-path 'current)
   :bind
   (:map
    elpy-mode-map
