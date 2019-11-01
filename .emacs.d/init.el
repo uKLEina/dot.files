@@ -557,6 +557,12 @@
   :custom-face
   (highlight-indentation-face ((t (:background "#1b1d26")))))
 
+(use-package ace-jump-mode
+  :ensure t
+  :defer t
+  :init
+  (evil-global-set-key 'normal (kbd "SPC") 'ace-jump-mode))
+
 (use-package elpy
   :ensure t
   :init
