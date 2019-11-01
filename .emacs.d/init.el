@@ -278,7 +278,7 @@
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
       '(bar evil-state-seg matches remote-host buffer-info  pdf-pages linum-colnum)
-      '(projectile-project-name python-venv vcs checker fancy-battery datetime)))
+      '(projectile-project-name python-venv vcs checker battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple buffer-size)
