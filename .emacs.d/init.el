@@ -563,8 +563,13 @@
   :ensure t
   :init
   (advice-add 'python-mode :before 'elpy-enable)
-  (remove-hook 'elpy-modules 'elpy-module-flymake)
   :custom
+  (elpy-modules '(elpy-module-sane-defaults
+                  elpy-module-company
+                  elpy-module-eldoc
+                  elpy-module-highlight-indentation
+                  elpy-module-pyvenv
+                  elpy-module-yasnippet))
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
   (elpy-rpc-virtualenv-path 'current)
