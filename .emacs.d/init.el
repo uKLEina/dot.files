@@ -542,8 +542,6 @@
   (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
   (flycheck-idle-change-delay 2)
   :config
-  (use-package flycheck-pos-tip :ensure t)
-  (flycheck-pos-tip-mode +1)
   (smartrep-define-key
       flycheck-mode-map "C-c !"
     '(("n" . flycheck-next-error)
