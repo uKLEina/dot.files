@@ -278,11 +278,11 @@
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
       '(bar evil-state-seg matches remote-host buffer-info  pdf-pages linum-colnum)
-      '(projectile-project-name python-venv vcs checker battery datetime)))
+      '(projectile-project-name vcs checker battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple buffer-size)
-    '(major-mode minor-modes buffer-encoding))
+    '(major-mode minor-modes python-venv buffer-encoding))
 
   (defun setup-initial-doom-modeline ()
     (doom-modeline-set-modeline 'simple t))
@@ -457,17 +457,13 @@
   (helm-ag-base-command "rg --vimgrep --no-heading")
   (helm-ag-insert-at-point 'symbol)
   :bind
-  (("C-M-S-g" . 'helm-ag))
+  (("C-M-g" . 'helm-ag)
+   ("C-M-S-g" . 'helm-projectile-ag))
   :config
   (defun helm-projectile-ag ()
     "Projectileと連携"
     (interactive)
     (helm-ag (projectile-project-root))))
-
-(use-package helm-rg
-  :ensure t
-  :bind
-  (("C-M-g" . 'helm-rg)))
 
 (use-package helm-swoop
   :ensure t
@@ -577,6 +573,7 @@
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
   (elpy-rpc-virtualenv-path 'current)
+  (elpy-test-runner 'elpy-test-pytest-runner)
   :bind
   (:map
    elpy-mode-map
