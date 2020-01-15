@@ -1290,7 +1290,12 @@
 
 (use-package yaml-mode
   :ensure t
-  :defer t)
+  :defer t
+  :hook
+  (yaml-mode . highlight-indentation-mode)
+  :config
+  (buffer-face-set 'default)
+  (highlight-indentation-set-offset 2))
 
 (use-package markdown-mode
   :ensure t
