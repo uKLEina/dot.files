@@ -538,8 +538,7 @@
   :hook
   (prog-mode . flycheck-mode)
   :custom
-  (flycheck-check-syntax-automatically '(save idle-change mode-enabled))
-  (flycheck-idle-change-delay 2)
+  (flycheck-check-syntax-automatically '(save mode-enabled))
   :config
   (smartrep-define-key
       flycheck-mode-map "C-c !"
