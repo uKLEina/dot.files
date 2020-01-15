@@ -1,0 +1,6 @@
+[style]
+based_on_style=pep8
+column_limit=88
+split_before_arithmetic_operator=true
+coalesce_brackets=true
+split_all_top_level_comma_separated_values=true

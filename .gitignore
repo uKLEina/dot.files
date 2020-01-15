@@ -19,6 +19,8 @@
 !/.config/flake8
 !/.config/pip
 !/.config/pip/pip.conf
+!/.config/yapf/
+!/.config/yapf/style
 !/.config/alacritty
 !/.config/alacritty/alacritty.yml
 !/.themes/
