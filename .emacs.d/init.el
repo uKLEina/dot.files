@@ -949,10 +949,7 @@
   :ensure t
   :defer t
   :mode (("\\.js\\'" . js2-mode))
-  :hook
-  (js2-mode . tern-mode)
-  :config
-  (add-to-list 'company-backends 'company-tern))
+  )
 
 (use-package slime
   :ensure t
