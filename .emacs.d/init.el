@@ -117,41 +117,6 @@
     (split-window-horizontally))
   (other-window 1))
 
-;;; scroll window without changing cursor position
-(defun my-count-string-columns (str)
-  "Count columns of string. The number of column begins 0."
-  (with-temp-buffer
-    (insert str)
-    (current-column)))
-
-(defun my-count-lines-window ()
-  "Count lines relative to the selected window. The number of lines begins 0."
-  (interactive)
-  (let* ((window-string (buffer-substring-no-properties (window-start) (point)))
-         (line-string-list (split-string window-string "\n"))
-         (line-count 0)
-         line-count-list)
-    (setq line-count (1- (length line-string-list)))
-    (unless truncate-lines      ; consider folding back
-      ;; `line-count-list' is list of the number of physical lines which each logical line has.
-      (setq line-count-list (mapcar #'(lambda (str)
-                                        (/ (my-count-string-columns str) (window-width)))
-                                    line-string-list))
-      (setq line-count (+ line-count (apply '+ line-count-list))))
-    line-count))
-
-(defadvice scroll-up (around scroll-up-relative activate)
-  "Scroll up relatively without move of cursor."
-  (let ((line (my-count-lines-window)))
-    ad-do-it
-    (move-to-window-line line)))
-
-(defadvice scroll-down (around scroll-down-relative activate)
-  "Scroll down relatively without move of cursor."
-  (let ((line (my-count-lines-window)))
-    ad-do-it
-    (move-to-window-line line)))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
