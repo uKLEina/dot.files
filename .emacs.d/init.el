@@ -276,7 +276,7 @@
       (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
-      '(bar evil-state-seg matches remote-host buffer-info  pdf-pages linum-colnum)
+      '(bar evil-state-seg matches remote-host buffer-info pdf-pages)
       '(projectile-project-name vcs checker battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
