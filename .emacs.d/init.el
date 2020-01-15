@@ -227,9 +227,8 @@
 
   (doom-modeline-def-segment linum-colnum
     "Display current linum/colnum"
-    (propertize (format " Ln %s/%s, Col %s"
+    (propertize (format " Ln %s, Col %s"
                         (format-mode-line "%l")
-                        (line-number-at-pos (point-max))
                         (format-mode-line "%c"))
                 'face (if (doom-modeline--active)
                           '(:foreground "#8cd0d3" :weight bold)
