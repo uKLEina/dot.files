@@ -100,7 +100,7 @@
      ("\t" 0 f-ub-steelblue prepend)
      ("[ ]+$" 0 f-bg-gray append))))
 (advice-add 'font-lock-mode :before #'visible-spaces)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
 (custom-set-variables
@@ -241,7 +241,7 @@
       (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
-      '(bar evil-state-seg matches remote-host buffer-info pdf-pages)
+      '(bar evil-state-seg matches remote-host buffer-info linum-colnum pdf-pages)
       '(projectile-project-name vcs checker battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
@@ -357,6 +357,9 @@
   :ensure t
   :hook
   (after-init . which-key-mode)
+  :custom
+  (which-key-idle-delay 5.0)
+  (which-key-idle-secondary-delay 1.0)
   :config
   (which-key-setup-side-window-right))
 
@@ -458,6 +461,8 @@
   (company-minimum-prefix-length 1)
   (company-selection-wrap-around t)
   :config
+  (evil-define-key 'insert company-mode-map (kbd "C-n") 'company-select-next)
+  (evil-define-key 'insert company-mode-map (kbd "C-p") 'company-select-previous)
   (bind-keys
    :map company-active-map
    ("C-s" . company-filter-candidates)
@@ -515,8 +520,6 @@
 (use-package highlight-indentation
   :ensure t
   :defer t
-  :hook
-  (python-mode-hook . highlight-indentation-mode)
   :custom-face
   (highlight-indentation-face ((t (:background "#1b1d26")))))
 
@@ -530,6 +533,8 @@
   :ensure t
   :init
   (advice-add 'python-mode :before 'elpy-enable)
+  :hook
+  (python-mode . (lambda () (setq tab-width 4)))
   :custom
   (elpy-modules '(elpy-module-sane-defaults
                   elpy-module-company
@@ -541,6 +546,7 @@
   (python-shell-interpreter-args "-i")
   (elpy-rpc-virtualenv-path 'current)
   (elpy-test-runner 'elpy-test-pytest-runner)
+  (elpy-rpc-timeout 30)
   :bind
   (:map
    elpy-mode-map
