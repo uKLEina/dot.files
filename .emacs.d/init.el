@@ -570,6 +570,8 @@
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
         popwin:special-display-config)
   (push '(inferior-python-mode :position bottom :width 30)
+        popwin:special-display-config)
+  (push '("*compilation*" :position bottom :width 50 :tail t)
         popwin:special-display-config))
 
 ;;; dired
@@ -678,8 +680,15 @@
   :defer t
   :custom
   (imenu-list-auto-resize t)
+  (imenu-list-focus-after-activation t)
+  :hook
+  (imenu-list-after-jump . imenu-list-smart-toggle)
   :bind
-  ("C-;" . imenu-list-smart-toggle))
+  ("C-;" . imenu-list-smart-toggle)
+  :config
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
 (use-package winner
   :init
@@ -1262,6 +1271,8 @@
 (use-package yaml-mode
   :ensure t
   :defer t
+  :init
+  (add-hook 'yaml-mode-hook '(lambda () (buffer-face-set 'default)))
   :hook
   (yaml-mode . highlight-indentation-mode)
   :config
