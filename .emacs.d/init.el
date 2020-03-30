@@ -283,7 +283,7 @@
 
   (defun evil-forward-par (origfun arg)
     (funcall origfun)
-    (unless (evil-emacs-state-p)
+    (if (not (or (evil-emacs-state-p) (evil-end-of-line-p)))
       (backward-char)))
 
   (defun evil-backward-par (origfun arg)
@@ -358,7 +358,7 @@
   :hook
   (after-init . which-key-mode)
   :custom
-  (which-key-idle-delay 5.0)
+  (which-key-idle-delay 2.0)
   (which-key-idle-secondary-delay 1.0)
   :config
   (which-key-setup-side-window-right))
@@ -384,11 +384,6 @@
   :custom
   (ripgrep-executable "~/.cargo/bin/rg")
   (ripgrep-arguments '("-S")))
-
-(use-package popwin
-  :ensure t
-  :defer t
-  :commands (popwin-mode))
 
 (use-package helm
   :ensure t
@@ -529,6 +524,22 @@
   :init
   (evil-global-set-key 'normal (kbd "SPC") 'ace-jump-mode))
 
+(use-package pangu-spacing
+  :ensure t
+  :hook
+  (text-mode . pangu-spacing-mode)
+  :custom
+  (pangu-spcing-real-insert-separator t)
+  :config
+  ;; chinse-two-byte→japanese に置き換えて日本語で使う
+  (setq pangu-spacing-chinese-before-english-regexp
+        (rx (group-n 1 (category japanese))
+            (group-n 2 (in "a-zA-Z0-9"))))
+  (setq pangu-spacing-chinese-after-english-regexp
+        (rx (group-n 1 (in "a-zA-Z0-9"))
+            (group-n 2 (category japanese)))))
+
+
 (use-package elpy
   :ensure t
   :init
@@ -545,6 +556,7 @@
   (python-shell-interpreter "python")
   (python-shell-interpreter-args "-i")
   (elpy-rpc-virtualenv-path 'current)
+  (elpy-test-pytest-runner-command '("pytest"))
   (elpy-test-runner 'elpy-test-pytest-runner)
   (elpy-rpc-timeout 30)
   :bind
@@ -571,7 +583,7 @@
         popwin:special-display-config)
   (push '(inferior-python-mode :position bottom :width 30)
         popwin:special-display-config)
-  (push '("*compilation*" :position bottom :width 50 :tail t)
+  (push '(compilation-mode :position bottom :width 50 :tail t)
         popwin:special-display-config))
 
 ;;; dired
