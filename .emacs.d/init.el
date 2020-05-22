@@ -241,7 +241,8 @@
       (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
-      '(bar evil-state-seg matches remote-host buffer-info linum-colnum pdf-pages)
+      ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
+      '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
       '(projectile-project-name vcs checker battery datetime)))
 
   (doom-modeline-def-modeline 'verbose
@@ -485,6 +486,7 @@
     '(("<tab>" . tab-to-tab-stop))))
 
 (use-package popwin
+  :ensure t
   :config
   (popwin-mode +1))
 
@@ -575,9 +577,9 @@
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
   ;; so add pylint after it
-  (when (eq system-type 'gnu/linux)
-    (flycheck-add-next-checker 'python-flake8 'python-pylint))
-
+  ;; (when (eq system-type 'gnu/linux)
+  ;;   (flycheck-add-next-checker 'python-flake8 'python-pylint))
+  (flycheck-remove-next-checker 'python-flake8 'python-pylint)
   ;; popwin
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
         popwin:special-display-config)
@@ -1394,4 +1396,5 @@
     :hook
     (java-mode . meghanada-mode)
     :config
-    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration)))
+    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration)
+    (evil-define-key 'normal meghanada-mode-map (kbd "M-,") 'meghanada-back-jump)))
