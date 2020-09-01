@@ -439,8 +439,6 @@
          :map isearch-mode-map
          ("M-i" . helm-swoop-from-isearch)
          :map helm-swoop-map
-         ("C-r" . helm-previous-line)
-         ("C-s" . helm-next-line)
          ("M-i" . helm-multi-swoop-all-from-helm-swoop))
   :custom
   (helm-swoop-split-with-multiple-windows nil)
