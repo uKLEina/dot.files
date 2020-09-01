@@ -1112,8 +1112,10 @@
   :mode (("\\.plantuml\\'" . plantuml-mode)
          ("\\.puml\\'" . plantuml-mode)
          ("\\.pu\\'" . plantuml-mode))
+  :custom
+  (plantuml-jar-path "~/opt/plantuml/plantuml.jar")
+  (plantuml-default-exec-mode 'jar)
   :config
-  (custom-set-variables '(plantuml-jar-path "~/plantuml.jar"))
   (push '("*PLANTUML Preview*" :position right :width 50 :noselect t)
         popwin:special-display-config))
 
