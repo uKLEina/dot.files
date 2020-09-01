@@ -795,7 +795,9 @@
   ;; auto highlight darker for Doom Dracula theme
   (highlight-symbol-face ((t (:background "#1b1d26"))))
   :bind
-  ("C-l C-s" . highlight-symbol))
+  ("C-l C-s" . highlight-symbol)
+  ("M-n" . highlight-symbol-next)
+  ("M-p" . highlight-symbol-prev))
 
 (use-package smartparens
   :ensure t
