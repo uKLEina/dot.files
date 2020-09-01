@@ -447,6 +447,15 @@
   (helm-swoop-move-to-line-cycle t)
   (helm-swoop-use-line-number-face t))
 
+(use-package ace-isearch
+  :ensure t
+  :defer t
+  :custom
+  (ace-isearch-function 'ace-jump-char-mode)
+  (ace-isearch-use-function-from-isearch nil)
+  :init
+  (global-ace-isearch-mode +1))
+
 (use-package company
   :ensure t
   :hook
@@ -519,12 +528,6 @@
   :defer t
   :custom-face
   (highlight-indentation-face ((t (:background "#1b1d26")))))
-
-(use-package ace-jump-mode
-  :ensure t
-  :defer t
-  :init
-  (evil-global-set-key 'normal (kbd "SPC") 'ace-jump-mode))
 
 (use-package pangu-spacing
   :ensure t
