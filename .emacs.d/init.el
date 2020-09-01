@@ -422,7 +422,7 @@
   :ensure t
   :defer t
   :custom
-  (helm-ag-base-command "rg --vimgrep --no-heading")
+  (helm-ag-base-command "rg --vimgrep --no-heading -S")
   (helm-ag-insert-at-point 'symbol)
   :bind
   (("C-M-g" . 'helm-ag)
