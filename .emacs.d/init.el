@@ -774,14 +774,11 @@
   (("C-M-]" . er/expand-region)
    ("C-M-:" . er/contract-region)))
 
-(use-package hideshow
-  :hook
-  ((c-mode-common emacs-lisp-mode java-mode lisp-mode perl-mode sh-mode python-mode) . hs-minor-mode)
+(use-package origami
+  :ensure t
   :bind
-  (:map hs-minor-mode-map
-        ("C-l h t" . hs-toggle-hiding)
-        ("C-l h a" . hs-hide-all)
-        ("C-l s a" . hs-show-all)))
+  ("C-l o" . origami-recursively-toggle-node)
+  )
 
 (use-package highlight-symbol
   :ensure t
