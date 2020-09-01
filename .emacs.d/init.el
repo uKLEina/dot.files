@@ -456,6 +456,7 @@
   (company-idle-delay 0)
   (company-minimum-prefix-length 1)
   (company-selection-wrap-around t)
+  (company-dabbrev-downcase nil)
   :config
   (evil-define-key 'insert company-mode-map (kbd "C-n") 'company-select-next)
   (evil-define-key 'insert company-mode-map (kbd "C-p") 'company-select-previous)
