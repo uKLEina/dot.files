@@ -376,6 +376,7 @@
   (migemo-regex-dictionary nil)
   (migemo-pattern-alist-length 1024)
   (migemo-coding-system 'utf-8)
+  (migemo-isearch-min-length 2)
   :init
   (migemo-init))
 
