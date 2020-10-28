@@ -453,6 +453,7 @@
   :custom
   (ace-isearch-function 'ace-jump-char-mode)
   (ace-isearch-use-function-from-isearch nil)
+  (ace-isearch-jump-delay 0.8)
   :init
   (global-ace-isearch-mode +1))
 
@@ -1304,6 +1305,18 @@
 (use-package dockerfile-mode
   :ensure t
   :defer t)
+
+(use-package textile-mode
+  :ensure t
+  :mode "\\.textile\\'")
+
+(use-package open-junk-file
+  :ensure t
+  :custom
+  (open-junk-file-format "~/.junk/%Y/%m/%d-%H%M%S.")
+  :bind
+  (("C-l j" . open-junk-file))
+  )
 
 (use-package diminish
   :ensure t
