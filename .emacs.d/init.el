@@ -535,7 +535,7 @@
   :hook
   (text-mode . pangu-spacing-mode)
   :custom
-  (pangu-spcing-real-insert-separator t)
+  (pangu-spacing-real-insert-separtor t)
   :config
   ;; chinse-two-byte→japanese に置き換えて日本語で使う
   (setq pangu-spacing-chinese-before-english-regexp
