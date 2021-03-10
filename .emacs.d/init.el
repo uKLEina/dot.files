@@ -447,6 +447,10 @@
   (helm-swoop-move-to-line-cycle t)
   (helm-swoop-use-line-number-face t))
 
+(use-package ace-jump-mode
+  :ensure t
+  :defer t)
+
 (use-package ace-isearch
   :ensure t
   :defer t
