@@ -307,10 +307,21 @@
   :ensure t
   :defer t)
 
+(use-package multiple-cursors
+  :ensure t
+  :bind
+  (("C-S-m" . 'mc/edit-lines)))
+
+(use-package undo-tree
+  :ensure t
+  :init
+  (global-undo-tree-mode +1))
+
 (use-package evil
   :ensure t
   :custom
   (evil-echo-state nil)
+  (evil-undo-system 'undo-tree)
   :init
   (defun evil-swap-key (map key1 key2)
     "Swap KEY1 and KEY2 in MAP."
