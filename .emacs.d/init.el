@@ -909,7 +909,7 @@
 (add-hook 'c++-mode-hook #'c/c++-mode-setup)
 
 (use-package rtags
-  :load-path "/usr/local/share/emacs/site-lisp/rtags/"
+  :ensure t
   :init
   (defun c/c++-mode-rtags-setup ()
     "hook function to setup rtags things for `c-mode' and `c++-mode'."
