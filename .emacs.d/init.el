@@ -289,7 +289,7 @@
   (defun evil-forward-par (origfun arg)
     (funcall origfun)
     (if (not (or (evil-emacs-state-p) (evil-end-of-line-p)))
-      (backward-char)))
+        (backward-char)))
 
   (defun evil-backward-par (origfun arg)
     (if (evil-end-of-line-p)
@@ -1315,7 +1315,7 @@
   :ensure t
   :defer t
   :init
-  (add-hook 'yaml-mode-hook '(lambda () (buffer-face-set 'default)))
+  (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
   :hook
   (yaml-mode . highlight-indentation-mode)
   :config
@@ -1400,11 +1400,11 @@
   (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
   (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))
   (add-hook 'text-mode-hook
-            '(lambda ()
-               (buffer-face-set 'variable-pitch)))
+            #'(lambda ()
+                (buffer-face-set 'variable-pitch)))
   (add-hook 'Info-mode-hook
-            '(lambda ()
-               (buffer-face-set 'variable-pitch)))
+            #'(lambda ()
+                (buffer-face-set 'variable-pitch)))
   (defun set-face-font-height (size)
     (interactive "nSize: ")
     (set-face-attribute 'default nil
