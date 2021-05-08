@@ -349,7 +349,8 @@
              ("C-t" . other-window-or-split)
              ("C-e" . end-of-line))
   (evil-swap-key evil-motion-state-map "j" "gj")
-  (evil-swap-key evil-motion-state-map "k" "gk"))
+  (evil-swap-key evil-motion-state-map "k" "gk")
+  )
 
 (use-package evil-mode-line
   :init
@@ -421,8 +422,10 @@
     :config
     (helm-descbinds-mode +1))
   (helm-autoresize-mode +1)
-  (with-eval-after-load 'migemo
-    (helm-migemo-mode +1)))
+  ;; helm-migemo が helm-swoop で上手く動かないのでコメントアウトしておく
+  ;; (with-eval-after-load 'migemo
+  ;;   (helm-migemo-mode +1))
+  )
 
 (use-package smex :ensure t)
 (use-package helm-smex
@@ -460,7 +463,9 @@
   (helm-swoop-split-direction 'split-window-vertically)
   (helm-swoop-speed-or-color t)
   (helm-swoop-move-to-line-cycle t)
-  (helm-swoop-use-line-number-face t))
+  (helm-swoop-use-line-number-face t)
+  :config
+  (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper))
 
 (use-package ace-jump-mode
   :ensure t
@@ -600,9 +605,9 @@
   ;; use both flake8 and pylint
   ;; flycheck uses only flake8 by default,
   ;; so add pylint after it
-  ;; (when (eq system-type 'gnu/linux)
-  ;;   (flycheck-add-next-checker 'python-flake8 'python-pylint))
-  (flycheck-remove-next-checker 'python-flake8 'python-pylint)
+  (when (eq system-type 'gnu/linux)
+    (flycheck-add-next-checker 'python-flake8 'python-pylint))
+  ;; (flycheck-remove-next-checker 'python-flake8 'python-pylint)
   ;; popwin
   (push '("*Python Doc*" :position bottom :width 30 :noselect t)
         popwin:special-display-config)
