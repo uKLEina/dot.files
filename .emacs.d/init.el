@@ -910,6 +910,7 @@
 
 (use-package rtags
   :ensure t
+  :defer t
   :init
   (defun c/c++-mode-rtags-setup ()
     "hook function to setup rtags things for `c-mode' and `c++-mode'."
@@ -955,10 +956,14 @@
 
 (use-package clang-format
   :ensure t
-  :defer t
-  :init
-  (bind-key "C-l i" 'clang-format-buffer c++-mode-map)
-  (bind-key "C-l i" 'clang-format-buffer c-mode-map))
+  :after (rtags)
+  :bind (
+         :map c++-mode-map
+         ("C-l i" . clang-format-buffer)
+         :map c-mode-map
+         ("C-l i" . clang-format-buffer)
+         )
+  )
 
 (use-package hideif
   :defer t
@@ -1271,6 +1276,7 @@
 ;;   (reftex-plug-into-AUCTeX t))
 
 (use-package org
+  :defer t
   :init
   ;; reftex with org mode
   (add-hook 'org-mode-hook 'turn-on-reftex)
@@ -1376,7 +1382,6 @@
   (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
   (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
   )
-
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
