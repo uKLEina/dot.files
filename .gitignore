@@ -30,6 +30,7 @@ chromedriver
 geckodriver
 !/linux_setup.sh
 !/.Xdefaults
+!/.Xresources
 !/.zshenv
 !/.gitignore_global
 

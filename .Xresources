@@ -1,0 +1,61 @@
+! disable keycap picture insert mode
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+
+! behavior
+URxvt.buffered: true
+URxvt.fading: 40
+URxvt.scrollBar: false
+URxvt.pointerBlank: true
+URxvt.saveLines: 1000000
+URxvt.urlLauncher: /usr/bin/firefox
+
+! color
+URxvt.depth: 32
+URxvt.colorBD: #F2A22B
+URxvt.colorUL: #7FA9E8
+URxvt.colorIT: #40EB84
+URxvt.cursorColor: #BD93F9
+
+! colorscheme
+! Dracula Xresources palette
+! slightly modified to lighter color 8 for transparent background
+URxvt.background: [90]#282A36
+URxvt.foreground: #F8F8F2
+URxvt.color0:     #000000
+URxvt.color1:     #FF5555
+URxvt.color2:     #50FA7B
+URxvt.color3:     #F1FA8C
+URxvt.color4:     #BD93F9
+URxvt.color5:     #FF79C6
+URxvt.color6:     #8BE9FD
+URxvt.color7:     #BFBFBF
+!URxvt.color8:     #666666
+URxvt.color8:     #4D4D4D
+URxvt.color9:     #FF6E67
+URxvt.color10:    #5AF78E
+URxvt.color11:    #F4F99D
+URxvt.color12:    #CAA9FA
+URxvt.color13:    #FF92D0
+URxvt.color14:    #9AEDFE
+URxvt.color15:    #E6E6E6
+
+! font
+URxvt.font: xft:Ricty Discord:pixelsize=16:antialias=true:hinting=true
+URxvt.boldFont: xft:Ricty Discord:pixelsize=16:antialias=true:bold:hinting=true
+URxvt.italicFont: xft:Ricty Discord:pixelsize=16:antialias=true:italic:autohint=true:hinting=true
+URxvt.bolditalicFont: xft:Ricty Discord:pixelsize=16:antialias=true:bold:italic:autohint=true:hinting=true
+URxvt.letterSpace: -1
+
+Xft.dpi: 96
+Xft.autohint: 0
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
+
+Xcursor.size: 22
+
+Xcursor.theme: Paper
