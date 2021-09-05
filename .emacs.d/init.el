@@ -548,11 +548,11 @@
   (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
         popwin:special-display-config))
 
-(use-package highlight-indentation
+(use-package highlight-indent-guides
   :ensure t
   :defer t
-  :custom-face
-  (highlight-indentation-face ((t (:background "#1b1d26")))))
+  :custom
+  (highlight-indent-guides-method 'column))
 
 (use-package pangu-spacing
   :ensure t
@@ -569,52 +569,37 @@
         (rx (group-n 1 (in "a-zA-Z0-9"))
             (group-n 2 (category japanese)))))
 
-
-(use-package elpy
+(use-package lsp-mode
   :ensure t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable)
+  :defer t
   :hook
-  (python-mode . (lambda () (setq tab-width 4)))
+  (python-mode . lsp)
+  (python-mode . highlight-indent-guides-mode)
   :custom
-  (elpy-modules '(elpy-module-sane-defaults
-                  elpy-module-company
-                  elpy-module-eldoc
-                  elpy-module-highlight-indentation
-                  elpy-module-pyvenv
-                  elpy-module-yasnippet))
-  (python-shell-interpreter "python")
-  (python-shell-interpreter-args "-i")
-  (elpy-rpc-virtualenv-path 'current)
-  (elpy-test-pytest-runner-command '("pytest"))
-  (elpy-test-runner 'elpy-test-pytest-runner)
-  (elpy-rpc-timeout 30)
-  :bind
-  (:map
-   elpy-mode-map
-   ("C-l C-v" . pyvenv-workon)
-   :map
-   inferior-python-mode-map
-   ("C-c C-z" . elpy-shell-switch-to-buffer))
+  ;; Python
+  (lsp-pylsp-plugins-flake8-enabled t)
+  (lsp-pylsp-plugins-pylint-enabled t)
+  (lsp-pylsp-plugins-yapf-enabled t)
   :config
-  (add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
-  ;; re-enable python-mode after switch venv to enable flycheck checkers
-  (add-hook 'pyvenv-post-activate-hooks #'python-mode)
-  (add-hook 'pyvenv-post-deactivate-hooks #'python-mode)
-
-  ;; use both flake8 and pylint
-  ;; flycheck uses only flake8 by default,
-  ;; so add pylint after it
-  (when (eq system-type 'gnu/linux)
-    (flycheck-add-next-checker 'python-flake8 'python-pylint))
-  ;; (flycheck-remove-next-checker 'python-flake8 'python-pylint)
-  ;; popwin
-  (push '("*Python Doc*" :position bottom :width 30 :noselect t)
-        popwin:special-display-config)
-  (push '(inferior-python-mode :position bottom :width 30)
-        popwin:special-display-config)
-  (push '(compilation-mode :position bottom :width 50 :tail t)
-        popwin:special-display-config))
+  (use-package lsp-ui
+    :ensure t
+    :preface
+    (defun my/toggle-lsp-ui-doc ()
+      (interactive)
+      (if lsp-ui-doc-mode
+        (progn
+          (lsp-ui-doc-mode -1)
+          (lsp-ui-doc--hide-frame))
+        (lsp-ui-doc-mode 1)))
+    :bind
+    (:map lsp-mode-map
+          ("C-c d" . my/toggle-lsp-ui-doc))
+    :custom
+    (lsp-ui-doc-include-signature t)
+    (lsp-ui-doc-position 'at-point)
+    :config
+    (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+    (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)))
 
 ;;; dired
 (use-package lv :ensure t :defer t)
@@ -1323,10 +1308,9 @@
   :init
   (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
   :hook
-  (yaml-mode . highlight-indentation-mode)
+  (yaml-mode . highlight-indent-guides-mode)
   :config
-  (buffer-face-set 'default)
-  (highlight-indentation-set-offset 2))
+  (buffer-face-set 'default))
 
 (use-package markdown-mode
   :ensure t
