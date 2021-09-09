@@ -51,6 +51,7 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (defvar default-tab-width 4)
+(setq tab-stop-list '(4 8 12))
 (setq scroll-step 1)
 (setq initial-scratch-message "")
 (setq delete-auto-save-files t)
@@ -600,6 +601,13 @@
     :config
     (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
     (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)))
+
+(use-package python-mode
+  :defer t
+  :bind
+  (:map python-mode-map
+        ("M-<right>" . python-indent-shift-right)
+        ("M-<left>" . python-indent-shift-left)))
 
 ;;; dired
 (use-package lv :ensure t :defer t)
@@ -1307,8 +1315,22 @@
   :defer t
   :init
   (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
+  (defun my/yaml-indent-shift-right (beg end)
+    (interactive "r")
+    (let ((tab-stop-list '(2 4 6))
+          (deactivate-mark nil))
+      (indent-rigidly-right-to-tab-stop beg end)))
+  (defun my/yaml-indent-shift-left (beg end)
+    (interactive "r")
+    (let ((tab-stop-list '(2 4 6))
+          (deactivate-mark nil))
+      (indent-rigidly-left-to-tab-stop beg end)))
   :hook
   (yaml-mode . highlight-indent-guides-mode)
+  :bind
+  (:map yaml-mode-map
+        ("M-<right>" . my/yaml-indent-shift-right)
+        ("M-<left>" . my/yaml-indent-shift-left))
   :config
   (buffer-face-set 'default))
 
