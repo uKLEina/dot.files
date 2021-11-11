@@ -39,6 +39,7 @@
 (column-number-mode 1)
 (setq gc-cons-threshold (* 100 gc-cons-threshold))
 (setq gc-cons-percentage 0.2)
+(setq read-process-output-max (* 1024 1024))
 (setq message-log-max 100000)
 (setq enable-recursive-minibuffers t)
 (setq use-dialog-box nil)
@@ -72,6 +73,8 @@
 (if window-system (add-to-list 'default-frame-alist '(alpha . 90)))
 
 (recentf-mode 1)
+
+(tab-bar-mode -1)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
@@ -577,6 +580,8 @@
   (python-mode . lsp)
   (python-mode . highlight-indent-guides-mode)
   :custom
+  ;; general
+  (lsp-idle-delay 2)
   ;; Python
   (lsp-pylsp-plugins-flake8-enabled t)
   (lsp-pylsp-plugins-pylint-enabled t)
@@ -596,6 +601,7 @@
     (:map lsp-mode-map
           ("C-c d" . my/toggle-lsp-ui-doc))
     :custom
+    (lsp-ui-doc-enable nil)
     (lsp-ui-doc-include-signature t)
     (lsp-ui-doc-position 'at-point)
     :config
@@ -604,10 +610,9 @@
 
 (use-package python-mode
   :defer t
-  :bind
-  (:map python-mode-map
-        ("M-<right>" . python-indent-shift-right)
-        ("M-<left>" . python-indent-shift-left)))
+  :config
+  (define-key python-mode-map [remap left-word] #'python-indent-shift-left)
+  (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
 
 ;;; dired
 (use-package lv :ensure t :defer t)
@@ -1334,10 +1339,6 @@
   :config
   (buffer-face-set 'default))
 
-(use-package markdown-mode
-  :ensure t
-  :defer t)
-
 (use-package dockerfile-mode
   :ensure t
   :defer t)
@@ -1406,8 +1407,8 @@
                       :family "Ricty Discord"
                       :height 120)
   (set-face-attribute 'variable-pitch nil
-                      :family "Migu 1VS"
-                      :height 105)
+                      :family "Ricty Discord"
+                      :height 120)
   (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
   (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))
   (add-hook 'text-mode-hook
