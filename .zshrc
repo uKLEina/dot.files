@@ -88,6 +88,9 @@ function cdwhich () {
 # install python dev tools
 alias pydev="pip install jedi rope autopep8 yapf black flake8 flake8-docstrings flake8-import-order pep8-naming pylint"
 
+# git
+alias git co="git checkout"
+
 function showfont (){ fc-match "$@" -f "%{file}" | xargs display }
 
 setopt hist_ignore_dups
