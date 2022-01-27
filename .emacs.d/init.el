@@ -560,8 +560,6 @@
 
 (use-package pangu-spacing
   :ensure t
-  :hook
-  (text-mode . pangu-spacing-mode)
   :custom
   (pangu-spacing-real-insert-separtor t)
   :config
@@ -1148,6 +1146,12 @@
   :config
   (push '("*PLANTUML Preview*" :position right :width 50 :noselect t)
         popwin:special-display-config))
+
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . gfm-mode))
+  :custom
+  (markdown-command "pandoc"))
 
 (use-package rust-mode
   :ensure t
