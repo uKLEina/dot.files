@@ -80,6 +80,8 @@ export THEFUCK_ALTER_HISTORY=true
 alias dcip="docker inspect --format '{{ .NetworkSettings.IPAddress }}' $1"
 alias dcls="docker container ls"
 
+alias tx='tar -xf'
+
 # whichで見付けたexecutableのあるディレクトリにcdする
 function cdwhich () {
     cd $(which $1 | xargs -0 dirname)
