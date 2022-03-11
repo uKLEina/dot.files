@@ -897,7 +897,7 @@
 (use-package projectile
   :ensure t
   :commands (projectile-project-root)
-  :bind (("C-l p e" . projectile-mode)))
+  :bind-keymap ("C-l p" . projectile-command-map))
 
 (use-package helm-projectile
   :ensure t
