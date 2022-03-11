@@ -460,6 +460,7 @@
 (use-package helm-swoop
   :ensure t
   :bind (("M-i" . helm-swoop)
+         ("M-I" . helm-swoop)
          :map isearch-mode-map
          ("M-i" . helm-swoop-from-isearch)
          :map helm-swoop-map
@@ -801,6 +802,7 @@
   (setq backward-forward-evil-compatibility-mode t)
   (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
   (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
+  (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper)
   :bind
   (:map backward-forward-mode-map
         ("C-l C-a" . backward-forward-previous-location)
