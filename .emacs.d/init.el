@@ -67,10 +67,12 @@
   :defer t)
 (show-paren-mode 1)
 ;; hide tool bar/scroll bar
-(tool-bar-mode 0)
-(scroll-bar-mode 0)
-(menu-bar-mode 0)
-(if window-system (add-to-list 'default-frame-alist '(alpha . 90)))
+(if window-system
+    (progn
+      (add-to-list 'default-frame-alist '(alpha . 90))
+      (tool-bar-mode 0)
+      (scroll-bar-mode 0)
+      (menu-bar-mode 0)))
 
 (recentf-mode 1)
 
@@ -580,6 +582,7 @@
   :custom
   ;; general
   (lsp-idle-delay 2)
+  (lsp-ui-sideline-enable nil)
   ;; Python
   (lsp-pylsp-plugins-flake8-enabled t)
   (lsp-pylsp-plugins-pylint-enabled t)
@@ -1411,10 +1414,13 @@
                       :family "Ricty Discord"
                       :height 120)
   (set-face-attribute 'variable-pitch nil
-                      :family "Ricty Discord"
-                      :height 120)
-  (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
-  (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))
+                      :family "Migu 1VS"
+                      :height 105)
+  (if window-system
+      (progn
+        (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
+        (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
+
   (add-hook 'text-mode-hook
             #'(lambda ()
                 (buffer-face-set 'variable-pitch)))
