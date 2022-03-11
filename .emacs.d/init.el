@@ -615,6 +615,23 @@
   (define-key python-mode-map [remap left-word] #'python-indent-shift-left)
   (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
 
+(use-package lsp-java
+  :defer t
+  :ensure t
+  :hook
+  (java-mode . lsp)
+  :custom
+  (lsp-java-jdt-download-url "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz"))
+(use-package dap-mode
+  :defer t
+  :ensure t
+  :after lsp-mode
+  :config
+  (dap-auto-configure-mode))
+(use-package dap-java
+  :defer t
+  :after lsp-java)
+
 ;;; dired
 (use-package lv :ensure t :defer t)
 (use-package dired
@@ -1452,12 +1469,4 @@
   (use-package autodisass-java-bytecode
     :ensure t
     :defer t)
-
-  (use-package meghanada
-    :ensure t
-    :defer t
-    :hook
-    (java-mode . meghanada-mode)
-    :config
-    (evil-define-key 'normal meghanada-mode-map (kbd "M-.") 'meghanada-jump-declaration)
-    (evil-define-key 'normal meghanada-mode-map (kbd "M-,") 'meghanada-back-jump)))
+  )
