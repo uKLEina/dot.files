@@ -901,7 +901,7 @@
 
 (use-package helm-projectile
   :ensure t
-  :bind (("C-l p f " . helm-projectile-find-file-dwim)))
+  :after projectile)
 
 (use-package yasnippet
   :ensure t
