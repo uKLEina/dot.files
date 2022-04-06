@@ -321,7 +321,9 @@
 (use-package undo-tree
   :ensure t
   :init
-  (global-undo-tree-mode +1))
+  (global-undo-tree-mode +1)
+  :custom
+  (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
 
 (use-package evil
   :ensure t
