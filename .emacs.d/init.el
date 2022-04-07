@@ -47,7 +47,7 @@
 (setq history-length 10000)
 (setq echo-keystrokes 0.1)
 (setq large-file-warning-threshold (* 25 1024 1024))
-(defalias 'yes-or-no-p 'y-or-n-p)
+(setq use-short-answers t)
 (setq visible-bell t)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
