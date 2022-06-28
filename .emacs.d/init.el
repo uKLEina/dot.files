@@ -911,7 +911,9 @@
 
 (use-package helm-projectile
   :ensure t
-  :after projectile)
+  :after projectile
+  :config
+  (helm-projectile-on))
 
 (use-package yasnippet
   :ensure t
