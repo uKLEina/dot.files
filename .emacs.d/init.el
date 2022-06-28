@@ -587,8 +587,14 @@
   (lsp-idle-delay 2)
   (lsp-ui-sideline-enable nil)
   ;; Python
+  ;; use flake8 instead of pycodestyle/pyflakes/mccabe
+  (lsp-pylsp-plugins-pycodestyle-enabled nil)
+  (lsp-pylsp-plugins-pyflakes-enabled nil)
+  (lsp-pylsp-plugins-mccabe-enabled nil)
   (lsp-pylsp-plugins-flake8-enabled t)
+  ;; use pylint
   (lsp-pylsp-plugins-pylint-enabled t)
+  ;; use yapf
   (lsp-pylsp-plugins-yapf-enabled t)
   :config
   (use-package lsp-ui
