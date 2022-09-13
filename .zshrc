@@ -131,6 +131,10 @@ source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # 環境依存の内容は別ファイルに置いておく
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
+# fzf
+[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+[ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+
 if [ $SHLVL = 1 ];then
   tmux
 fi
