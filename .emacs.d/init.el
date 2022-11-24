@@ -563,6 +563,20 @@
   :custom
   (highlight-indent-guides-method 'column))
 
+(use-package tree-sitter
+  :ensure t
+  :init
+  (global-tree-sitter-mode +1)
+  :hook
+  (tree-sitter-after-on . tree-sitter-hl-mode)
+  :config
+  ;; プロパティ系が italic にならないようにしておく
+  (custom-set-faces '(tree-sitter-hl-face:property ((t (:inherit font-lock-constant-face))))))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :defer t)
+
 (use-package pangu-spacing
   :ensure t
   :custom
