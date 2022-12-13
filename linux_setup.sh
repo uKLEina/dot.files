@@ -48,6 +48,12 @@ ln -s ~/dot.files/.tmux.conf ~/.tmux.conf
 # scripts
 ln -s ~/dot.files/bin ~/bin
 
+# git
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.ci commit
+git config --global alias.st status
+
 # others
 ln -s ~/dot.files/.aspell.conf ~/.aspell.conf
 ln -s ~/dot.files/.latexmkrc ~/.latexmkrc
