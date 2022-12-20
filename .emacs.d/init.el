@@ -424,7 +424,6 @@
   (helm-mode-fuzzy-match t)
   (helm-completion-in-region-fuzzy-match t)
   :config
-  (use-package helm-config)
   (use-package helm-descbinds
     :ensure t
     :config
