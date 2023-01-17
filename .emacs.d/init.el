@@ -556,6 +556,19 @@
   (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
         popwin:special-display-config))
 
+(use-package smerge-mode
+  :defer t
+  :config
+  (smartrep-define-key
+      smerge-mode-map "C-c ^"
+    '(("n" . smerge-next)
+      ("p" . smerge-prev)
+      ("l" . smerge-keep-lower)
+      ("u" . smerge-keep-upper)
+      ("b" . smerge-keep-base)
+      ("a" . smerge-keep-all)
+      ("E" . smerge-ediff))))
+
 (use-package highlight-indent-guides
   :ensure t
   :defer t
