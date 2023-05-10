@@ -546,6 +546,7 @@
   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   :hook
   (prog-mode . flycheck-mode)
+  (python-ts-mode . flycheck-mode)
   :custom
   (flycheck-check-syntax-automatically '(save mode-enabled))
   :config
@@ -571,23 +572,32 @@
 
 (use-package highlight-indent-guides
   :ensure t
-  :defer t
+  :hook
+  (python-mode . highlight-indent-guides-mode)
+  (python-ts-mode . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-method 'column))
 
-(use-package tree-sitter
-  :ensure t
-  :init
-  (global-tree-sitter-mode +1)
-  :hook
-  (tree-sitter-after-on . tree-sitter-hl-mode)
-  :config
-  ;; プロパティ系が italic にならないようにしておく
-  (custom-set-faces '(tree-sitter-hl-face:property ((t (:inherit font-lock-constant-face))))))
+; (use-package tree-sitter
+;   :ensure t
+;   :init
+;   (global-tree-sitter-mode +1)
+;   :hook
+;   (tree-sitter-after-on . tree-sitter-hl-mode)
+;   :config
+;   ;; プロパティ系が italic にならないようにしておく
+;   (custom-set-faces '(tree-sitter-hl-face:property ((t (:inherit font-lock-constant-face))))))
 
-(use-package tree-sitter-langs
+; (use-package tree-sitter-langs
+;   :ensure t
+;   :defer t)
+
+(use-package treesit-auto
   :ensure t
-  :defer t)
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (global-treesit-auto-mode))
 
 (use-package pangu-spacing
   :ensure t
@@ -604,10 +614,10 @@
 
 (use-package lsp-mode
   :ensure t
-  :defer t
   :hook
   (python-mode . lsp)
-  (python-mode . highlight-indent-guides-mode)
+  (python-ts-mode . lsp)
+  (perl-mode . lsp)
   :custom
   ;; general
   (lsp-idle-delay 2)
@@ -813,7 +823,10 @@
 
 (use-package rainbow-delimiters
   :ensure t
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook
+  (prog-mode . rainbow-delimiters-mode)
+  (python-ts-mode . rainbow-delimiters-mode)
+  )
 
 (use-package anzu
   :ensure t
@@ -846,7 +859,8 @@
   :ensure t
   :commands (electric-operator-add-rules-for-mode electric-operator-get-rules-for-mode)
   :hook
-  ((python-mode . electric-operator-mode)))
+  (python-mode . electric-operator-mode)
+  (python-ts-mode . electric-operator-mode))
 
 (use-package expand-region
   :ensure t
@@ -946,9 +960,12 @@
   :commands (yas-expand)
   :hook
   (prog-mode . yas-minor-mode)
+  (python-ts-mode . yas-minor-mode)
   :bind (("C-<tab>" . yas-expand))
   :config
   (use-package yasnippet-snippets :ensure t))
+
+(require 'yasnippet-snippets)
 
 (use-package ivy-yasnippet
   :ensure t
