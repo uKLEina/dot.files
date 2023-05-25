@@ -168,9 +168,9 @@
   :config
   (load-theme 'doom-dracula t)
   (enable-theme 'doom-dracula)
-  (with-eval-after-load 'helm-files
-    (doom-themes-set-faces 'doom-dracula
-      '(helm-ff-directory :weight 'bold :foreground (doom-color 'cyan))))
+  ;; (with-eval-after-load 'helm-files
+  ;;   (doom-themes-set-faces 'doom-dracula
+  ;;     '(helm-ff-directory :weight 'bold :foreground (doom-color 'cyan))))
   (doom-themes-set-faces 'doom-dracula
     '(font-lock-variable-name-face :foreground (doom-color 'cyan)))
   (custom-set-variables '(window-divider-default-right-width 10))
@@ -850,7 +850,7 @@
   (setq backward-forward-evil-compatibility-mode t)
   (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
   (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
-  (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper)
+  ;; (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper)
   :bind
   (:map backward-forward-mode-map
         ("C-l C-a" . backward-forward-previous-location)
