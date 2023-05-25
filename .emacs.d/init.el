@@ -59,7 +59,7 @@
 ;; show filename and path in title bar
 (setq frame-title-format
       '(buffer-file-name "%f"
-	                     (dired-directory dired-directory "%b")))
+                         (dired-directory dired-directory "%b")))
 (display-time-mode +1)
 (setq require-final-newline t)
 ;; デフォルト色付け
@@ -195,19 +195,19 @@
     "Display Projectile project name"
     (if (and (boundp 'projectile-mode) projectile-mode)
         (propertize (format " [%s]" (projectile-default-project-name (projectile-project-root)))
-	                'face (if (doom-modeline--active)
-		                      '(:foreground "#8cd0d3" :weight bold)
-		                    'mode-line-inactive))
+                    'face (if (doom-modeline--active)
+                              '(:foreground "#8cd0d3" :weight bold)
+                            'mode-line-inactive))
       ""))
 
   (doom-modeline-def-segment linum-colnum
     "Display current linum/colnum"
     (propertize (format " Ln %s, Col %s"
-		                (format-mode-line "%l")
-		                (format-mode-line "%c"))
-	            'face (if (doom-modeline--active)
-		                  '(:foreground "#8cd0d3" :weight bold)
-		                'mode-line-inactive)))
+                        (format-mode-line "%l")
+                        (format-mode-line "%c"))
+                'face (if (doom-modeline--active)
+                          '(:foreground "#8cd0d3" :weight bold)
+                        'mode-line-inactive)))
 
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
@@ -230,26 +230,26 @@
        'help-echo "Show calendar"
        'mouse-face '(:box 1)
        'local-map (make-mode-line-mouse-map
-	               'mouse-1 (lambda () (interactive) (calendar))))))
+                   'mouse-1 (lambda () (interactive) (calendar))))))
 
   (doom-modeline-def-segment python-venv
     "Display current python venv name"
     (if (eq major-mode 'python-mode)
         (let ((venv-name (if (or (not (boundp 'pyvenv-virtual-env-name))
-			                     (eq pyvenv-virtual-env-name nil))
-		                     "GLOBAL"
-		                   pyvenv-virtual-env-name)))
+                                 (eq pyvenv-virtual-env-name nil))
+                             "GLOBAL"
+                           pyvenv-virtual-env-name)))
           (propertize (format " [%s]" venv-name)
-	                  'face (if (doom-modeline--active)
-			                    '(:foreground "#f0dfaf" :weight bold)
-		                      'mode-line-inactive)))
+                      'face (if (doom-modeline--active)
+                                '(:foreground "#f0dfaf" :weight bold)
+                              'mode-line-inactive)))
       ""))
 
   (with-eval-after-load 'evil
     (doom-modeline-def-segment evil-state-seg
       "Display current Evil State."
       (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
-	              'face '(:weight bold)))
+                  'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
       ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
       '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
@@ -640,9 +640,9 @@
     (defun my/toggle-lsp-ui-doc ()
       (interactive)
       (if lsp-ui-doc-mode
-        (progn
-          (lsp-ui-doc-mode -1)
-          (lsp-ui-doc--hide-frame))
+          (progn
+            (lsp-ui-doc-mode -1)
+            (lsp-ui-doc--hide-frame))
         (lsp-ui-doc-mode 1)))
     :bind
     (:map lsp-mode-map
@@ -835,7 +835,7 @@
   :custom
   (anzu-mode-lighter "")
   (anzu-deactivate-region t)
-;  (anzu-use-migemo t)
+  ;(anzu-use-migemo t)
   (anzu-search-threshold 1000)
   :bind
   (("C-M-%" . anzu-query-replace-at-cursor)         ; replace currnet string in entire buffer with query
@@ -1452,7 +1452,7 @@
   (diminish 'yas-minor-mode "YAS")
   (diminish 'company-mode "Comp")
   (diminish 'which-key-mode "WhKey")
-;  (diminish 'helm-migemo-mode "HelmMigemo")
+  ;(diminish 'helm-migemo-mode "HelmMigemo")
   (diminish 'undo-tree-mode "UndoTree")
   (diminish 'super-save-mode "SSave"))
 
