@@ -1481,6 +1481,8 @@
 (when (eq system-type 'gnu/linux)
   (use-package exec-path-from-shell
     :ensure t
+    :custom
+    (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
     :config
     (exec-path-from-shell-initialize))
 
