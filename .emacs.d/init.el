@@ -966,8 +966,6 @@
   :config
   (use-package yasnippet-snippets :ensure t))
 
-(require 'yasnippet-snippets)
-
 (use-package ivy-yasnippet
   :ensure t
   :bind (("C-l y" . ivy-yasnippet)))
