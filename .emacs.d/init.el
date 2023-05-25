@@ -411,6 +411,50 @@
   (ripgrep-executable "/usr/bin/rg")
   (ripgrep-arguments '("-S")))
 
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
+
+(use-package orderless
+  :ensure t
+  :defer t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (orderless-matching-styles '(orderless-literal orderless-regexp orderless-initialism orderless-flex)))
+
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
+
+(use-package embark
+  :ensure t
+  :bind
+  (("C-S-i" . embark-act)
+   ("M-i" . embark-dwim)))
+
+(use-package consult
+  :ensure t
+  :bind
+  (("C-x b" . consult-buffer)
+   ("M-i" . consult-line-thing-at-point))
+  :config
+  ;; cosult-line-thing-at-point
+  (consult-customize consult-line :add-history (seq-some #'thing-at-point '(region symbol)))
+  (defalias 'consult-line-thing-at-point 'consult-line)
+  (consult-customize consult-line-thing-at-point :initial (thing-at-point 'symbol)))
+
+(use-package embark-consult
+  :ensure t
+  )
+
+(use-package wgrep
+  :ensure t
+  )
+
+
 ;; (use-package helm
 ;;   :ensure t
 ;;   :init
@@ -748,7 +792,7 @@
   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
 
-(use-package recentf-ext :ensure t)
+;; (use-package recentf-ext :ensure t)
 
 (use-package skk
   :ensure ddskk
