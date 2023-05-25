@@ -618,6 +618,7 @@
   (python-mode . lsp)
   (python-ts-mode . lsp)
   (perl-mode . lsp)
+  (cperl-mode . lsp)
   :custom
   ;; general
   (lsp-idle-delay 2)
@@ -1047,6 +1048,15 @@
   :defer t
   :mode (("\\.js\\'" . js2-mode))
   )
+
+(use-package cperl-mode
+  :mode (("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
+  :init
+  (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
+  (setq interpreter-mode-alist (rassq-delete-all 'perl-mode interpreter-mode-alist))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
 
 (use-package slime
   :ensure t
