@@ -411,69 +411,69 @@
   (ripgrep-executable "/usr/bin/rg")
   (ripgrep-arguments '("-S")))
 
-(use-package helm
-  :ensure t
-  :init
-  (helm-mode +1)
-  :bind
-  (("C-x C-f" . helm-find-files)
-   ("C-x b" . helm-for-files)
-   ("M-y" . helm-show-kill-ring)
-   :map helm-map ("C-h" . delete-backward-char))
-  :custom
-  (helm-mode-fuzzy-match t)
-  (helm-completion-in-region-fuzzy-match t)
-  :config
-  (use-package helm-descbinds
-    :ensure t
-    :config
-    (helm-descbinds-mode +1))
-  (helm-autoresize-mode +1)
-  ;; helm-migemo が helm-swoop で上手く動かないのでコメントアウトしておく
-  ;; (with-eval-after-load 'migemo
-  ;;   (helm-migemo-mode +1))
-  )
+;; (use-package helm
+;;   :ensure t
+;;   :init
+;;   (helm-mode +1)
+;;   :bind
+;;   (("C-x C-f" . helm-find-files)
+;;    ("C-x b" . helm-for-files)
+;;    ("M-y" . helm-show-kill-ring)
+;;    :map helm-map ("C-h" . delete-backward-char))
+;;   :custom
+;;   (helm-mode-fuzzy-match t)
+;;   (helm-completion-in-region-fuzzy-match t)
+;;   :config
+;;   (use-package helm-descbinds
+;;     :ensure t
+;;     :config
+;;     (helm-descbinds-mode +1))
+;;   (helm-autoresize-mode +1)
+;;   ;; helm-migemo が helm-swoop で上手く動かないのでコメントアウトしておく
+;;   ;; (with-eval-after-load 'migemo
+;;   ;;   (helm-migemo-mode +1))
+;;   )
 
-(use-package smex :ensure t)
-(use-package helm-smex
-  :ensure t
-  :bind (("M-X" . helm-smex-major-mode-commands))
-  :init
-  (global-set-key [remap execute-extended-command] #'helm-smex)
-  :custom
-  (helm-smex-show-bindings t))
+;; (use-package smex :ensure t)
+;; (use-package helm-smex
+;;   :ensure t
+;;   :bind (("M-X" . helm-smex-major-mode-commands))
+;;   :init
+;;   (global-set-key [remap execute-extended-command] #'helm-smex)
+;;   :custom
+;;   (helm-smex-show-bindings t))
 
-(use-package helm-ag
-  :ensure t
-  :defer t
-  :custom
-  (helm-ag-base-command "rg --vimgrep --no-heading -S")
-  (helm-ag-insert-at-point 'symbol)
-  :bind
-  (("C-M-g" . 'helm-ag)
-   ("C-M-S-g" . 'helm-projectile-ag))
-  :config
-  (defun helm-projectile-ag ()
-    "Projectileと連携"
-    (interactive)
-    (helm-ag (projectile-project-root))))
+;; (use-package helm-ag
+;;   :ensure t
+;;   :defer t
+;;   :custom
+;;   (helm-ag-base-command "rg --vimgrep --no-heading -S")
+;;   (helm-ag-insert-at-point 'symbol)
+;;   :bind
+;;   (("C-M-g" . 'helm-ag)
+;;    ("C-M-S-g" . 'helm-projectile-ag))
+;;   :config
+;;   (defun helm-projectile-ag ()
+;;     "Projectileと連携"
+;;     (interactive)
+;;     (helm-ag (projectile-project-root))))
 
-(use-package helm-swoop
-  :ensure t
-  :bind (("M-i" . helm-swoop)
-         ("M-I" . helm-swoop)
-         :map isearch-mode-map
-         ("M-i" . helm-swoop-from-isearch)
-         :map helm-swoop-map
-         ("M-i" . helm-multi-swoop-all-from-helm-swoop))
-  :custom
-  (helm-swoop-split-with-multiple-windows nil)
-  (helm-swoop-split-direction 'split-window-vertically)
-  (helm-swoop-speed-or-color t)
-  (helm-swoop-move-to-line-cycle t)
-  (helm-swoop-use-line-number-face t)
-  :config
-  (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper))
+;; (use-package helm-swoop
+;;   :ensure t
+;;   :bind (("M-i" . helm-swoop)
+;;          ("M-I" . helm-swoop)
+;;          :map isearch-mode-map
+;;          ("M-i" . helm-swoop-from-isearch)
+;;          :map helm-swoop-map
+;;          ("M-i" . helm-multi-swoop-all-from-helm-swoop))
+;;   :custom
+;;   (helm-swoop-split-with-multiple-windows nil)
+;;   (helm-swoop-split-direction 'split-window-vertically)
+;;   (helm-swoop-speed-or-color t)
+;;   (helm-swoop-move-to-line-cycle t)
+;;   (helm-swoop-use-line-number-face t)
+;;   :config
+;;   (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper))
 
 (use-package ace-jump-mode
   :ensure t
@@ -950,11 +950,11 @@
   :commands (projectile-project-root)
   :bind-keymap ("C-l p" . projectile-command-map))
 
-(use-package helm-projectile
-  :ensure t
-  :after projectile
-  :config
-  (helm-projectile-on))
+;; (use-package helm-projectile
+;;   :ensure t
+;;   :after projectile
+;;   :config
+;;   (helm-projectile-on))
 
 (use-package yasnippet
   :ensure t
@@ -966,9 +966,9 @@
   :config
   (use-package yasnippet-snippets :ensure t))
 
-(use-package ivy-yasnippet
-  :ensure t
-  :bind (("C-l y" . ivy-yasnippet)))
+;; (use-package ivy-yasnippet
+;;   :ensure t
+;;   :bind (("C-l y" . ivy-yasnippet)))
 
 ;;; C
 (defun c/c++-mode-setup ()
