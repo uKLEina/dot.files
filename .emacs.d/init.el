@@ -439,7 +439,8 @@
   :ensure t
   :bind
   (("C-x b" . consult-buffer)
-   ("M-i" . consult-line-thing-at-point))
+   ("M-i" . consult-line-thing-at-point)
+   ("C-M-g" . consult-ripgrep))
   :config
   ;; cosult-line-thing-at-point
   (consult-customize consult-line :add-history (seq-some #'thing-at-point '(region symbol)))
@@ -658,6 +659,7 @@
 
 (use-package lsp-mode
   :ensure t
+  :pin melpa-stable
   :hook
   (python-mode . lsp)
   (python-ts-mode . lsp)
@@ -707,6 +709,7 @@
 
 (use-package lsp-java
   :defer t
+  :pin melpa-stable
   :ensure t
   :hook
   (java-mode . lsp)
@@ -765,6 +768,9 @@
 (use-package all-the-icons-dired
   :ensure t
   :hook (dired-mode . all-the-icons-dired-mode))
+(use-package all-the-icons-completion
+  :ensure t
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup))
 
 (use-package direx
   :ensure t
