@@ -659,7 +659,6 @@
 
 (use-package lsp-mode
   :ensure t
-  :pin melpa-stable
   :hook
   (python-mode . lsp)
   (python-ts-mode . lsp)
