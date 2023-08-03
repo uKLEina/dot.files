@@ -168,9 +168,6 @@
   :config
   (load-theme 'doom-dracula t)
   (enable-theme 'doom-dracula)
-  ;; (with-eval-after-load 'helm-files
-  ;;   (doom-themes-set-faces 'doom-dracula
-  ;;     '(helm-ff-directory :weight 'bold :foreground (doom-color 'cyan))))
   (doom-themes-set-faces 'doom-dracula
     '(font-lock-variable-name-face :foreground (doom-color 'cyan)))
   (custom-set-variables '(window-divider-default-right-width 10))
@@ -388,22 +385,6 @@
   :config
   (which-key-setup-side-window-right))
 
-;(use-package migemo
-;  :ensure t
-;  :defer t
-;  :commands (migemo-init)
-;  :custom
-;  (migemo-command "cmigemo")
-;  (migemo-options '("-q" "--emacs"))
-;  (migemo-dictionary (expand-file-name "/usr/share/cmigemo/utf-8/migemo-dict"))
-;  (migemo-user-dictionary nil)
-;  (migemo-regex-dictionary nil)
-;  (migemo-pattern-alist-length 1024)
-;  (migemo-coding-system 'utf-8)
-;  (migemo-isearch-min-length 2)
-;  :init
-;  (migemo-init))
-
 (use-package ripgrep
   :ensure t
   :defer t
@@ -458,71 +439,6 @@
 (use-package wgrep
   :ensure t
   )
-
-
-;; (use-package helm
-;;   :ensure t
-;;   :init
-;;   (helm-mode +1)
-;;   :bind
-;;   (("C-x C-f" . helm-find-files)
-;;    ("C-x b" . helm-for-files)
-;;    ("M-y" . helm-show-kill-ring)
-;;    :map helm-map ("C-h" . delete-backward-char))
-;;   :custom
-;;   (helm-mode-fuzzy-match t)
-;;   (helm-completion-in-region-fuzzy-match t)
-;;   :config
-;;   (use-package helm-descbinds
-;;     :ensure t
-;;     :config
-;;     (helm-descbinds-mode +1))
-;;   (helm-autoresize-mode +1)
-;;   ;; helm-migemo が helm-swoop で上手く動かないのでコメントアウトしておく
-;;   ;; (with-eval-after-load 'migemo
-;;   ;;   (helm-migemo-mode +1))
-;;   )
-
-;; (use-package smex :ensure t)
-;; (use-package helm-smex
-;;   :ensure t
-;;   :bind (("M-X" . helm-smex-major-mode-commands))
-;;   :init
-;;   (global-set-key [remap execute-extended-command] #'helm-smex)
-;;   :custom
-;;   (helm-smex-show-bindings t))
-
-;; (use-package helm-ag
-;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   (helm-ag-base-command "rg --vimgrep --no-heading -S")
-;;   (helm-ag-insert-at-point 'symbol)
-;;   :bind
-;;   (("C-M-g" . 'helm-ag)
-;;    ("C-M-S-g" . 'helm-projectile-ag))
-;;   :config
-;;   (defun helm-projectile-ag ()
-;;     "Projectileと連携"
-;;     (interactive)
-;;     (helm-ag (projectile-project-root))))
-
-;; (use-package helm-swoop
-;;   :ensure t
-;;   :bind (("M-i" . helm-swoop)
-;;          ("M-I" . helm-swoop)
-;;          :map isearch-mode-map
-;;          ("M-i" . helm-swoop-from-isearch)
-;;          :map helm-swoop-map
-;;          ("M-i" . helm-multi-swoop-all-from-helm-swoop))
-;;   :custom
-;;   (helm-swoop-split-with-multiple-windows nil)
-;;   (helm-swoop-split-direction 'split-window-vertically)
-;;   (helm-swoop-speed-or-color t)
-;;   (helm-swoop-move-to-line-cycle t)
-;;   (helm-swoop-use-line-number-face t)
-;;   :config
-;;   (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper))
 
 (use-package ace-jump-mode
   :ensure t
@@ -626,20 +542,6 @@
   (python-ts-mode . highlight-indent-guides-mode)
   :custom
   (highlight-indent-guides-method 'column))
-
-; (use-package tree-sitter
-;   :ensure t
-;   :init
-;   (global-tree-sitter-mode +1)
-;   :hook
-;   (tree-sitter-after-on . tree-sitter-hl-mode)
-;   :config
-;   ;; プロパティ系が italic にならないようにしておく
-;   (custom-set-faces '(tree-sitter-hl-face:property ((t (:inherit font-lock-constant-face))))))
-
-; (use-package tree-sitter-langs
-;   :ensure t
-;   :defer t)
 
 (use-package treesit-auto
   :ensure t
@@ -888,7 +790,6 @@
   :custom
   (anzu-mode-lighter "")
   (anzu-deactivate-region t)
-  ;(anzu-use-migemo t)
   (anzu-search-threshold 1000)
   :bind
   (("C-M-%" . anzu-query-replace-at-cursor)         ; replace currnet string in entire buffer with query
@@ -903,7 +804,6 @@
   (setq backward-forward-evil-compatibility-mode t)
   (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
   (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
-  ;; (advice-add 'helm-swoop :before #'backward-forward-push-mark-wrapper)
   :bind
   (:map backward-forward-mode-map
         ("C-l C-a" . backward-forward-previous-location)
@@ -1003,12 +903,6 @@
   :commands (projectile-project-root)
   :bind-keymap ("C-l p" . projectile-command-map))
 
-;; (use-package helm-projectile
-;;   :ensure t
-;;   :after projectile
-;;   :config
-;;   (helm-projectile-on))
-
 (use-package yasnippet
   :ensure t
   :commands (yas-expand)
@@ -1018,10 +912,6 @@
   :bind (("C-<tab>" . yas-expand))
   :config
   (use-package yasnippet-snippets :ensure t))
-
-;; (use-package ivy-yasnippet
-;;   :ensure t
-;;   :bind (("C-l y" . ivy-yasnippet)))
 
 ;;; C
 (defun c/c++-mode-setup ()
@@ -1407,12 +1297,6 @@
   (turn-on-reftex)
   )
 
-;; (use-package reftex-aux
-;;   :defer t
-;;   :after (tex-jp)
-;;   :custom
-;;   (reftex-plug-into-AUCTeX t))
-
 (use-package org
   :defer t
   :init
@@ -1505,7 +1389,6 @@
   (diminish 'yas-minor-mode "YAS")
   (diminish 'company-mode "Comp")
   (diminish 'which-key-mode "WhKey")
-  ;(diminish 'helm-migemo-mode "HelmMigemo")
   (diminish 'undo-tree-mode "UndoTree")
   (diminish 'super-save-mode "SSave"))
 
