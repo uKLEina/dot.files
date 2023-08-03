@@ -901,7 +901,15 @@
 (use-package projectile
   :ensure t
   :commands (projectile-project-root)
-  :bind-keymap ("C-l p" . projectile-command-map))
+  :bind-keymap ("C-l p" . projectile-command-map)
+  :config
+  (when (executable-find "ghq")
+    (setq projectile-known-projects
+          (delete-dups
+           (append projectile-known-projects
+                   (mapcar
+                    (lambda (x) (abbreviate-file-name x))
+                    (split-string (shell-command-to-string "ghq list --full-path"))))))))
 
 (use-package yasnippet
   :ensure t
