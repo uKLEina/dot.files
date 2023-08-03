@@ -904,6 +904,7 @@
   :bind-keymap ("C-l p" . projectile-command-map)
   :config
   (when (executable-find "ghq")
+    (projectile-load-known-projects)
     (setq projectile-known-projects
           (delete-dups
            (append projectile-known-projects
