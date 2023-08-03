@@ -447,6 +447,10 @@
   (defalias 'consult-line-thing-at-point 'consult-line)
   (consult-customize consult-line-thing-at-point :initial (thing-at-point 'symbol)))
 
+(use-package consult-ghq
+  :ensure t
+  :defer t)
+
 (use-package embark-consult
   :ensure t
   )
