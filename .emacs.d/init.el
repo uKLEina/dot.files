@@ -993,11 +993,20 @@
   (add-hook 'c++-mode-hook 'hide-ifdef-mode)
   (add-hook 'c-mode-hook 'hide-ifdef-mode))
 
-(use-package js2-mode
+;; (use-package js2-mode
+;;   :ensure t
+;;   :defer t
+;;   :mode (("\\.js\\'" . js2-mode))
+;;   )
+(use-package web-mode
   :ensure t
-  :defer t
-  :mode (("\\.js\\'" . js2-mode))
-  )
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.vue\\'" . web-mode)
+         ("\\.js\\'" . web-mode)))
+
+(use-package typescript-mode
+  :ensure t
+  :defer t)
 
 (use-package cperl-mode
   :mode (("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
@@ -1186,7 +1195,13 @@
   :ensure t
   :mode (("\\.md\\'" . gfm-mode))
   :custom
-  (markdown-command "pandoc"))
+  (markdown-command "multimarkdown")
+  )
+(setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+
+(use-package markdown-preview-mode
+  :ensure t
+  :defer t)
 
 (use-package rust-mode
   :ensure t
