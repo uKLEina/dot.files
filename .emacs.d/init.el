@@ -69,7 +69,7 @@
 ;; hide tool bar/scroll bar
 (if window-system
     (progn
-      (add-to-list 'default-frame-alist '(alpha . 90))
+      (add-to-list 'default-frame-alist '(alpha-background . 95))
       (tool-bar-mode 0)
       (scroll-bar-mode 0)
       (menu-bar-mode 0)))
@@ -126,6 +126,24 @@
 (defun copy-buffer-file-path ()
   (interactive)
   (kill-new (buffer-file-name)))
+
+;;; Fix copy/paste in Wayland
+;; credit: yorickvP on Github
+(setq wl-copy-process nil)
+(defun wl-copy (text)
+  (setq wl-copy-process (make-process :name "wl-copy"
+                                      :buffer nil
+                                      :command '("wl-copy" "-f" "-n")
+                                      :connection-type 'pipe
+                                      :noquery t))
+  (process-send-string wl-copy-process text)
+  (process-send-eof wl-copy-process))
+(defun wl-paste ()
+  (if (and wl-copy-process (process-live-p wl-copy-process))
+      nil ; should return nil if we're the current paste owner
+      (shell-command-to-string "wl-paste -n | tr -d \r")))
+(setq interprogram-cut-function 'wl-copy)
+(setq interprogram-paste-function 'wl-paste)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
