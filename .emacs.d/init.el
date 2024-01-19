@@ -145,12 +145,14 @@
 (setq interprogram-cut-function 'wl-copy)
 (setq interprogram-paste-function 'wl-paste)
 
+(setopt debug-on-error t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; packages
+                                        ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package server
   :init
-  (when (and (eq system-type 'gnu/linux) (window-system))
+  (when (and (not pgtk-initialized) (eq system-type 'gnu/linux) (window-system))
     (defun raise-frame-with-wmctrl (&optional frame)
       (call-process "wmctrl" nil nil nil "-i" "-R"
                     (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
