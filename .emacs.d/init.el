@@ -69,14 +69,14 @@
 ;; hide tool bar/scroll bar
 (if window-system
     (progn
-      (add-to-list 'default-frame-alist '(alpha-background . 95))
+      (add-to-list 'default-frame-alist '(alpha-background . 90))
       (tool-bar-mode 0)
       (scroll-bar-mode 0)
       (menu-bar-mode 0)))
-
 (recentf-mode 1)
-
 (tab-bar-mode -1)
+(pixel-scroll-precision-mode +1)
+(setopt pixel-scroll-precision-large-scroll-height 40.0)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
