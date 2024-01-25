@@ -633,19 +633,20 @@
   (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
 
 (use-package lsp-java
-  :defer t
-  :pin melpa-stable
   :ensure t
   :hook
   (java-mode . lsp)
+  (java-ts-mode . lsp)
   :custom
   (lsp-java-jdt-download-url "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz"))
+
 (use-package dap-mode
   :defer t
   :ensure t
   :after lsp-mode
   :config
   (dap-auto-configure-mode))
+
 (use-package dap-java
   :defer t
   :after lsp-java)
