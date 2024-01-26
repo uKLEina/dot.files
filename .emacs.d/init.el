@@ -141,7 +141,7 @@
 (defun wl-paste ()
   (if (and wl-copy-process (process-live-p wl-copy-process))
       nil ; should return nil if we're the current paste owner
-      (shell-command-to-string "wl-paste -n | tr -d \r")))
+    (shell-command-to-string "wl-paste -n | tr -d \r")))
 (setq interprogram-cut-function 'wl-copy)
 (setq interprogram-paste-function 'wl-paste)
 
@@ -156,11 +156,11 @@
     (defun raise-frame-with-wmctrl (&optional frame)
       (call-process "wmctrl" nil nil nil "-i" "-R"
                     (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
-    (advice-add 'raise-frame :after #'raise-frame-with-wmctrl)
-    (defun iconify-emacs-when-server-is-done ()
-      (unless server-clients (iconify-frame)))
-    (add-hook 'server-switch-hook #'raise-frame)
-    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+    (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
+  (defun iconify-emacs-when-server-is-done ()
+    (unless server-clients (iconify-frame)))
+  (add-hook 'server-switch-hook #'raise-frame)
+  (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
   :config
   (unless (server-running-p)
     (server-start)))
