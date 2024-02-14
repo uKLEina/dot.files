@@ -129,20 +129,20 @@
 
 ;;; Fix copy/paste in Wayland
 ;; credit: yorickvP on Github
-(setq wl-copy-process nil)
-;; (defun wl-copy (text)
-;;   (setq wl-copy-process (make-process :name "wl-copy"
-;;                                       :buffer nil
-;;                                       :command '("wl-copy" "-f" "-n")
-;;                                       :connection-type 'pipe
-;;                                       :noquery t))
-;;   (process-send-string wl-copy-process text)
-;;   (process-send-eof wl-copy-process))
+(defvar wl-copy-process nil)
+(defun wl-copy (text)
+  (setq wl-copy-process (make-process :name "wl-copy"
+                                      :buffer nil
+                                      :command '("wl-copy" "-f" "-n")
+                                      :connection-type 'pipe
+                                      :noquery t))
+  (process-send-string wl-copy-process text)
+  (process-send-eof wl-copy-process))
 (defun wl-paste ()
   (if (and wl-copy-process (process-live-p wl-copy-process))
       nil ; should return nil if we're the current paste owner
     (shell-command-to-string "wl-paste -n | tr -d \r")))
-;; (setq interprogram-cut-function 'wl-copy)
+(setq interprogram-cut-function 'wl-copy)
 (setq interprogram-paste-function 'wl-paste)
 
 (setopt debug-on-error t)
@@ -1472,24 +1472,34 @@
     :defer t
     :init
     (pdf-loader-install))
+  ;; font
+  ;; default ASCII font
+  ;; (set-face-attribute 'default nil :family "HackGen" :height 110)
+  ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
+  (set-face-attribute 'default nil :family "0xProto" :height 110)
+  ;; non-ASCII Unicode font
+  ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
+  ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
+  ;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
+  (setq use-default-font-for-symbols t)
 
-  (set-face-attribute 'default nil
-                      :family "Ricty Discord"
-                      :height 120)
-  (set-face-attribute 'variable-pitch nil
-                      :family "Migu 1VS"
-                      :height 105)
-  (if window-system
-      (progn
-        (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
-        (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
+  ;; (set-face-attribute 'default nil
+  ;;                     :family "Ricty Discord"
+  ;;                     :height 140)
+  ;; (set-face-attribute 'variable-pitch nil
+  ;;                     :family "Migu 1VS"
+  ;;                     :height 105)
+  ;; (if window-system
+  ;;     (progn
+  ;;       (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
+  ;;       (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
 
-  (add-hook 'text-mode-hook
-            #'(lambda ()
-                (buffer-face-set 'variable-pitch)))
-  (add-hook 'Info-mode-hook
-            #'(lambda ()
-                (buffer-face-set 'variable-pitch)))
+  ;; (add-hook 'text-mode-hook
+  ;;           #'(lambda ()
+  ;;               (buffer-face-set 'variable-pitch)))
+  ;; (add-hook 'Info-mode-hook
+  ;;           #'(lambda ()
+  ;;               (buffer-face-set 'variable-pitch)))
   (defun set-face-font-height (size)
     (interactive "nSize: ")
     (set-face-attribute 'default nil
