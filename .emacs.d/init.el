@@ -1458,6 +1458,19 @@
   (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
   )
 
+(use-package ligature
+  :ensure t
+  :hook
+  (prog-mode . ligature-mode)
+  :config
+  (ligature-set-ligatures 'prog-mode
+                          '("->" "<-" "=>" "=>>" ">=>" "=>=" "=<<" "=<=" "<=<" "<=>"
+                            ">>" ">>>" "<<" "<<<" "<>" "<|>" "==" "===" ".=" ":="
+                            "#=" "!=" "!==" "=!=" "=:=" "::" ":::" ":<:" ":>:"
+                            "||" "|>" "||>" "|||>" "<|" "<||" "<|||"
+                            "**" "***" "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
+                            "$$" "??" "%%" "|]" "[|" "//" "///")))
+
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
   (use-package exec-path-from-shell
@@ -1477,6 +1490,7 @@
   ;; (set-face-attribute 'default nil :family "HackGen" :height 110)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
   (set-face-attribute 'default nil :family "0xProto" :height 110)
+  ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
   ;; non-ASCII Unicode font
   ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
   ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
