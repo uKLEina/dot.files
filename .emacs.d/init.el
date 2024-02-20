@@ -555,7 +555,8 @@
   :custom
   (treesit-auto-install 'prompt)
   :config
-  (global-treesit-auto-mode))
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode +1))
 
 (use-package pangu-spacing
   :ensure t
