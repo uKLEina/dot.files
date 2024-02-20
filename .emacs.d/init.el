@@ -474,18 +474,25 @@
 (use-package corfu
   :ensure t
   :custom ((corfu-auto t)
-           (corfu-auto-delay 0)
-           (corfu-auto-prefix 1)
+           (corfu-auto-delay 0.05)
+           (corfu-auto-prefix 2)
            (corfu-cycle t)
            (corfu-on-exact-match nil)
            (tab-always-indent 'complete))
   :bind (nil
          :map corfu-map
-         ("TAB" . corfu-insert)
-         ("<tab>" . corfu-insert)
-         ("RET" . nil)
-         ("<return>" . nil))
+         ("C-n" . corfu-next)
+         ("C-p" . corfu-previous))
   :init (global-corfu-mode +1))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  (kind-icon-blend-background t)
+  (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package smartrep
   :ensure t
