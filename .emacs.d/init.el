@@ -321,10 +321,7 @@
     (funcall origfun))
 
   (advice-add 'paredit-forward :around #'evil-forward-par)
-  (advice-add 'paredit-backward :around #'evil-backward-par)
-  ;; (advice-add 'forward-sexp :around #'evil-forward-par)
-  ;; (advice-add 'backward-sexp :around #'evil-backward-par)
-  )
+  (advice-add 'paredit-backward :around #'evil-backward-par))
 
 (use-package posframe
   :ensure t
@@ -474,31 +471,21 @@
   :init
   (global-ace-isearch-mode +1))
 
-(use-package company
+(use-package corfu
   :ensure t
-  :hook
-  (after-init . global-company-mode)
-  :custom
-  (company-idle-delay 0)
-  (company-minimum-prefix-length 1)
-  (company-selection-wrap-around t)
-  (company-dabbrev-downcase nil)
-  :config
-  (evil-define-key 'insert company-mode-map (kbd "C-n") 'company-select-next)
-  (evil-define-key 'insert company-mode-map (kbd "C-p") 'company-select-previous)
-  (bind-keys
-   :map company-active-map
-   ("C-s" . company-filter-candidates)
-   ("C-h" . delete-backward-char)
-   :map company-mode-map
-   ("C-M-i" . company-complete)))
-
-(use-package company-quickhelp
-  :ensure t
-  :hook
-  (company-mode . company-quickhelp-mode)
-  :custom
-  (company-quickhelp-delay 0.2))
+  :custom ((corfu-auto t)
+           (corfu-auto-delay 0)
+           (corfu-auto-prefix 1)
+           (corfu-cycle t)
+           (corfu-on-exact-match nil)
+           (tab-always-indent 'complete))
+  :bind (nil
+         :map corfu-map
+         ("TAB" . corfu-insert)
+         ("<tab>" . corfu-insert)
+         ("RET" . nil)
+         ("<return>" . nil))
+  :init (global-corfu-mode +1))
 
 (use-package smartrep
   :ensure t
@@ -523,24 +510,24 @@
   (push '("*xref*" :position bottom :width 5)
         popwin:special-display-config))
 
-(use-package flycheck
+(use-package flymake
   :ensure t
-  :defer t
-  :commands (flycheck-add-next-checker)
-  :init
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
-  :hook
-  (prog-mode . flycheck-mode)
-  (python-ts-mode . flycheck-mode)
-  :custom
-  (flycheck-check-syntax-automatically '(save mode-enabled))
+  :pin gnu
+  :commands (flymake-show-buffer-diagnostics flymake-goto-next-error flymake-goto-prev-error)
+  :bind (("C-c ! l" . flymake-show-buffer-diagnostics)
+         ("C-c ! n" . flymake-goto-next-error)
+         ("C-c ! p" . flymake-goto-prev-error))
   :config
   (smartrep-define-key
-      flycheck-mode-map "C-c !"
-    '(("n" . flycheck-next-error)
-      ("p" . flycheck-previous-error)))
-  (push '(flycheck-error-list-mode :position bottom :width 5 :noselect t)
+      flymake-mode-map "C-c !"
+    '(("n" . flymake-goto-next-error)
+      ("p" . flymake-goto-prev-error)))
+  (push '(flymake-diagnostics-buffer-mode :position bottom :width 5 :noselect t)
         popwin:special-display-config))
+
+(use-package flymake-ruff
+  :ensure t
+  :hook (eglot-managed-mode . flymake-ruff-load))
 
 (use-package smerge-mode
   :defer t
@@ -583,48 +570,6 @@
         (rx (group-n 1 (in "a-zA-Z0-9"))
             (group-n 2 (category japanese)))))
 
-(use-package lsp-mode
-  :ensure t
-  :hook
-  (python-mode . lsp)
-  (python-ts-mode . lsp)
-  (perl-mode . lsp)
-  (cperl-mode . lsp)
-  :custom
-  ;; general
-  (lsp-idle-delay 2)
-  (lsp-ui-sideline-enable nil)
-  ;; Python
-  ;; use flake8 instead of pycodestyle/pyflakes/mccabe
-  (lsp-pylsp-plugins-pycodestyle-enabled nil)
-  (lsp-pylsp-plugins-pyflakes-enabled nil)
-  (lsp-pylsp-plugins-mccabe-enabled nil)
-  (lsp-pylsp-plugins-flake8-enabled t)
-  ;; use pylint
-  (lsp-pylsp-plugins-pylint-enabled t)
-  ;; use yapf
-  (lsp-pylsp-plugins-yapf-enabled t)
-  :config
-  (use-package lsp-ui
-    :ensure t
-    :preface
-    (defun my/toggle-lsp-ui-doc ()
-      (interactive)
-      (if lsp-ui-doc-mode
-          (progn
-            (lsp-ui-doc-mode -1)
-            (lsp-ui-doc--hide-frame))
-        (lsp-ui-doc-mode 1)))
-    :bind
-    (:map lsp-mode-map
-          ("C-c d" . my/toggle-lsp-ui-doc))
-    :custom
-    (lsp-ui-doc-enable nil)
-    (lsp-ui-doc-include-signature t)
-    (lsp-ui-doc-position 'at-point)
-    :config
-    (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-    (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)))
 
 (use-package python-mode
   :defer t
@@ -632,24 +577,35 @@
   (define-key python-mode-map [remap left-word] #'python-indent-shift-left)
   (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
 
-(use-package lsp-java
+(use-package eglot
   :ensure t
-  :hook
-  (java-mode . lsp)
-  (java-ts-mode . lsp)
-  :custom
-  (lsp-java-jdt-download-url "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz"))
+  :pin gnu
+  :defer t)
 
-(use-package dap-mode
-  :defer t
+(use-package reformatter
   :ensure t
-  :after lsp-mode
   :config
-  (dap-auto-configure-mode))
+  (reformatter-define ruff-format
+    :program "ruff"
+    :args `("format" "--stdin-filename" ,buffer-file-name "-")))
 
-(use-package dap-java
-  :defer t
-  :after lsp-java)
+(defun ruff-fix-buffer ()
+  "Use ruff to fix lint violations in the current buffer."
+  (interactive)
+  (let* ((temporary-file-directory (if (buffer-file-name)
+                                       (file-name-directory (buffer-file-name))
+                                     temporary-file-directory))
+         (temporary-file-name-suffix (format "--%s" (if (buffer-file-name)
+                                                        (file-name-nondirectory (buffer-file-name))
+                                                      "")))
+         (temp-file (make-temp-file "temp-ruff-" nil temporary-file-name-suffix))
+         (current-point (point)))
+    (write-region (point-min) (point-max) temp-file nil)
+    (shell-command-to-string (format "ruff check --fix %s" temp-file))
+    (erase-buffer)
+    (insert-file-contents temp-file)
+    (delete-file temp-file)
+    (goto-char current-point)))
 
 ;;; dired
 (use-package lv :ensure t :defer t)
@@ -723,8 +679,6 @@
   (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
-
-;; (use-package recentf-ext :ensure t)
 
 (use-package skk
   :ensure ddskk
@@ -951,62 +905,6 @@
 (add-hook 'c-mode-hook #'c/c++-mode-setup)
 (add-hook 'c++-mode-hook #'c/c++-mode-setup)
 
-(use-package rtags
-  :ensure t
-  :defer t
-  :init
-  (defun c/c++-mode-rtags-setup ()
-    "hook function to setup rtags things for `c-mode' and `c++-mode'."
-    (when (rtags-is-indexed)
-      (rtags-start-process-unless-running)
-      (setq-local flycheck-highlighting-mode nil) ;; RTags creates more accurate overlays.
-      (setq-local flycheck-check-syntax-automatically nil)
-      (local-set-key (kbd "M-.") 'rtags-find-symbol-at-point)
-      (local-set-key (kbd "M-,") 'rtags-location-stack-back)
-      (local-set-key (kbd "M-@") 'rtags-find-references)
-      (local-set-key (kbd "C-M-.") 'rtags-next-match)
-      (local-set-key (kbd "C-M-,") 'rtags-next-match)
-      (custom-set-variables
-       '(rtags-completions-enabled t)
-       '(rtags-autostart-diagnostics t))
-      (use-package company-rtags)
-      (eval-after-load 'company
-        '(add-to-list 'company-backends 'company-rtags))
-      (use-package flycheck-rtags)
-      (flycheck-select-checker 'rtags)
-      (push '("*RTags*" :position bottom :noselect t)
-            popwin:special-display-config)))
-  (add-hook 'c-mode-hook #'c/c++-mode-rtags-setup)
-  (add-hook 'c++-mode-hook #'c/c++-mode-rtags-setup)
-  :config
-  (evil-make-overriding-map c++-mode-map)
-  (evil-make-overriding-map c-mode-map))
-
-(use-package irony
-  :ensure t
-  :defer t
-  :init
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-  :config
-  (use-package company-irony :ensure t)
-  (company-irony-setup-begin-commands)
-  (use-package company-irony-c-headers :ensure t)
-  (add-to-list 'company-backends '(company-irony-c-headers company-irony))
-  (use-package flycheck-irony :ensure t)
-  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-
-(use-package clang-format
-  :ensure t
-  :after (rtags)
-  :bind (
-         :map c++-mode-map
-         ("C-l i" . clang-format-buffer)
-         :map c-mode-map
-         ("C-l i" . clang-format-buffer)
-         )
-  )
 
 (use-package hideif
   :defer t
@@ -1014,11 +912,6 @@
   (add-hook 'c++-mode-hook 'hide-ifdef-mode)
   (add-hook 'c-mode-hook 'hide-ifdef-mode))
 
-;; (use-package js2-mode
-;;   :ensure t
-;;   :defer t
-;;   :mode (("\\.js\\'" . js2-mode))
-;;   )
 (use-package web-mode
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
@@ -1045,20 +938,13 @@
   :hook
   (lisp-mode . slime-mode)
   :config
-  (setq inferior-lisp-program "/usr/bin/sbcl")
-  (use-package slime-company :ensure t)
-  (slime-setup '(slime-repl slime-fancy slime-company)))
+  (setq inferior-lisp-program "/usr/bin/sbcl"))
 
 (use-package cython-mode
   :ensure t
   :mode (("\\.pyx\\'" . cython-mode)
          ("\\.pxd\\'" . cython-mode)
-         ("\\.pxi\\'" . cython-mode))
-  :config
-  (use-package flycheck-cython
-    :ensure t
-    :hook
-    (cython-mode . flycheck-mode)))
+         ("\\.pxi\\'" . cython-mode)))
 
 (use-package graphviz-dot-mode
   :ensure t
@@ -1237,16 +1123,9 @@
   :ensure t
   :hook
   ((rust-mode . racer-mode)
-   (racer-mode . eldoc-mode)
-   (racer-mode . company-mode))
+   (racer-mode . eldoc-mode))
   :config
   (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
-
-(use-package flycheck-rust
-  :ensure t
-  :hook
-  ((rust-mode . flycheck-mode)
-   (rust-mode . flycheck-rust-setup)))
 
 (use-package tex-jp
   :ensure auctex
@@ -1427,12 +1306,10 @@
 (use-package diminish
   :ensure t
   :config
-  (diminish 'flycheck-mode "FlyC")
   (diminish 'highlight-symbol-mode "HighSym")
   (diminish 'smartparens-mode "SmPar")
   (diminish 'hs-minor-mode "HideShow")
   (diminish 'yas-minor-mode "YAS")
-  (diminish 'company-mode "Comp")
   (diminish 'which-key-mode "WhKey")
   (diminish 'undo-tree-mode "UndoTree")
   (diminish 'super-save-mode "SSave"))
@@ -1455,8 +1332,7 @@
   :config
   (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
   (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
-  (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)
-  )
+  (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files))
 
 (use-package ligature
   :ensure t
