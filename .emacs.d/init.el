@@ -63,8 +63,7 @@
 (display-time-mode +1)
 (setq require-final-newline t)
 ;; デフォルト色付け
-(use-package generic-x
-  :defer t)
+(use-package generic-x)
 (show-paren-mode 1)
 ;; hide tool bar/scroll bar
 (if window-system
