@@ -126,6 +126,30 @@
   (interactive)
   (kill-new (buffer-file-name)))
 
+(defun copy-project-buffer-file-path ()
+  (interactive)
+  (let ((project-root (file-local-name (abbreviate-file-name
+                                        (or (when-let ((project (project-current)))
+                                              (expand-file-name
+                                               (if (fboundp 'project-root)
+                                                   (project-root project)
+                                                 (car (with-no-warnings
+                                                        (project-roots project))))))
+                                            default-directory)))))
+    (kill-new (concat
+               ;; Project directory
+               (concat (file-name-nondirectory (directory-file-name project-root)) "/")
+               ;; relative path
+               (when-let (relative-path (file-relative-name
+                                         (or (file-name-directory buffer-file-name)
+                                             "./")
+                                         project-root))
+                 (if (string= relative-path "./")
+                     ""
+                   relative-path))
+               ;; File name
+               (file-name-nondirectory buffer-file-name)))))
+
 ;;; Fix copy/paste in Wayland
 ;; credit: yorickvP on Github
 (defvar wl-copy-process nil)
