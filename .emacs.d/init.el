@@ -129,26 +129,26 @@
 (defun copy-project-buffer-file-path ()
   (interactive)
   (let* ((project-root (file-local-name (abbreviate-file-name
-                                        (or (when-let ((project (project-current)))
-                                              (expand-file-name
-                                               (if (fboundp 'project-root)
-                                                   (project-root project)
-                                                 (car (with-no-warnings
-                                                        (project-roots project))))))
-                                            default-directory))))
-         (project-buffer-file-path (concat
-               ;; Project directory
-               (concat (file-name-nondirectory (directory-file-name project-root)) "/")
-               ;; relative path
-               (when-let (relative-path (file-relative-name
-                                         (or (file-name-directory buffer-file-name)
-                                             "./")
-                                         project-root))
-                 (if (string= relative-path "./")
-                     ""
-                   relative-path))
-               ;; File name
-               (file-name-nondirectory buffer-file-name))))
+                                         (or (when-let ((project (project-current)))
+                                               (expand-file-name
+                                                (if (fboundp 'project-root)
+                                                    (project-root project)
+                                                  (car (with-no-warnings (project-roots project))))))
+                                             default-directory))))
+         (project-buffer-file-path
+          (concat
+           ;; Project directory
+           (concat (file-name-nondirectory (directory-file-name project-root)) "/")
+           ;; relative path
+           (when-let (relative-path (file-relative-name
+                                     (or (file-name-directory buffer-file-name)
+                                         "./")
+                                     project-root))
+             (if (string= relative-path "./")
+                 ""
+               relative-path))
+           ;; File name
+           (file-name-nondirectory buffer-file-name))))
     (kill-new project-buffer-file-path)
     (message "copied: %s" project-buffer-file-path)))
 
