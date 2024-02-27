@@ -204,7 +204,7 @@
         (substring num 1)
       num))
 
-  (doom-modeline-def-segment buffer-size
+  (doom-modeline-def-segment my-buffer-size
     "Display current buffer size"
     (format-mode-line " %IB"))
 
@@ -269,11 +269,14 @@
                   'face '(:weight bold)))
     (doom-modeline-def-modeline 'simple
       ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
-      '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
-      '(projectile-project-name vcs checker battery datetime)))
+      ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
+      ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
+      '(bar modals matches remote-host buffer-info buffer-position)
+      '(projectile-project-name vcs check battery datetime)
+      ))
 
   (doom-modeline-def-modeline 'verbose
-    '(bar matches remote-host buffer-info-simple buffer-size)
+    '(bar matches remote-host buffer-info-simple my-buffer-size)
     '(major-mode minor-modes python-venv buffer-encoding))
 
   (defun setup-initial-doom-modeline ()
