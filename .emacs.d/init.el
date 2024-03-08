@@ -3,6 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setq load-prefer-newer t)
 (setq custom-file (locate-user-emacs-file "custom.el"))
+(setopt package-install-upgrade-built-in t)
 
 (require 'package)
 (setq package-archives
