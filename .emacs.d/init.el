@@ -187,42 +187,38 @@
     (unless server-clients (iconify-frame)))
   (add-hook 'server-switch-hook #'raise-frame)
   (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
-  :config
-  (unless (server-running-p)
-    (server-start)))
+  :hook (emacs-startup . server-start))
 
 (use-package auto-compile
   :ensure t
-  :pin melpa-stable
-  :defer t
-  :init
-  (auto-compile-on-load-mode)
-  (auto-compile-on-save-mode)
+  ;; :pin melpa-stable
+  :hook
+  (emacs-startup . auto-compile-on-load-mode)
+  (emacs-startup . auto-compile-on-save-mode)
   :custom
   (auto-compile-display-buffer nil)
   (auto-compile-mode-line-counter t))
 
 (use-package super-save
   :ensure t
+  :hook (emacs-startup . super-save-mode)
   :custom
-  (super-save-auto-save-when-idle t)
-  :config
-  (super-save-mode +1))
+  (super-save-auto-save-when-idle t))
 
 (use-package doom-themes
   :ensure t
+  :hook (emacs-startup . window-divider-mode)
+  :custom (window-divider-default-right-width 10)
   :config
   (load-theme 'doom-dracula t)
   (enable-theme 'doom-dracula)
   (doom-themes-set-faces 'doom-dracula
-    '(font-lock-variable-name-face :foreground (doom-color 'cyan)))
-  (custom-set-variables '(window-divider-default-right-width 10))
-  (window-divider-mode +1))
+    '(font-lock-variable-name-face :foreground (doom-color 'cyan))))
 
 (use-package doom-modeline
   :ensure t
   :hook
-  (after-init . doom-modeline-mode)
+  (emacs-startup . doom-modeline-mode)
   :commands (doom-modeline-def-modeline doom-modeline-def-segment)
   :init
   (defun remove-padding-zero (num)
@@ -243,14 +239,14 @@
                             'mode-line-inactive))
       ""))
 
-  (doom-modeline-def-segment linum-colnum
-    "Display current linum/colnum"
-    (propertize (format " Ln %s, Col %s"
-                        (format-mode-line "%l")
-                        (format-mode-line "%c"))
-                'face (if (doom-modeline--active)
-                          '(:foreground "#8cd0d3" :weight bold)
-                        'mode-line-inactive)))
+  ;; (doom-modeline-def-segment linum-colnum
+  ;;   "Display current linum/colnum"
+  ;;   (propertize (format " Ln %s, Col %s"
+  ;;                       (format-mode-line "%l")
+  ;;                       (format-mode-line "%c"))
+  ;;               'face (if (doom-modeline--active)
+  ;;                         '(:foreground "#8cd0d3" :weight bold)
+  ;;                       'mode-line-inactive)))
 
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
