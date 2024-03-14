@@ -499,7 +499,7 @@
 (use-package corfu
   :ensure t
   :custom ((corfu-auto t)
-           (corfu-auto-delay 0.05)
+           (corfu-auto-delay 0)
            (corfu-auto-prefix 2)
            (corfu-cycle t)
            (corfu-on-exact-match nil)
@@ -613,7 +613,13 @@
 (use-package eglot
   :ensure t
   :pin gnu
-  :defer t)
+  :defer t
+  :config
+  (unless (require 'eglot-booster nil t)
+    (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
+  (use-package eglot-booster
+    :config (eglot-booster-mode +1)))
+
 
 (use-package eglot-java
   :ensure t
