@@ -27,6 +27,7 @@ ln -s ~/dot.files/.config/flake8 ~/.config/flake8
 ln -s ~/dot.files/.config/pep8 ~/.config/pep8
 ln -s ~/dot.files/.config/pylintrc ~/.config/pylintrc
 ln -s ~/dot.files/.gitignore_global ~/.gitignore_global
+ln -s ~/dot.files/nihongo.kanata.lisp ~/.config/nihongo.kanata.lisp
 
 # Emacs
 ln -s ~/dot.files/.emacs.d ~/.emacs.d
