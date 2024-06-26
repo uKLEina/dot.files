@@ -1419,6 +1419,34 @@
                             "||" "|>" "||>" "|||>" "<|" "<||" "<|||"
                             "**" "***" "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
                             "$$" "??" "%%" "|]" "[|" "//" "///")))
+(use-package copilot
+  :init
+  ;; check dependencies
+  (use-package editorconfig
+    :ensure t
+    :defer t)
+  (use-package jsonrpc
+    :ensure t
+    :defer t)
+  (use-package s
+    :ensure t
+    :defer t)
+  (use-package f
+    :ensure t
+    :defer t)
+  ;; install via github
+  (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
+         (copilot-file (concat elpa-lisp-dir "/copilot/copilot.el")))
+    (unless (file-exists-p copilot-file)
+      (package-vc-install "https://github.com/copilot-emacs/copilot.el.git" nil nil 'copilot)))
+  :hook
+  (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
