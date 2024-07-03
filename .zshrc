@@ -42,11 +42,11 @@ alias rm="rm -i"
 alias cp="cp -i"
 alias mv="mv -i"
 
-alias ls='ls -hF --color=auto --show-control-chars --group-directories-first'
-alias la='ls -hFA --color=auto --show-control-chars --group-directories-first'
-alias ll='ls -hFl --color=auto --show-control-chars --group-directories-first'
-alias lal='ls -hFAl --color=auto --show-control-chars --group-directories-first'
-alias lla='ls -hFlA --color=auto --show-control-chars --group-directories-first'
+alias ls='ls -hF --color=always --show-control-chars --group-directories-first'
+alias la='ls -hFA --color=always --show-control-chars --group-directories-first'
+alias ll='ls -hFl --color=always --show-control-chars --group-directories-first'
+alias lal='ls -hFAl --color=always --show-control-chars --group-directories-first'
+alias lla='ls -hFlA --color=always --show-control-chars --group-directories-first'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
