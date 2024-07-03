@@ -156,21 +156,21 @@
 
 ;;; Fix copy/paste in Wayland
 ;; credit: yorickvP on Github
-(defvar wl-copy-process nil)
-(defun wl-copy (text)
-  (setq wl-copy-process (make-process :name "wl-copy"
-                                      :buffer nil
-                                      :command '("wl-copy" "-f" "-n")
-                                      :connection-type 'pipe
-                                      :noquery t))
-  (process-send-string wl-copy-process text)
-  (process-send-eof wl-copy-process))
-(defun wl-paste ()
-  (if (and wl-copy-process (process-live-p wl-copy-process))
-      nil ; should return nil if we're the current paste owner
-    (shell-command-to-string "wl-paste -n | tr -d \r")))
-(setq interprogram-cut-function 'wl-copy)
-(setq interprogram-paste-function 'wl-paste)
+;(defvar wl-copy-process nil)
+;(defun wl-copy (text)
+;  (setq wl-copy-process (make-process :name "wl-copy"
+;                                      :buffer nil
+;                                      :command '("wl-copy" "-f" "-n")
+;                                      :connection-type 'pipe
+;                                      :noquery t))
+;  (process-send-string wl-copy-process text)
+;  (process-send-eof wl-copy-process))
+;(defun wl-paste ()
+;  (if (and wl-copy-process (process-live-p wl-copy-process))
+;      nil ; should return nil if we're the current paste owner
+;    (shell-command-to-string "wl-paste -n | tr -d \r")))
+;(setq interprogram-cut-function 'wl-copy)
+;(setq interprogram-paste-function 'wl-paste)
 
 (setopt debug-on-error t)
 
@@ -179,11 +179,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package server
   :init
-  (when (and (not pgtk-initialized) (eq system-type 'gnu/linux) (window-system))
-    (defun raise-frame-with-wmctrl (&optional frame)
-      (call-process "wmctrl" nil nil nil "-i" "-R"
-                    (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
-    (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
+  ;(when (and (not pgtk-initialized) (eq system-type 'gnu/linux) (window-system))
+  ;  (defun raise-frame-with-wmctrl (&optional frame)
+  ;    (call-process "wmctrl" nil nil nil "-i" "-R"
+  ;                  (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
+  ;  (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
   (defun iconify-emacs-when-server-is-done ()
     (unless server-clients (iconify-frame)))
   (add-hook 'server-switch-hook #'raise-frame)
@@ -1444,6 +1444,8 @@
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
+              ("<ret>" . 'copilot-accept-completion)
+              ("RET" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
@@ -1457,11 +1459,11 @@
   ;;   :config
   ;;   (exec-path-from-shell-initialize))
 
-  (use-package pdf-tools
-    :ensure t
-    :defer t
-    :init
-    (pdf-loader-install))
+  ;(use-package pdf-tools
+  ;  :ensure t
+  ;  :defer t
+  ;  :init
+  ;  (pdf-loader-install))
   ;; font
   ;; default ASCII font
   ;; (set-face-attribute 'default nil :family "HackGen" :height 110)
