@@ -505,11 +505,16 @@
            (corfu-cycle t)
            (corfu-on-exact-match nil)
            (tab-always-indent 'complete))
-  :bind (nil
-         :map corfu-map
+  :bind (:map corfu-map
          ("C-n" . corfu-next)
          ("C-p" . corfu-previous))
-  :init (global-corfu-mode +1))
+  :init (global-corfu-mode +1)
+  :config
+  (define-key evil-insert-state-map (kbd "C-n") nil)
+  (define-key evil-insert-state-map (kbd "C-p") nil)
+  (evil-define-key 'insert corfu-map (kbd "C-n") 'corfu-next)
+  (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)
+  )
 
 (use-package kind-icon
   :ensure t
@@ -1451,8 +1456,6 @@
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
-              ("<ret>" . 'copilot-accept-completion)
-              ("RET" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 
