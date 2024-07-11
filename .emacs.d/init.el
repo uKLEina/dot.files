@@ -68,7 +68,6 @@
 ;; デフォルト色付け
 (use-package generic-x)
 (show-paren-mode 1)
-(recentf-mode 1)
 (tab-bar-mode -1)
 (pixel-scroll-precision-mode +1)
 (setopt pixel-scroll-precision-large-scroll-height 40.0)
@@ -199,6 +198,9 @@
   :hook (emacs-startup . super-save-mode)
   :custom
   (super-save-auto-save-when-idle t))
+
+(use-package recentf
+  :custom (recentf-auto-cleanup 10))
 
 (use-package doom-themes
   :ensure t
