@@ -843,8 +843,7 @@
   :ensure t
   :hook
   (prog-mode . rainbow-delimiters-mode)
-  (python-ts-mode . rainbow-delimiters-mode)
-  )
+  (python-ts-mode . rainbow-delimiters-mode))
 
 (use-package anzu
   :ensure t
@@ -1457,8 +1456,8 @@
          (copilot-file (concat elpa-lisp-dir "/copilot/copilot.el")))
     (unless (file-exists-p copilot-file)
       (package-vc-install "https://github.com/copilot-emacs/copilot.el.git" nil nil 'copilot)))
-  :hook
-  (prog-mode . copilot-mode)
+  ;; :hook
+  ;; (prog-mode . copilot-mode)
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
