@@ -560,7 +560,12 @@
 
 (use-package flymake-ruff
   :ensure t
-  :hook (python-ts-mode . flymake-ruff-load))
+  :init
+  (defun my/flymake-ruff-load-python-ts-mode ()
+    "check major mode before load flymake-ruff"
+    (when (eq major-mode 'python-ts-mode)
+      (flymake-ruff-load)))
+  :hook (eglot-managed-mode . my/flymake-ruff-load-python-ts-mode))
 
 (use-package smerge-mode
   :defer t
