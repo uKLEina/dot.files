@@ -461,7 +461,9 @@
   :bind
   (("C-x b" . consult-buffer)
    ("M-i" . consult-line-thing-at-point)
-   ("C-M-g" . consult-ripgrep))
+   ("C-M-g" . consult-ripgrep)
+   ("M-g g" . consult-goto-line)
+   )
   :config
   ;; cosult-line-thing-at-point
   (consult-customize consult-line :add-history (seq-some #'thing-at-point '(region symbol)))
