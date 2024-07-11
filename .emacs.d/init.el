@@ -420,6 +420,7 @@
 
 (use-package which-key
   :ensure t
+  :pin melpa
   :hook
   (after-init . which-key-mode)
   :custom
@@ -826,6 +827,7 @@
 
 (use-package magit
   :ensure t
+  :pin melpa
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
@@ -846,6 +848,7 @@
 
 (use-package anzu
   :ensure t
+  :pin melpa
   :init (global-anzu-mode +1)
   :custom
   (anzu-mode-lighter "")
@@ -974,13 +977,16 @@
 
 (use-package yasnippet
   :ensure t
+  :pin melpa
   :commands (yas-expand)
   :hook
   (prog-mode . yas-minor-mode)
   (python-ts-mode . yas-minor-mode)
   :bind (("C-<tab>" . yas-expand))
   :config
-  (use-package yasnippet-snippets :ensure t))
+  (use-package yasnippet-snippets
+    :ensure t
+    :pin melpa))
 
 ;;; C
 (defun c/c++-mode-setup ()
@@ -1457,7 +1463,9 @@
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+              ("C-<tab>" . 'copilot-accept-completion-by-word))
+  :custom
+  (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
 
 ;;; Linux specific setup
