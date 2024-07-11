@@ -566,7 +566,7 @@
 
 (use-package flymake-ruff
   :ensure t
-  :hook (eglot-managed-mode . flymake-ruff-load))
+  :hook (python-ts-mode . flymake-ruff-load))
 
 (use-package smerge-mode
   :defer t
@@ -1456,8 +1456,8 @@
          (copilot-file (concat elpa-lisp-dir "/copilot/copilot.el")))
     (unless (file-exists-p copilot-file)
       (package-vc-install "https://github.com/copilot-emacs/copilot.el.git" nil nil 'copilot)))
-  ;; :hook
-  ;; (prog-mode . copilot-mode)
+  :hook
+  (python-ts-mode . copilot-mode)
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
