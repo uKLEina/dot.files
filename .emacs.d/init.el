@@ -200,7 +200,17 @@
   (super-save-auto-save-when-idle t))
 
 (use-package recentf
-  :custom (recentf-auto-cleanup 10))
+  :custom (recentf-auto-cleanup 10)
+  :config
+  ;; recentf の メッセージをエコーエリアに表示しない
+  (defun recentf-save-list-inhibit-message (orig-func &rest args)
+    (setq inhibit-message t)
+    (apply orig-func args)
+    (setq inhibit-message nil)
+    'around)
+  (advice-add 'recentf-cleanup   :around 'recentf-save-list-inhibit-message)
+  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message)
+  )
 
 (use-package doom-themes
   :ensure t
