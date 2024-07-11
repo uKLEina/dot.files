@@ -5,7 +5,7 @@
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (setopt package-install-upgrade-built-in t)
 
-;; (require 'package)
+(require 'package)
 ;; (setq package-archives
 ;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
 ;;         ("melpa" . "https://melpa.org/packages/")
@@ -621,38 +621,38 @@
     :config (eglot-booster-mode +1)))
 
 
-(use-package eglot-java
-  :ensure t
-  :init
-  (defun my/eglot-java--install-lsp-server ()
-    "Install specific version of the Eclipse JDT LSP server."
-    (interactive)
-    (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
-           (dest-dir                     (expand-file-name destination-dir))
-           (download-metadata            (eglot-java--parse-jdtls-download-metadata
-                                          (eglot-java--read-json-from-url eglot-java-eclipse-jdt-ls-dl-metadata-url)))
-           (download-url                 "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
-           (download-version             "0.57.0")
-           (dest-filename                (file-name-nondirectory download-url))
-           (dest-abspath                 (expand-file-name dest-filename dest-dir))
-           (dest-versionfile             (expand-file-name eglot-java-filename-version-jdtls dest-dir))
-           (large-file-warning-threshold nil))
-      (message "Installing Eclipse JDT LSP server, please wait...")
-      (eglot-java--download-file download-url dest-abspath)
+;; (use-package eglot-java
+;;   :ensure t
+;;   :init
+;;   (defun my/eglot-java--install-lsp-server ()
+;;     "Install specific version of the Eclipse JDT LSP server."
+;;     (interactive)
+;;     (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
+;;            (dest-dir                     (expand-file-name destination-dir))
+;;            (download-metadata            (eglot-java--parse-jdtls-download-metadata
+;;                                           (eglot-java--read-json-from-url eglot-java-eclipse-jdt-ls-dl-metadata-url)))
+;;            (download-url                 "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+;;            (download-version             "0.57.0")
+;;            (dest-filename                (file-name-nondirectory download-url))
+;;            (dest-abspath                 (expand-file-name dest-filename dest-dir))
+;;            (dest-versionfile             (expand-file-name eglot-java-filename-version-jdtls dest-dir))
+;;            (large-file-warning-threshold nil))
+;;       (message "Installing Eclipse JDT LSP server, please wait...")
+;;       (eglot-java--download-file download-url dest-abspath)
 
-      (message "Extracting Eclipse JDT LSP archive, please wait...")
-      (let ((b (find-file dest-abspath)))
-        (switch-to-buffer b)
-        (goto-char (point-min))
-        (tar-untar-buffer)
-        (kill-buffer b))
-      (delete-file dest-abspath)
+;;       (message "Extracting Eclipse JDT LSP archive, please wait...")
+;;       (let ((b (find-file dest-abspath)))
+;;         (switch-to-buffer b)
+;;         (goto-char (point-min))
+;;         (tar-untar-buffer)
+;;         (kill-buffer b))
+;;       (delete-file dest-abspath)
 
-      (eglot-java--record-version-info download-version dest-versionfile)
+;;       (eglot-java--record-version-info download-version dest-versionfile)
 
-      (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
-  :custom
-  (eglot-java-eglot-server-programs-manual-updates t))
+;;       (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
+;;   :custom
+;;   (eglot-java-eglot-server-programs-manual-updates t))
 
 (use-package reformatter
   :ensure t
