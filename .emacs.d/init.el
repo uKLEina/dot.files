@@ -5,7 +5,7 @@
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (setopt package-install-upgrade-built-in t)
 
-(require 'package)
+;; (require 'package)
 ;; (setq package-archives
 ;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
 ;;         ("melpa" . "https://melpa.org/packages/")
@@ -15,7 +15,7 @@
       '(("gnu" . 30)
         ("nongnu" . 20)
         ("melpa" . 10)))
-(package-initialize)
+;; (package-initialize)
 
 (unless (require 'use-package nil t)
   (package-refresh-contents)
