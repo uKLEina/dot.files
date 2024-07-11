@@ -67,13 +67,6 @@
 ;; デフォルト色付け
 (use-package generic-x)
 (show-paren-mode 1)
-;; hide tool bar/scroll bar
-(if window-system
-    (progn
-      (add-to-list 'default-frame-alist '(alpha-background . 90))
-      (tool-bar-mode 0)
-      (scroll-bar-mode 0)
-      (menu-bar-mode 0)))
 (recentf-mode 1)
 (tab-bar-mode -1)
 (pixel-scroll-precision-mode +1)
