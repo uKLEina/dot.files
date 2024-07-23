@@ -435,6 +435,11 @@
   :config
   (which-key-setup-side-window-right))
 
+(use-package migemo
+  :ensure t
+  :custom
+  (migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict"))
+
 (use-package ripgrep
   :ensure t
   :defer t
