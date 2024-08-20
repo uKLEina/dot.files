@@ -643,8 +643,8 @@
   (unless (require 'eglot-booster nil t)
     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
   (use-package eglot-booster
-    :config (eglot-booster-mode +1)))
-
+    :config (eglot-booster-mode +1))
+  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
 
 ;; (use-package eglot-java
 ;;   :ensure t
