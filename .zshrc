@@ -126,6 +126,7 @@ RPROMPT=$RPROMPT'${vcs_info_msg_0_}'
 # zsh autosuggestion
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/zsh-completions/zsh-completions.plugin.zsh
 
 # 環境依存の内容は別ファイルに置いておく
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
