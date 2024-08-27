@@ -109,10 +109,68 @@ export LANG=ja_JP.UTF-8
 
 # prompt
 PROMPT="%B%F{blue}%m:%f%F{green}%n%f %F{white}%%%f %b"
-RPROMPT="%F{yellow}[%~]%f"
 SPROMPT="correct: %R -> %r ? [n,y,a,e]: "
+# RPROMPT
+# shorten if too long
+shorten_path() {
+    local current_path="$1"
+    local git_root=""
+    local shortened_path=""
 
-# vcs
+    # git コマンドが存在するか確認
+    if command -v git >/dev/null 2>&1; then
+        # カレントディレクトリがGitリポジトリ内かを確認
+        if git_root=$(git rev-parse --show-toplevel 2>/dev/null); then
+            # Gitのルートディレクトリ名を取得
+            local root_dir="$(basename "$git_root")"
+
+            # 現在のパスがGitのルートディレクトリの場合はそのまま表示
+            if [ "$current_path" = "$git_root" ]; then
+                shortened_path="$root_dir"
+            else
+                # ルートディレクトリ以下の相対パスを取得し、ルートディレクトリ名を保持
+                local relative_path="${current_path#$git_root}"
+                shortened_path="$root_dir${relative_path}"
+            fi
+        else
+            # Git管理外の場合、通常のパス短縮を適用
+            shortened_path=$(echo "$current_path" | sed "s|^/home/$(whoami)|~|g")
+        fi
+    else
+        # git コマンドが存在しない場合、通常のパス短縮を適用
+        shortened_path=$(echo "$current_path" | sed "s|^/home/$(whoami)|~|g")
+    fi
+
+    # パスの長さを計算
+    local len=$(echo -n "$shortened_path" | wc -m)
+
+    # パスの長さがターミナル幅の40%以上なら短縮
+    if [ "$len" -ge $(($COLUMNS * 40 / 100)) ]; then
+        # Gitのルートディレクトリ部分は省略せず、相対パス部分のみ短縮
+        if [ -n "$git_root" ] && [ "$current_path" != "$git_root" ]; then
+            local relative_shortened_path="${shortened_path#$root_dir}"
+            echo "$root_dir$(echo "$relative_shortened_path" | sed -E "s|(\w)[^/]+/|\1/|g")"
+        else
+            echo "$shortened_path" | sed -E "s|(\w)[^/]+/|\1/|g"
+        fi
+    else
+        echo "$shortened_path"
+    fi
+}
+
+# RPROMPT の設定を更新する関数
+update_rprompt() {
+    # vcs_info を先に更新
+    vcs_info
+    # shorten_path の結果と vcs_info の結果を組み合わせて RPROMPT を構築
+    RPROMPT="%F{yellow}[$(shorten_path "$PWD")]%f${vcs_info_msg_0_}"
+}
+
+# コマンド実行後に update_rprompt を呼び出すフックを設定
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd update_rprompt
+
+# vcs_info 設定
 autoload -Uz vcs_info
 setopt prompt_subst
 zstyle ':vcs_info:git:*' check-for-changes true
@@ -120,8 +178,9 @@ zstyle ':vcs_info:git:*' stagedstr "%F{yellow}!"
 zstyle ':vcs_info:git:*' unstagedstr "%F{red}+"
 zstyle ':vcs_info:*' formats "%F{green}%c%u[%b]%f"
 zstyle ':vcs_info:*' actionformats '[%b|%a]'
-precmd () { vcs_info }
-RPROMPT=$RPROMPT'${vcs_info_msg_0_}'
+
+# シェル起動時に一度 update_rprompt を呼び出しておく
+update_rprompt
 
 # zsh autosuggestion
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
