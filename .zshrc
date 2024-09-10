@@ -111,33 +111,28 @@ export LANG=ja_JP.UTF-8
 PROMPT="%B%F{blue}%m:%f%F{green}%n%f %F{white}%%%f %b"
 SPROMPT="correct: %R -> %r ? [n,y,a,e]: "
 # RPROMPT
-# shorten if too long
+# Gitコマンドの存在をチェックして結果を変数に保持
+if command -v git >/dev/null 2>&1; then
+    GIT_AVAILABLE=true
+else
+    GIT_AVAILABLE=false
+fi
+
+GIT_ROOT=""
+GIT_PROJECT=""
+
+# カレントディレクトリを短縮表示する関数
 shorten_path() {
     local current_path="$1"
-    local git_root=""
     local shortened_path=""
 
-    # git コマンドが存在するか確認
-    if command -v git >/dev/null 2>&1; then
-        # カレントディレクトリがGitリポジトリ内かを確認
-        if git_root=$(git rev-parse --show-toplevel 2>/dev/null); then
-            # Gitのルートディレクトリ名を取得
-            local root_dir="$(basename "$git_root")"
-
-            # 現在のパスがGitのルートディレクトリの場合はそのまま表示
-            if [ "$current_path" = "$git_root" ]; then
-                shortened_path="$root_dir"
-            else
-                # ルートディレクトリ以下の相対パスを取得し、ルートディレクトリ名を保持
-                local relative_path="${current_path#$git_root}"
-                shortened_path="$root_dir${relative_path}"
-            fi
-        else
-            # Git管理外の場合、通常のパス短縮を適用
-            shortened_path=$(echo "$current_path" | sed "s|^/home/$(whoami)|~|g")
-        fi
+    # Gitのルートディレクトリが設定されている場合
+    if [ -n "$GIT_ROOT" ] && [[ "$current_path" == "$GIT_ROOT"* ]]; then
+        # ルートディレクトリ以下の相対パスを取得し、ルートディレクトリ名を保持
+        local relative_path="${current_path#$GIT_ROOT}"
+        shortened_path="$GIT_PROJECT${relative_path}"
     else
-        # git コマンドが存在しない場合、通常のパス短縮を適用
+        # Git管理外の場合、通常のパス短縮を適用
         shortened_path=$(echo "$current_path" | sed "s|^/home/$(whoami)|~|g")
     fi
 
@@ -147,9 +142,9 @@ shorten_path() {
     # パスの長さがターミナル幅の40%以上なら短縮
     if [ "$len" -ge $(($COLUMNS * 40 / 100)) ]; then
         # Gitのルートディレクトリ部分は省略せず、相対パス部分のみ短縮
-        if [ -n "$git_root" ] && [ "$current_path" != "$git_root" ]; then
-            local relative_shortened_path="${shortened_path#$root_dir}"
-            echo "$root_dir$(echo "$relative_shortened_path" | sed -E "s|(\w)[^/]+/|\1/|g")"
+        if [ -n "$GIT_ROOT" ] && [[ "$current_path" == "$GIT_ROOT"* ]]; then
+            local relative_shortened_path="${shortened_path#$GIT_PROJECT}"
+            echo "$GIT_PROJECT$(echo "$relative_shortened_path" | sed -E "s|(\w)[^/]+/|\1/|g")"
         else
             echo "$shortened_path" | sed -E "s|(\w)[^/]+/|\1/|g"
         fi
@@ -160,8 +155,20 @@ shorten_path() {
 
 # RPROMPT の設定を更新する関数
 update_rprompt() {
+    # Git情報の更新（関数外に移動）
+    if $GIT_AVAILABLE; then
+        GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+        if [ -n "$GIT_ROOT" ]; then
+            GIT_PROJECT=$(basename "$GIT_ROOT")
+        else
+            GIT_ROOT=""
+            GIT_PROJECT=""
+        fi
+    fi
+
     # vcs_info を先に更新
     vcs_info
+
     # shorten_path の結果と vcs_info の結果を組み合わせて RPROMPT を構築
     RPROMPT="%F{yellow}[$(shorten_path "$PWD")]%f${vcs_info_msg_0_}"
 }
