@@ -167,6 +167,8 @@
 
 (setopt debug-on-error t)
 
+(setopt tramp-default-method "ssh")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1501,9 +1503,9 @@
   ;  (pdf-loader-install))
   ;; font
   ;; default ASCII font
-  ;; (set-face-attribute 'default nil :family "HackGen" :height 110)
+  (set-face-attribute 'default nil :family "HackGen" :height 140)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-  (set-face-attribute 'default nil :family "0xProto" :height 110)
+  ;; (set-face-attribute 'default nil :family "0xProto" :height 140)
   ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
   ;; non-ASCII Unicode font
   ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
