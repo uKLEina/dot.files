@@ -1393,25 +1393,27 @@
 
 (use-package csv-mode
   :ensure t
+  :defer t
   :init
   (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
   (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+  (defun my/smartrep-csv-setup ()
+    (smartrep-define-key
+        csv-mode-map "C-c" '(("l" . csv-forward-field)
+                             ("h" . csv-backward-field))))
   :hook
   (csv-mode . csv-align-mode)
   (tsv-mode . csv-align-mode)
-  (csv-mode . (lambda () (interactive) (toggle-truncate-lines nil)))
-  (tsv-mode . (lambda () (interactive) (toggle-truncate-lines nil)))
+  (csv-mode . (lambda () (toggle-truncate-lines t)))
+  (tsv-mode . (lambda () (toggle-truncate-lines t)))
+  (csv-mode . my/smartrep-csv-setup)
   :bind
   (:map csv-mode-map
         ("C-c l" . csv-forward-field)
         ("C-c h" . csv-backward-field))
   :custom
   (csv-align-style 'auto)
-  (csv-align-max-width 200)
-  :config
-  (smartrep-define-key
-      csv-mode-map "C-c" '(("l" . csv-forward-field)
-                           ("h" . csv-backward-field))))
+  (csv-align-max-width 200))
 
 (use-package open-junk-file
   :ensure t
