@@ -147,38 +147,16 @@
     (kill-new project-buffer-file-path)
     (message "copied: %s" project-buffer-file-path)))
 
-;;; Fix copy/paste in Wayland
-;; credit: yorickvP on Github
-;(defvar wl-copy-process nil)
-;(defun wl-copy (text)
-;  (setq wl-copy-process (make-process :name "wl-copy"
-;                                      :buffer nil
-;                                      :command '("wl-copy" "-f" "-n")
-;                                      :connection-type 'pipe
-;                                      :noquery t))
-;  (process-send-string wl-copy-process text)
-;  (process-send-eof wl-copy-process))
-;(defun wl-paste ()
-;  (if (and wl-copy-process (process-live-p wl-copy-process))
-;      nil ; should return nil if we're the current paste owner
-;    (shell-command-to-string "wl-paste -n | tr -d \r")))
-;(setq interprogram-cut-function 'wl-copy)
-;(setq interprogram-paste-function 'wl-paste)
-
-(setopt debug-on-error t)
-
-(setopt tramp-default-method "ssh")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package server
   :init
-  ;(when (and (not pgtk-initialized) (eq system-type 'gnu/linux) (window-system))
-  ;  (defun raise-frame-with-wmctrl (&optional frame)
-  ;    (call-process "wmctrl" nil nil nil "-i" "-R"
-  ;                  (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
-  ;  (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
+  (when (and (not (boundp 'pgtk-initialized)) (eq system-type 'gnu/linux) (window-system))
+   (defun raise-frame-with-wmctrl (&optional frame)
+     (call-process "wmctrl" nil nil nil "-i" "-R"
+                   (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
+   (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
   (defun iconify-emacs-when-server-is-done ()
     (unless server-clients (iconify-frame)))
   (add-hook 'server-switch-hook #'raise-frame)
@@ -1515,8 +1493,33 @@
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
 
+(setopt debug-on-error t)
+
+(setopt tramp-default-method "ssh")
+
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
+  ;;; Fix copy/paste in Wayland
+  ;; credit: yorickvP on Github
+  (if (bound-and-true-p pgtk-initialized)
+      (progn
+        (defvar wl-copy-process nil)
+        (defun wl-copy (text)
+          (setq wl-copy-process (make-process :name "wl-copy"
+                                              :buffer nil
+                                              :command '("wl-copy" "-f" "-n")
+                                              :connection-type 'pipe
+                                              :noquery t))
+          (process-send-string wl-copy-process text)
+          (process-send-eof wl-copy-process))
+        (defun wl-paste ()
+          (if (and wl-copy-process (process-live-p wl-copy-process))
+              nil ; should return nil if we're the current paste owner
+            (shell-command-to-string "wl-paste -n | tr -d \r")))
+        (setq interprogram-cut-function 'wl-copy)
+        (setq interprogram-paste-function 'wl-paste)
+        ))
+
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
