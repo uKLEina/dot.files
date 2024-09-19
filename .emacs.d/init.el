@@ -277,6 +277,7 @@
         (format " F%d" (csv--field-index))
       ""))
 
+  ;; ;; you can use featurep to check if library is loaded or not
   ;; (with-eval-after-load 'evil
   ;;   (doom-modeline-def-segment evil-state-seg
   ;;     "Display current Evil State."
