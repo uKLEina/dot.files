@@ -277,18 +277,19 @@
         (format " F%d" (csv--field-index))
       ""))
 
-  (with-eval-after-load 'evil
-    (doom-modeline-def-segment evil-state-seg
-      "Display current Evil State."
-      (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
-                  'face '(:weight bold)))
-    (doom-modeline-def-modeline 'simple
-      ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
-      ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
-      ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
-      '(bar modals matches remote-host buffer-info buffer-position csv-index)
-      '(projectile-project-name vcs check battery datetime)
-      ))
+  ;; (with-eval-after-load 'evil
+  ;;   (doom-modeline-def-segment evil-state-seg
+  ;;     "Display current Evil State."
+  ;;     (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
+  ;;                 'face '(:weight bold)))
+  ;;   )
+  (doom-modeline-def-modeline 'simple
+    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
+    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
+    ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
+    '(bar modals matches remote-host buffer-info buffer-position csv-index)
+    '(projectile-project-name vcs check battery datetime)
+    )
 
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple my-buffer-size)
