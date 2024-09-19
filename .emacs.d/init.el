@@ -293,6 +293,12 @@
                               'mode-line-inactive)))
       ""))
 
+  (doom-modeline-def-segment csv-index
+    "Display current csv column index"
+    (if (derived-mode-p 'csv-mode)
+        (format " F%d" (csv--field-index))
+      ""))
+
   (with-eval-after-load 'evil
     (doom-modeline-def-segment evil-state-seg
       "Display current Evil State."
@@ -302,7 +308,7 @@
       ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
       ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
       ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
-      '(bar modals matches remote-host buffer-info buffer-position)
+      '(bar modals matches remote-host buffer-info buffer-position csv-index)
       '(projectile-project-name vcs check battery datetime)
       ))
 
@@ -1404,6 +1410,28 @@
 (use-package textile-mode
   :ensure t
   :mode "\\.textile\\'")
+
+(use-package csv-mode
+  :ensure t
+  :init
+  (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+  (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+  :hook
+  (csv-mode . csv-align-mode)
+  (tsv-mode . csv-align-mode)
+  (csv-mode . (lambda () (interactive) (toggle-truncate-lines nil)))
+  (tsv-mode . (lambda () (interactive) (toggle-truncate-lines nil)))
+  :bind
+  (:map csv-mode-map
+        ("C-c l" . csv-forward-field)
+        ("C-c h" . csv-backward-field))
+  :custom
+  (csv-align-style 'auto)
+  (csv-align-max-width 200)
+  :config
+  (smartrep-define-key
+      csv-mode-map "C-c" '(("l" . csv-forward-field)
+                           ("h" . csv-backward-field))))
 
 (use-package open-junk-file
   :ensure t
