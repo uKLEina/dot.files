@@ -884,11 +884,11 @@
   (python-mode . electric-operator-mode)
   (python-ts-mode . electric-operator-mode))
 
-(use-package expand-region
+(use-package expreg
   :ensure t
   :bind
-  (("C-M-]" . er/expand-region)
-   ("C-M-:" . er/contract-region)))
+  (("C-M-]" . expreg-expand)
+   ("C-M-:" . expreg-contract)))
 
 (use-package origami
   :ensure t
