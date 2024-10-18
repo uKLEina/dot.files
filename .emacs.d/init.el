@@ -49,7 +49,7 @@
 (defalias 'message-box 'message)
 (setq history-length 10000)
 (setq echo-keystrokes 0.1)
-(setq large-file-warning-threshold (* 25 1024 1024))
+(setq large-file-warning-threshold (* 500 1024 1024))
 (setq use-short-answers t)
 (setq visible-bell t)
 (setq-default indent-tabs-mode nil)
