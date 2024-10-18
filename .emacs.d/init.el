@@ -603,6 +603,17 @@
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode +1))
 
+
+(use-package treesit-fold
+  :init
+  (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
+         (treesit-fold-file (concat elpa-lisp-dir "/treesit-fold/treesit-fold.el")))
+    (unless (file-exists-p treesit-fold-file)
+      (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
+  :bind
+  ("C-l o" . treesit-fold-toggle)
+  )
+
 (use-package pangu-spacing
   :ensure t
   :custom
@@ -896,11 +907,11 @@
   (("C-M-]" . expreg-expand)
    ("C-M-:" . expreg-contract)))
 
-(use-package origami
-  :ensure t
-  :bind
-  ("C-l o" . origami-recursively-toggle-node)
-  )
+;; (use-package origami
+;;   :ensure t
+;;   :bind
+;;   ("C-l o" . origami-recursively-toggle-node)
+;;   )
 
 (use-package highlight-symbol
   :ensure t
