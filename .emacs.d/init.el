@@ -1401,8 +1401,17 @@
   :ensure t
   :defer t
   :init
-  (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-  (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+  (defun enable-csv-mode-for-small-files ()
+    "Enable csv-mode for TSV/CSV files if they are not too large."
+    (when (and buffer-file-name
+               (or (string-match-p "\\.csv\\'" buffer-file-name)
+                   (string-match-p "\\.tsv\\'" buffer-file-name))
+               (or (not large-file-warning-threshold)
+                   (< (buffer-size) large-file-warning-threshold)))
+      (csv-mode +1)))
+  (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
   (defun my/smartrep-csv-setup ()
     (smartrep-define-key
         csv-mode-map "C-c" '(("l" . csv-forward-field)
