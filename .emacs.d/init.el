@@ -845,6 +845,12 @@
   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
   (advice-add 'with-editor-finish :after #'apply-iconify))
 
+(use-package magit-file-icons
+  :ensure t
+  :after magit
+  :init
+  (magit-file-icons-mode +1))
+
 (use-package rainbow-delimiters
   :ensure t
   :hook
