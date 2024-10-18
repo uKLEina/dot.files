@@ -858,9 +858,7 @@
 
 (use-package magit-file-icons
   :ensure t
-  :after magit
-  :init
-  (magit-file-icons-mode +1))
+  :hook (magit-mode . magit-file-icons-mode))
 
 (use-package rainbow-delimiters
   :ensure t
