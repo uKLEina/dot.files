@@ -1238,99 +1238,38 @@
   :config
   (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
 
-(use-package tex-jp
-  :ensure auctex
-  :after tex-mode
+(use-package auctex
+  :ensure t
+  :mode (("\\.tex\\'" . TeX-tex-mode)
+         ("\\.latex\\'" . TeX-tex-mode))
   :custom
   (TeX-auto-save t)
   (TeX-parse-self t)
-  (TeX-default-mode 'japanese-latex-mode)
-  (japanese-TeX-engine-default 'uptex)
-  (japanese-LaTeX-default-style "jsarticle")
-  (TeX-engine 'uptex)
-  (TeX-PDF-from-DVI "Dvipdfmx")
-  (TeX-view-program-list '(("Evince" "/usr/bin/evince %o")))
-  (TeX-view-program-selection '((output-pdf "Evince")))
-  (TeX-source-correlate-method 'synctex)
-  (TeX-source-correlate-start-server t)
-  :init
-  (add-hook 'LaTeX-mode-hook
-            (function (lambda ()
-                        (add-to-list 'TeX-command-list
-                                     '("Latexmk"
-                                       "latexmk %t"
-                                       TeX-run-TeX nil (latex-mode) :help "Run Latexmk"))
-                        (add-to-list 'TeX-command-list
-                                     '("Latexmk-upLaTeX"
-                                       "latexmk -e '$latex=q/uplatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -e '$dvipdf=q/dvipdfmx %%O -o %%D %%S/' -norc -gg -pdfdvi %t"
-                                       TeX-run-TeX nil (latex-mode) :help "Run Latexmk-upLaTeX"))
-                        (add-to-list 'TeX-command-list
-                                     '("Latexmk-LuaLaTeX"
-                                       "latexmk -e '$lualatex=q/lualatex %%O %(file-line-error) %(extraopts) %S %(mode) %%S/' -e '$bibtex=q/upbibtex %%O %%B/' -e '$biber=q/biber %%O --bblencoding=utf8 -u -U --output_safechars %%B/' -e '$makeindex=q/upmendex %%O -o %%D %%S/' -norc -gg -pdflua %t"
-                                       TeX-run-TeX nil (latex-mode) :help "Run Latexmk-LuaLaTeX"))
-                        (add-to-list 'TeX-command-list
-                                     '("Xdg-open"
-                                       "xdg-open %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Run xdg-open"))
-                        (add-to-list 'TeX-command-list
-                                     '("Evince"
-                                        ;"synctex view -i \"%n:0:%b\" -o %s.pdf -x \"evince -i %%{page+1} %%{output}\""
-                                       "TeX-evince-sync-view"
-                                       TeX-run-discard-or-function t t :help "Forward search with Evince"))
-                        (add-to-list 'TeX-command-list
-                                     '("Fwdevince"
-                                       "fwdevince %s.pdf %n \"%b\""
-                                       TeX-run-discard-or-function t t :help "Forward search with fwdevince"))
-                        (add-to-list 'TeX-command-list
-                                     '("Atril"
-                                        ;"synctex view -i \"%n:0:%b\" -o %s.pdf -x \"atril -i %%{page+1} %%{output}\""
-                                       "TeX-atril-sync-view"
-                                       TeX-run-discard-or-function t t :help "Forward search with Atril"))
-                        (add-to-list 'TeX-command-list
-                                     '("Okular"
-                                       "okular --unique \"file:\"%s.pdf\"#src:%n %a\""
-                                       TeX-run-discard-or-function t t :help "Forward search with Okular"))
-                        (add-to-list 'TeX-command-list
-                                     '("Zathura"
-                                       "zathura -x \"emacsclient --no-wait +%%{line} %%{input}\" --synctex-forward \"%n:0:%b\" %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Forward and inverse search with zathura"))
-                        (add-to-list 'TeX-command-list
-                                     '("Qpdfview"
-                                       "qpdfview --unique \"\"%s.pdf\"#src:%b:%n:0\""
-                                       TeX-run-discard-or-function t t :help "Forward search with qpdfview"))
-                        (add-to-list 'TeX-command-list
-                                     '("TeXworks"
-                                       "synctex view -i \"%n:0:%b\" -o %s.pdf -x \"texworks --position=%%{page+1} %%{output}\""
-                                       TeX-run-discard-or-function t t :help "Forward search with TeXworks"))
-                        (add-to-list 'TeX-command-list
-                                     '("TeXstudio"
-                                       "synctex view -i \"%n:0:%b\" -o %s.pdf -x \"texstudio --pdf-viewer-only --page %%{page+1} %%{output}\""
-                                       TeX-run-discard-or-function t t :help "Forward search with TeXstudio"))
-                        (add-to-list 'TeX-command-list
-                                     '("MuPDF"
-                                       "mupdf %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Run MuPDF"))
-                        (add-to-list 'TeX-command-list
-                                     '("Firefox"
-                                       "firefox -new-window %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Run Mozilla Firefox"))
-                        (add-to-list 'TeX-command-list
-                                     '("Chromium"
-                                       "chromium --new-window %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Run Chromium"))
-                        (add-to-list 'TeX-command-list
-                                     '("AcroRead"
-                                       "wine cmd /c start AcroRd32.exe %s.pdf"
-                                       TeX-run-discard-or-function t t :help "Run Adobe Acrobat Reader DC")))))
+  ;; use tectonic as tex engine
+  (TeX-engine-alist '((tectonic                          ; engine symbol
+                       "Tectonic"                        ; engine name
+                       "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
+                       "tectonic -X watch"               ; shell command for compiling LaTeX documents
+                       nil                               ; shell command for compiling ConTeXt documents
+                       )))
+  (TeX-engine 'tectonic)
+  (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
+  (TeX-check-TeX nil)
   :config
-  (TeX-source-correlate-mode +1)
-  (use-package pdf-sync)
-  (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
-  (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
-    (delq (assoc command TeX-command-list) TeX-command-list))
-  (LaTeX-math-mode +1)
-  (turn-on-reftex)
-  )
+  (use-package tex
+    :config
+    (let ((tex-list (assoc "TeX" TeX-command-list))
+          (latex-list (assoc "LaTeX" TeX-command-list)))
+      (setf (cadr tex-list) "%(tex)"
+            (cadr latex-list) "%l"))))
+;;   :config
+;;   (TeX-source-correlate-mode +1)
+;;   (use-package pdf-sync)
+;;   (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
+;;   (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
+;;     (delq (assoc command TeX-command-list) TeX-command-list))
+;;   (LaTeX-math-mode +1)
+;;   (turn-on-reftex)
 
 (use-package org
   :defer t
