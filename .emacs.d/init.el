@@ -399,18 +399,18 @@ frame if FRAME is nil, and to 1 if AMT is nil."
       (define-key map key2 def1)))
   :config
   (evil-mode 1)
-  (defun my/evil-scroll-line-down-1 ()
+  (defun kle/evil-scroll-line-down-1 ()
     (interactive)
     (evil-scroll-line-down 1)
     (forward-line 1))
-  (defun my/evil-scroll-line-up-1 ()
+  (defun kle/evil-scroll-line-up-1 ()
     (interactive)
     (evil-scroll-line-up 1)
     (forward-line -1))
   (bind-keys :map evil-normal-state-map
              ("M-." . xref-find-definitions)
-             ("J" . my/evil-scroll-line-down-1)
-             ("K" . my/evil-scroll-line-up-1)
+             ("J" . kle/evil-scroll-line-down-1)
+             ("K" . kle/evil-scroll-line-up-1)
              ("C-e" . end-of-line)
              ("C-t" . other-window-or-split)
              :map evil-insert-state-map
@@ -594,11 +594,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package flymake-ruff
   :ensure t
   :init
-  (defun my/flymake-ruff-load-python-ts-mode ()
+  (defun kle/flymake-ruff-load-python-ts-mode ()
     "check major mode before load flymake-ruff"
     (when (eq major-mode 'python-ts-mode)
       (flymake-ruff-load)))
-  :hook (eglot-managed-mode . my/flymake-ruff-load-python-ts-mode))
+  :hook (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode))
 
 (use-package smerge-mode
   :defer t
@@ -674,7 +674,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (use-package eglot-java
 ;;   :ensure t
 ;;   :init
-;;   (defun my/eglot-java--install-lsp-server ()
+;;   (defun kle/eglot-java--install-lsp-server ()
 ;;     "Install specific version of the Eclipse JDT LSP server."
 ;;     (interactive)
 ;;     (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
@@ -786,18 +786,18 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package direx
   :ensure t
   :init
-  (defun my/direx-open ()
+  (defun kle/direx-open ()
     (interactive)
     (or (ignore-errors
           (direx-project:jump-to-project-root-other-window))
         (direx:jump-to-directory-other-window)))
-  (defun my/direx-dwim ()
+  (defun kle/direx-dwim ()
     (interactive)
     (if (derived-mode-p 'direx:direx-mode)
         (kill-buffer)
-      (my/direx-open)))
+      (kle/direx-open)))
   :bind
-  (("<f8>" . my/direx-dwim))
+  (("<f8>" . kle/direx-dwim))
   :config
   (push '(direx:direx-mode :position left :width 40 :dedicated t)
         popwin:special-display-config)
@@ -1344,12 +1344,12 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :defer t
   :init
   (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
-  (defun my/yaml-indent-shift-right (beg end)
+  (defun kle/yaml-indent-shift-right (beg end)
     (interactive "r")
     (let ((tab-stop-list '(2 4 6))
           (deactivate-mark nil))
       (indent-rigidly-right-to-tab-stop beg end)))
-  (defun my/yaml-indent-shift-left (beg end)
+  (defun kle/yaml-indent-shift-left (beg end)
     (interactive "r")
     (let ((tab-stop-list '(2 4 6))
           (deactivate-mark nil))
@@ -1358,8 +1358,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (yaml-mode . highlight-indent-guides-mode)
   :bind
   (:map yaml-mode-map
-        ("M-<right>" . my/yaml-indent-shift-right)
-        ("M-<left>" . my/yaml-indent-shift-left))
+        ("M-<right>" . kle/yaml-indent-shift-right)
+        ("M-<left>" . kle/yaml-indent-shift-left))
   :config
   (buffer-face-set 'default))
 
@@ -1386,7 +1386,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                    (< (buffer-size) large-file-warning-threshold)))
       (csv-mode +1)))
   (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
-  (defun my/smartrep-csv-setup ()
+  (defun kle/smartrep-csv-setup ()
     (smartrep-define-key
         csv-mode-map "C-c" '(("l" . csv-forward-field)
                              ("h" . csv-backward-field))))
@@ -1395,7 +1395,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (tsv-mode . csv-align-mode)
   (csv-mode . (lambda () (toggle-truncate-lines t)))
   (tsv-mode . (lambda () (toggle-truncate-lines t)))
-  (csv-mode . my/smartrep-csv-setup)
+  (csv-mode . kle/smartrep-csv-setup)
   :bind
   (:map csv-mode-map
         ("C-c l" . csv-forward-field)
@@ -1527,7 +1527,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;  (pdf-loader-install))
   ;; font
   ;; default ASCII font
-  (set-face-attribute 'default nil :family "HackGen" :height 140)
+  (set-face-attribute 'default nil :family "HackGen" :height 120)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
   ;; (set-face-attribute 'default nil :family "0xProto" :height 140)
   ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
