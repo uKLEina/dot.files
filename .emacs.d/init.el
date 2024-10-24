@@ -147,6 +147,32 @@
     (kill-new project-buffer-file-path)
     (message "copied: %s" project-buffer-file-path)))
 
+;; Resize the whole frame, and not only a window
+;; Adapted from https://stackoverflow.com/a/24714383/5103881
+(defun kle/zoom-frame (&optional amt frame)
+  "Increaze FRAME font size by amount AMT. Defaults to selected
+frame if FRAME is nil, and to 1 if AMT is nil."
+  (interactive "p")
+  (let* ((frame (or frame (selected-frame)))
+         (font (face-attribute 'default :font frame))
+         (size (font-get font :size))
+         (amt (or amt 1))
+         (new-size (+ size amt)))
+    (set-frame-font (font-spec :size new-size) t `(,frame))
+    (message "Frame's font new size: %d" new-size)))
+
+(defun kle/zoom-frame-out (&optional amt frame)
+  "Call `kle/zoom-frame' with negative argument."
+  (interactive "p")
+  (kle/zoom-frame (- (or amt 1)) frame))
+
+(global-set-key (kbd "C-x C-+") 'kle/zoom-frame)
+(global-set-key (kbd "C-x C--") 'kle/zoom-frame-out)
+(smartrep-define-key
+    global-map "C-x"
+  '(("C-+" . kle/zoom-frame)
+    ("C--" . kle/zoom-frame-out)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
