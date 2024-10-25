@@ -168,10 +168,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (global-set-key (kbd "C-x C-+") 'kle/zoom-frame)
 (global-set-key (kbd "C-x C--") 'kle/zoom-frame-out)
-(smartrep-define-key
-    global-map "C-x"
-  '(("C-+" . kle/zoom-frame)
-    ("C--" . kle/zoom-frame-out)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
@@ -563,7 +560,12 @@ frame if FRAME is nil, and to 1 if AMT is nil."
       ("o" . other-window)))
   (smartrep-define-key
       global-map "C-l"
-    '(("<tab>" . tab-to-tab-stop))))
+      '(("<tab>" . tab-to-tab-stop)))
+(smartrep-define-key
+    global-map "C-x"
+  '(("C-+" . kle/zoom-frame)
+    ("C--" . kle/zoom-frame-out)))
+  )
 
 (use-package popwin
   :ensure t
