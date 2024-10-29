@@ -27,7 +27,8 @@
 (global-unset-key (kbd "C-l"))
 (bind-keys ("C-l C-l" . recenter-top-bottom)
            ("C-l C-x" . server-edit)
-           ("C-l C-<tab>" . tab-to-tab-stop))
+           ("C-l C-<tab>" . tab-to-tab-stop)
+           ("C-M-y" . duplicate-dwim))
 
 ;;; customize
 (set-language-environment "Japanese")
