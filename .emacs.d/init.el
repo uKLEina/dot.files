@@ -1304,7 +1304,46 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :bind
   ("C-l C-o l" . org-store-link)
   ("C-l C-o a" . org-agenda)
-  ("C-l C-o c" . org-capture))
+  ("C-l C-o c" . org-capture)
+  :custom
+  (org-latex-packages-alist
+   '(("" "fontspec" t)
+     ("" "xeCJK" t)))
+  :config
+  ;; (setq org-latex-packages-alist '(("" "fontspec" t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (sql . t))))
+
+(use-package ox
+  :defer t
+  :custom
+  (org-export-default-language "ja"))
+
+(use-package ox-latex
+  :defer t
+  :custom
+  (org-latex-compiler "xelatex")
+  (org-latex-pdf-process "%latex -X compile -o %o %f")
+  (org-latex-classes
+   '(("bxjsarticle"
+      "\\documentclass[xelatex,ja=standard,a4paper,12pt]{bxjsarticle}
+\[DEFAULT-PACKAGES]
+\[PACKAGES]
+\\setmainfont{Linux Libertine}
+\\setsansfont{Linux Biolinum}
+\\setmonofont{0xProto}
+\\setCJKmainfont{IPAex明朝}
+\\setCJKsansfont{IPAexゴシック}
+\\setCJKmonofont{HackGen}"
+      ("\\section{%s}" . "\\section*{%s}")
+      ("\\subsection{%s}" . "\\subsection*{%s}")
+      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+  (org-latex-default-class "bxjsarticle"))
 
 (use-package vimrc-mode
   :ensure t
