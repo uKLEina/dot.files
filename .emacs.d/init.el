@@ -177,10 +177,10 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package server
   :init
   (when (and (not (boundp 'pgtk-initialized)) (eq system-type 'gnu/linux) (window-system))
-   (defun raise-frame-with-wmctrl (&optional frame)
-     (call-process "wmctrl" nil nil nil "-i" "-R"
-                   (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
-   (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
+    (defun raise-frame-with-wmctrl (&optional frame)
+      (call-process "wmctrl" nil nil nil "-i" "-R"
+                    (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
+    (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
   (defun iconify-emacs-when-server-is-done ()
     (unless server-clients (iconify-frame)))
   (add-hook 'server-switch-hook #'raise-frame)
@@ -532,8 +532,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
            (corfu-on-exact-match nil)
            (tab-always-indent 'complete))
   :bind (:map corfu-map
-         ("C-n" . corfu-next)
-         ("C-p" . corfu-previous))
+              ("C-n" . corfu-next)
+              ("C-p" . corfu-previous))
   :init (global-corfu-mode +1)
   :config
   (define-key evil-insert-state-map (kbd "C-n") nil)
@@ -561,11 +561,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
       ("o" . other-window)))
   (smartrep-define-key
       global-map "C-l"
-      '(("<tab>" . tab-to-tab-stop)))
-(smartrep-define-key
-    global-map "C-x"
-  '(("C-+" . kle/zoom-frame)
-    ("C--" . kle/zoom-frame-out)))
+    '(("<tab>" . tab-to-tab-stop)))
+  (smartrep-define-key
+      global-map "C-x"
+    '(("C-+" . kle/zoom-frame)
+      ("C--" . kle/zoom-frame-out)))
   )
 
 (use-package popwin
