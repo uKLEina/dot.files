@@ -672,6 +672,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (use-package python-mode
   :defer t
+  :custom
+  (eldoc-echo-area-use-multiline-p nil)
   :config
   (define-key python-mode-map [remap left-word] #'python-indent-shift-left)
   (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
@@ -685,7 +687,18 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
   (use-package eglot-booster
     :config (eglot-booster-mode +1))
-  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start"))))
+  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
+  (defun my-reorder-eldoc-functions ()
+    "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
+    (when (and (boundp 'eldoc-documentation-functions)
+               (listp eldoc-documentation-functions))
+      (let ((flymake-fn 'flymake-eldoc-function))
+        (setq eldoc-documentation-functions
+              (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+  (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
+  (setq-default eglot-workspace-configuration
+                '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"])))
+  )
 
 ;; (use-package eglot-java
 ;;   :ensure t
