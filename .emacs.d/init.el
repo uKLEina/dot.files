@@ -118,9 +118,17 @@
     (split-window-horizontally))
   (other-window 1))
 
-(defun copy-buffer-file-path ()
-  (interactive)
-  (kill-new (buffer-file-name)))
+(defun copy-buffer-file-path (use-file-name-only)
+  "Copy the current buffer's file path to the kill ring.
+If called with a prefix argument (C-u), copy only the file name (without path)."
+  (interactive "P")
+  (if-let ((file-path (buffer-file-name)))
+      (let ((text-to-copy (if use-file-name-only
+                              (file-name-nondirectory file-path)
+                            file-path)))
+        (kill-new text-to-copy)
+        (message "Copied: %s" text-to-copy))
+    (message "This buffer is not associated with a file")))
 
 (defun copy-project-buffer-file-path ()
   (interactive)
