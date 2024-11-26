@@ -1300,6 +1300,10 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;   (LaTeX-math-mode +1)
 ;;   (turn-on-reftex)
 
+(use-package json-ts-mode
+  :defer t
+  :custom (json-ts-mode-indent-offset 4))
+
 (use-package org
   :bind
   ("C-l C-o l" . org-store-link)
