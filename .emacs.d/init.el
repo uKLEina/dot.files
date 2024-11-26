@@ -550,6 +550,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)
   )
 
+(use-package cape
+  :ensure t
+  :bind (("C-:" . cape-dabbrev))
+  )
+
 (use-package kind-icon
   :ensure t
   :after corfu
