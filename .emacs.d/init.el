@@ -755,27 +755,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (bind-key "C-l C-o" 'dired-omit-mode dired-mode-map)
   (bind-key "r" 'wdired-change-to-wdired-mode dired-mode-map)
   (when (eq system-type 'gnu/linux)
-    (custom-set-variables '(dired-listing-switches "-AFDlh --group-directories-first"))
-    (defun file-open-file-manager ()
-      "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
-Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
-      (interactive)
-      (let* ((path (or (if (derived-mode-p 'dired-mode)
-                           (dired-current-directory)
-                         (file-name-directory (or buffer-file-name default-directory)))
-                       default-directory))
-             (wsl-p (string-match-p "microsoft" (shell-command-to-string "uname -r"))) ; WSL環境かどうかを確認
-             (distro (if wsl-p
-                         (replace-regexp-in-string "\n" "" (shell-command-to-string "lsb_release -si")) ; WSLディストリビューション名を取得
-                       nil))
-             (command (if wsl-p
-                          (concat "explorer.exe /root,'\\\\wsl$\\" distro
-                                  (replace-regexp-in-string "/" "\\" path t t) "\'")
-                        (concat "nautilus --no-desktop -n " path))))
-        (message "open file manager with command: %s" command)
-        (start-process-shell-command "open-file-manager" nil command)))
-    (bind-key "C-l C-e" 'file-open-file-manager)
-    (bind-key "e" 'file-open-file-manager dired-mode-map))
+    (custom-set-variables '(dired-listing-switches "-AFDlh --group-directories-first")))
   (when (eq system-type 'windows-nt)
     (custom-set-variables '(ls-lisp-dirs-first t)))
   (use-package dired-quick-sort
@@ -1596,4 +1576,25 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (use-package autodisass-java-bytecode
     :ensure t
     :defer t)
-  )
+
+  (defun file-open-file-manager ()
+    "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
+Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
+    (interactive)
+    (let* ((path (or (if (derived-mode-p 'dired-mode)
+                         (dired-current-directory)
+                       (file-name-directory (or buffer-file-name default-directory)))
+                     default-directory))
+           (wsl-p (string-match-p "microsoft" (shell-command-to-string "uname -r"))) ; WSL環境かどうかを確認
+           (distro (if wsl-p
+                       (replace-regexp-in-string "\n" "" (shell-command-to-string "lsb_release -si")) ; WSLディストリビューション名を取得
+                     nil))
+           (command (if wsl-p
+                        (concat "explorer.exe /root,'\\\\wsl$\\" distro
+                                (replace-regexp-in-string "/" "\\" path t t) "\'")
+                      (concat "nautilus --no-desktop -n " path))))
+      (message "open file manager with command: %s" command)
+      (start-process-shell-command "open-file-manager" nil command)))
+  (bind-key "C-l C-e" 'file-open-file-manager)
+  (with-eval-after-load 'dired
+    (bind-key "e" 'file-open-file-manager dired-mode-map)))
