@@ -72,6 +72,7 @@
 (tab-bar-mode -1)
 (pixel-scroll-precision-mode +1)
 (setopt pixel-scroll-precision-large-scroll-height 40.0)
+(global-auto-revert-mode +1)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
