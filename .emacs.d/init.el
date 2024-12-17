@@ -780,6 +780,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :custom
   ;; fix keybind for SKK
   (dired-bind-jump nil)
+  (dired-kill-when-opening-new-dired-buffer t)
   :config
   (bind-keys :map dired-mode-map
              ("C-t" . other-window-or-split)
