@@ -1563,7 +1563,37 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;  (pdf-loader-install))
   ;; font
   ;; default ASCII font
-  (set-face-attribute 'default nil :family "HackGen" :height 120)
+  ;; (defun calculate-font-size-for-frame (frame)
+  ;;   "Calculate the font size dynamically based on the frame's display resolution."
+  ;;   (let* ((attrs (frame-monitor-attributes frame))
+  ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
+  ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
+  ;;          (dpi (if (and mm-width pixel-width)
+  ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
+  ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
+  ;;                 96))                                  ; Default to 96 DPI if unavailable
+  ;;          (font-size (cond
+  ;;                      ((> dpi 200) 180)  ; High DPI
+  ;;                      ((> dpi 150) 140)  ; Medium DPI
+  ;;                      (t 120))))        ; Low DPI
+  ;;     font-size))
+
+  ;; (defun set-font-for-frame (frame)
+  ;;   "Set the font size for a specific frame based on its display resolution."
+  ;;   (let ((font-size (calculate-font-size-for-frame frame)))
+  ;;     (with-selected-frame frame
+  ;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
+
+  ;; (defun adjust-font-on-frame-events (frame)
+  ;;   "Adjust font size when a frame is created or moved."
+  ;;   (set-font-for-frame frame))
+
+  ;; ;; Apply font settings to existing frames and new ones
+  ;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
+
+  ;; ;; For the initial frame
+  ;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
+  (set-face-attribute 'default nil :family "HackGen" :height 140)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
   ;; (set-face-attribute 'default nil :family "0xProto" :height 140)
   ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
