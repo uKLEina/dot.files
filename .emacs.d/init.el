@@ -131,6 +131,13 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
         (message "Copied: %s" text-to-copy))
     (message "This buffer is not associated with a file")))
 
+(defun kle/expand ()
+  (interactive)
+  ;; (message "file name: %s"(expand-file-name (buffer-file-name)))
+  (message "file name: %s"(expand-file-name (buffer-file-name)))
+
+  )
+
 (defun copy-project-buffer-file-path ()
   (interactive)
   (let* ((project-root (file-local-name (abbreviate-file-name
