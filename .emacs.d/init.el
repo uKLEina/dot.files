@@ -472,7 +472,22 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package migemo
   :ensure t
   :custom
-  (migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict"))
+  (migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")
+  (migemo-isearch-enable-p nil)
+  :config
+  ;; C-u で migemo を有効にする isearch
+  (defun kle/isearch-forward-migemo (arg)
+    "通常は通常のisearch。C-uでmigemoが有効になる。"
+    (interactive "P")
+    (let ((migemo-isearch-enable-p arg))
+      (isearch-forward)))
+  (defun kle/isearch-backward-migemo (arg)
+    "通常は通常のisearch。C-uでmigemoが有効になる(後方検索)。"
+    (interactive "P")
+    (let ((migemo-isearch-enable-p arg))
+      (isearch-backward)))
+  (bind-key "C-s" 'kle/isearch-forward-migemo)
+  (bind-key "C-r" 'kle/isearch-backward-migemo))
 
 (use-package ripgrep
   :ensure t
