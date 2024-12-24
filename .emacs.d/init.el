@@ -12,10 +12,12 @@
 ;;         ("melpa" . "https://melpa.org/packages/")
 ;;         ("gnu" . "https://elpa.gnu.org/packages/")))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))
 (setq package-archive-priorities
       '(("gnu" . 30)
         ("nongnu" . 20)
-        ("melpa" . 10)))
+        ("melpa" . 10)
+        ("jcs-elpa" . 0)))
 ;; (package-initialize)
 
 (unless (require 'use-package nil t)
@@ -1395,6 +1397,10 @@ frame if FRAME is nil, and to 1 if AMT is nil."
               ("C-<tab>" . 'copilot-accept-completion-by-word))
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
+
+(use-package chatgpt
+  :ensure t)
+
 
 (setopt debug-on-error t)
 
