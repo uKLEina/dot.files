@@ -704,6 +704,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
+  :hook
+  (python-mode-hook . electric-operator-mode)
   :config
   (smartrep-define-key
       python-mode-map "C-c"
@@ -946,9 +948,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (use-package electric-operator
   :ensure t
-  :commands (electric-operator-add-rules-for-mode electric-operator-get-rules-for-mode)
-  :hook
-  (prog-mode . electric-operator-mode))
+  :commands (electric-operator-add-rules-for-mode electric-operator-get-rules-for-mode))
 
 (use-package expreg
   :ensure t
