@@ -738,8 +738,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
   (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
   (setq-default eglot-workspace-configuration
-                '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"])))
-  )
+                '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
 
 ;; (use-package eglot-java
 ;;   :ensure t
@@ -1093,118 +1092,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
 
-(use-package slime
-  :ensure t
-  :mode
-  (("\\.lisp\\'" . lisp-mode))
-  :hook
-  (lisp-mode . slime-mode)
-  :config
-  (setq inferior-lisp-program "/usr/bin/sbcl"))
-
-(use-package cython-mode
-  :ensure t
-  :mode (("\\.pyx\\'" . cython-mode)
-         ("\\.pxd\\'" . cython-mode)
-         ("\\.pxi\\'" . cython-mode)))
-
-(use-package graphviz-dot-mode
-  :ensure t
-  :mode
-  (("\\.dot\\'" . graphviz-dot-mode)
-   ("\\.gc\\'" . graphviz-dot-mode)))
-
-(use-package ess
-  :ensure t
-  :mode (("\\.jl\\'" . ess-julia-mode))
-  :config
-  (apply #'electric-operator-add-rules-for-mode
-         'ess-julia-mode
-         (electric-operator-get-rules-for-mode 'prog-mode))
-  (electric-operator-add-rules-for-mode
-   'ess-julia-mode
-   (cons "=" #'electric-operator-julia-mode-kwargs-=)
-   (cons ";" "; ")
-
-   ;; Subtype comparison
-   (cons "<:" " <: ")
-
-   ;; Cool! Unicode!
-   (cons "÷" " ÷ ")
-   (cons "≠" " ≠ ")
-   (cons "≤" " ≤ ")
-   (cons "≥" " ≥ ")
-
-   ;; something about fractions
-   (cons "//" " // ")
-   (cons ".//" " .// ")
-   (cons "//=" " //= ")
-
-   ;; pipe
-   (cons "|>" " |> ")
-
-   (cons "*" " * ")
-   (cons "/" " / ")
-   (cons "%" " % ")
-   (cons "&" " & ")
-
-   ;; \ (escaped), for solving matrix multiplies
-   (cons "\\" " \\ ")
-   (cons "\\=" " \\= ")
-   (cons ".\\" " .\\ ")
-
-   ;; XOR
-   (cons "$" " $ ")
-
-   ;; Even more equal!
-   (cons "===" " === ")
-   (cons "!==" " !== ")
-
-   ;; vector operations and assign-operators
-   (cons ".^" " .^ ")
-   (cons ".*" " .* ")
-   (cons "./" " ./ ")
-   (cons ".%" " .% ")
-   (cons "<<" " << ")
-   (cons ">>" " >> ")
-   (cons ">>>" " >>> ")
-   (cons ".<<" " .<< ")
-   (cons ".>>" " .>> ")
-   (cons ".>>>" " .>>> ")
-   (cons ".+" " .+ ")
-   (cons ".-" " .- ")
-   (cons ".>" " .> ")
-   (cons ".<" " .< ")
-   (cons ".>=" " .>= ")
-   (cons ".<=" " .<= ")
-   (cons ".==" " .== ")
-   (cons ".!=" " .!= ")
-   (cons "^=" " ^= ")
-   (cons "÷=" " ÷= ")
-   (cons "%=" " %= ")
-   (cons "|=" " |= ")
-   (cons "&=" " &= ")
-   (cons "$=" " $= ")
-   (cons "<<=" " <<= ")
-   (cons ">>=" " >>= ")
-   (cons ">>>=" " >>>= ")
-   (cons ".+=" " .+= ")
-   (cons ".-=" " .-= ")
-   (cons ".*=" " .*= ")
-   (cons "./=" " ./= ")
-   (cons ".//=" " .//= ")
-   (cons ".\\=" " .\\= ")
-   (cons ".^=" " .^= ")
-   (cons ".÷=" " .÷= ")
-   (cons ".%=" " .%= ")))
-
-(use-package matlab
-  :ensure matlab-mode
-  :mode
-  (("\\.m'" . matlab-mode))
-  :custom
-  (matlab-indent-function-body t))
-
 (use-package tuareg
   :ensure t
   :mode (("\\.ml\\'" . tuareg-mode)
@@ -1248,24 +1135,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :mode (("\\.ps1'" . powershell-mode)))
 
-(use-package plantuml-mode
-  :ensure t
-  :mode (("\\.plantuml\\'" . plantuml-mode)
-         ("\\.puml\\'" . plantuml-mode)
-         ("\\.pu\\'" . plantuml-mode))
-  :custom
-  (plantuml-jar-path "~/opt/plantuml/plantuml.jar")
-  (plantuml-default-exec-mode 'jar)
-  :config
-  (push '("*PLANTUML Preview*" :position right :width 50 :noselect t)
-        popwin:special-display-config))
-
 (use-package markdown-mode
   :ensure t
   :mode (("\\.md\\'" . gfm-mode))
   :custom
-  (markdown-command "multimarkdown")
-  )
+  (markdown-command "multimarkdown"))
 (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
 
 (use-package markdown-preview-mode
