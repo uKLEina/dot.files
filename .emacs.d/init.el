@@ -699,13 +699,25 @@ frame if FRAME is nil, and to 1 if AMT is nil."
             (group-n 2 (category japanese)))))
 
 
-(use-package python-mode
+(use-package python
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
   :config
-  (define-key python-mode-map [remap left-word] #'python-indent-shift-left)
-  (define-key python-mode-map [remap right-word] #'python-indent-shift-right))
+  (smartrep-define-key
+      python-mode-map "C-c"
+    '(("<" . python-indent-shift-left)
+      (">" . python-indent-shift-right)))
+  (smartrep-define-key
+      python-ts-mode-map "C-c"
+    '(("<" . python-indent-shift-left)
+      (">" . python-indent-shift-right)))
+  (defun ruff-fix-buffer ()
+    "Use ruff to fix lint violations in the current buffer."
+    (interactive)
+    (shell-command-to-string (format "ruff check --fix %s" (buffer-file-name)))
+    (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
+    (revert-buffer t t t)))
 
 (use-package eglot
   :ensure t
@@ -761,38 +773,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;       (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
 ;;   :custom
 ;;   (eglot-java-eglot-server-programs-manual-updates t))
-
-(use-package reformatter
-  :ensure t
-  :config
-  (reformatter-define ruff-format
-    :program "ruff"
-    :args `("format" "--stdin-filename" ,buffer-file-name "-")))
-
-;; (defun ruff-fix-buffer ()
-;;   "Use ruff to fix lint violations in the current buffer."
-;;   (interactive)
-;;   (let* ((temporary-file-directory (if (buffer-file-name)
-;;                                        (file-name-directory (buffer-file-name))
-;;                                      temporary-file-directory))
-;;          (temporary-file-name-suffix (format "--%s" (if (buffer-file-name)
-;;                                                         (file-name-nondirectory (buffer-file-name))
-;;                                                       "")))
-;;          (temp-file (make-temp-file "temp-ruff-" nil temporary-file-name-suffix))
-;;          (current-point (point)))
-;;     (write-region (point-min) (point-max) temp-file nil)
-;;     (shell-command-to-string (format "ruff check --fix %s" temp-file))
-;;     (erase-buffer)
-;;     (insert-file-contents temp-file)
-;;     (delete-file temp-file)
-;;     (goto-char current-point)))
-
-(defun ruff-fix-buffer ()
-  "Use ruff to fix lint violations in the current buffer."
-  (interactive)
-  (shell-command-to-string (format "ruff check --fix %s" (buffer-file-name)))
-  (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
-  (revert-buffer t t t))
 
 ;;; dired
 (use-package lv :ensure t :defer t)
@@ -968,8 +948,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :commands (electric-operator-add-rules-for-mode electric-operator-get-rules-for-mode)
   :hook
-  (python-mode . electric-operator-mode)
-  (python-ts-mode . electric-operator-mode))
+  (prog-mode . electric-operator-mode))
 
 (use-package expreg
   :ensure t
@@ -1541,7 +1520,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
               ("C-<tab>" . 'copilot-accept-completion-by-word))
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
-
 
 (setopt debug-on-error t)
 
