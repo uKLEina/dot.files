@@ -30,6 +30,11 @@
 !/bin
 chromedriver
 geckodriver
+emacs-lsp-booster
+ghq
+mvn
+tectonic
+xelatex
 !/linux_setup.sh
 !/.Xdefaults
 !/.Xresources
