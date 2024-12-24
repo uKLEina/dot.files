@@ -370,28 +370,26 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (emacs-lisp-mode . enable-paredit-mode)
   :init
   ;; Evil compatibility fix
-  (defun evil-end-of-line-p ()
-    (let ((offset (if (evil-emacs-state-p)
-                      0
-                    1)))
-      (eq (- (line-end-position) offset)  (point))))
+  (defun kle/paredit-forward-advice (orig-fun &rest args)
+    (if (and (bound-and-true-p evil-mode)
+             (or (evil-normal-state-p) (evil-visual-state-p)))
+        (progn
+          (funcall orig-fun)
+          (unless (or (eolp) (bobp))  ;; 行末・行頭でなければ1文字戻る
+            (backward-char)))
+      (apply orig-fun args)))
 
-  (defun evil-beginning-of-line-p ()
-    (eq (line-beginning-position) (point)))
-
-  (defun evil-forward-par (origfun arg)
-    (funcall origfun)
-    (if (not (or (evil-emacs-state-p) (evil-end-of-line-p)))
-        (backward-char)))
-
-  (defun evil-backward-par (origfun arg)
-    (if (evil-end-of-line-p)
-        (forward-line)
-      (forward-char))
-    (funcall origfun))
-
-  (advice-add 'paredit-forward :around #'evil-forward-par)
-  (advice-add 'paredit-backward :around #'evil-backward-par))
+  (defun kle/paredit-backward-advice (orig-fun &rest args)
+    (if (and (bound-and-true-p evil-mode)
+             (or (evil-normal-state-p) (evil-visual-state-p)))
+        (progn
+          (if (eolp)
+              (forward-line 1)  ;; 行末なら次の行の行頭へ
+            (forward-char))     ;; それ以外なら1文字先へ
+          (funcall orig-fun))
+      (apply orig-fun args)))
+  (advice-add 'paredit-forward :around #'kle/paredit-forward-advice)
+  (advice-add 'paredit-backward :around #'kle/paredit-backward-advice))
 
 (use-package posframe
   :ensure t
