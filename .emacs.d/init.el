@@ -229,6 +229,19 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message)
   )
 
+(use-package tab-bar
+  :after evil
+  :custom
+  (tab-bar-show 1)
+  (tab-bar-new-button-show nil)
+  (tab-bar-close-button-show nil)
+  :config
+  (evil-define-key 'normal global-map (kbd "S-T") 'tab-new)
+  (evil-define-key 'normal global-map (kbd "C-S-T") 'tab-close)
+  (evil-define-key 'normal global-map (kbd "S-L") 'tab-next)
+  (evil-define-key 'normal global-map (kbd "S-H") 'tab-previous)
+  )
+
 (use-package doom-themes
   :ensure t
   :hook (emacs-startup . window-divider-mode)
