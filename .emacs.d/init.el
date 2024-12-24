@@ -37,8 +37,7 @@
 (set-default 'buffer-file-coding-system 'utf-8)
 
 (savehist-mode 1)
-(save-place-mode +1)
-(display-time)
+(save-place-mode 1)
 (line-number-mode 1)
 (column-number-mode 1)
 (setq gc-cons-threshold (* 100 gc-cons-threshold))
@@ -64,12 +63,10 @@
 (setq frame-title-format
       '(buffer-file-name "%f"
                          (dired-directory dired-directory "%b")))
-(display-time-mode +1)
 (setq require-final-newline t)
 ;; デフォルト色付け
 (use-package generic-x)
-(show-paren-mode 1)
-(tab-bar-mode -1)
+(show-paren-mode +1)
 (pixel-scroll-precision-mode +1)
 (setopt pixel-scroll-precision-large-scroll-height 40.0)
 (global-auto-revert-mode +1)
