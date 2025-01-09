@@ -183,6 +183,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (global-set-key (kbd "C-x C-+") 'kle/zoom-frame)
 (global-set-key (kbd "C-x C--") 'kle/zoom-frame-out)
 
+(defun kle/ensure-package-vc-install (url)
+  "package-vc-install if not yet installed."
+  (let ((elpa-lisp-dir "~/.emacs.d/elpa"))
+    (unless (file-directory-p (concat elpa-lisp-dir "/" (car (last (split-string url "/"))) "/"))
+      (package-vc-install url))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
