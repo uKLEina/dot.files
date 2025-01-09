@@ -1395,9 +1395,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-(use-package chatgpt
-  :ensure t)
-
 
 (setopt debug-on-error t)
 
