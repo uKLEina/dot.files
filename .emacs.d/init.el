@@ -12,12 +12,10 @@
 ;;         ("melpa" . "https://melpa.org/packages/")
 ;;         ("gnu" . "https://elpa.gnu.org/packages/")))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))
 (setq package-archive-priorities
       '(("gnu" . 30)
         ("nongnu" . 20)
-        ("melpa" . 10)
-        ("jcs-elpa" . 0)))
+        ("melpa" . 10)))
 ;; (package-initialize)
 
 (unless (require 'use-package nil t)
