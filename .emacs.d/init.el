@@ -1467,9 +1467,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
   ;; ;; For the initial frame
   ;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
-  (set-face-attribute 'default nil :family "HackGen" :height 140)
+  ;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
+  ;; (set-face-attribute 'default nil :family "HackGen" :height 140)
+  ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-  ;; (set-face-attribute 'default nil :family "0xProto" :height 140)
+  (set-face-attribute 'default nil :family "0xProto" :height 130)
   ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
   ;; non-ASCII Unicode font
   ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
