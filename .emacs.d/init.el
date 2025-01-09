@@ -674,7 +674,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (treesit-auto-add-to-auto-mode-alist 'all)
   (global-treesit-auto-mode +1))
 
-
 (use-package treesit-fold
   :init
   (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
