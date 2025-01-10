@@ -241,10 +241,10 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (tab-bar-new-button-show nil)
   (tab-bar-close-button-show nil)
   :config
-  (evil-define-key 'normal global-map (kbd "S-T") 'tab-new)
-  (evil-define-key 'normal global-map (kbd "C-S-T") 'tab-close)
-  (evil-define-key 'normal global-map (kbd "S-L") 'tab-next)
-  (evil-define-key 'normal global-map (kbd "S-H") 'tab-previous)
+  (evil-define-key 'normal global-map (kbd "T") 'tab-new)
+  (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
+  (evil-define-key 'normal global-map (kbd "L") 'tab-next)
+  (evil-define-key 'normal global-map (kbd "H") 'tab-previous)
   )
 
 (use-package doom-themes
