@@ -864,7 +864,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (skk-annotation-delay 0.01)
   (skk-show-candidates-nth-henkan-char 3)
   :config
-  (setq skk-get-jisyo-directory (expand-file-name ""))
   (use-package skk-hint)
   (use-package skk-study)
   ;; Isearch setting.
