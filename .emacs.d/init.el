@@ -850,9 +850,46 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (skk-user-directory "~/.skk.d")
   (skk-dcomp-activate t)
   (skk-show-candidates-always-pop-to-buffer t)
+  (skk-isearch-start-mode 'latin)
+  (skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+  (skk-extra-jisyo-file-list
+   '("~/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.fullname"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.geo"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.propernoun"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.station"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.law"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.okinawa"))
+  (skk-show-annotation t)
+  (skk-annotation-delay 0.01)
+  (skk-show-candidates-nth-henkan-char 3)
   :config
+  (setq skk-get-jisyo-directory (expand-file-name ""))
   (use-package skk-hint)
-  (use-package skk-study))
+  (use-package skk-study)
+  ;; Isearch setting.
+  (defun skk-isearch-setup-maybe ()
+    (require 'skk-vars)
+    (when (or (eq skk-isearch-mode-enable 'always)
+              (and (boundp 'skk-mode)
+                   skk-mode
+                   skk-isearch-mode-enable))
+      (skk-isearch-mode-setup)))
+
+  (defun skk-isearch-cleanup-maybe ()
+    (require 'skk-vars)
+    (when (and (featurep 'skk-isearch)
+               skk-isearch-mode-enable)
+      (skk-isearch-mode-cleanup)))
+
+  (add-hook 'isearch-mode-hook #'skk-isearch-setup-maybe)
+  (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
+
+;; (use-package ddskk-posframe
+;;   :ensure t
+;;   :after skk
+;;   :config
+;;   (ddskk-posframe-mode 1))
 
 (use-package image
   :defer t
