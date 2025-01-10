@@ -1436,7 +1436,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-
 (setopt debug-on-error t)
 
 (setopt tramp-default-method "ssh")
@@ -1513,12 +1512,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
   ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
   (set-face-attribute 'default nil :family "0xProto" :height 130)
+  ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
   ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
   ;; non-ASCII Unicode font
   ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
   ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
   ;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
-  (setq use-default-font-for-symbols t)
+  (setq use-default-font-for-symbols nil)
 
   ;; (set-face-attribute 'default nil
   ;;                     :family "Ricty Discord"
