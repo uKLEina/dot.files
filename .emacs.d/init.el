@@ -471,10 +471,9 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
-  (migemo-directory
-   (if (eq system-type 'gnu/linux)
-       "/usr/share/cmigemo/utf-8/migemo-dict"
-     (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict")))
+  (migemo-directory (seq-find #'file-exists-p
+                              '("/usr/share/cmigemo/utf-8/migemo-dict"
+                                (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
   :config
   ;; C-u で migemo を有効にする isearch
   (defun kle/isearch-forward-migemo (arg)
@@ -494,7 +493,9 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :defer t
   :custom
-  (ripgrep-executable "/usr/bin/rg")
+  (ripgrep-executable (seq-find #'file-exists-p
+                                '("/usr/bin/rg"
+                                  (expand-file-name "~/bin/rg"))))
   (ripgrep-arguments '("-S")))
 
 (use-package vertico
@@ -667,24 +668,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :custom
   (highlight-indent-guides-method 'column))
 
-(use-package treesit-auto
-  :ensure t
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode +1))
-
-(use-package treesit-fold
-  :init
-  (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
-         (treesit-fold-file (concat elpa-lisp-dir "/treesit-fold/treesit-fold.el")))
-    (unless (file-exists-p treesit-fold-file)
-      (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
-  :bind
-  ("C-l o" . treesit-fold-toggle)
-  )
-
 (use-package pangu-spacing
   :ensure t
   :defer t
@@ -699,12 +682,12 @@ frame if FRAME is nil, and to 1 if AMT is nil."
         (rx (group-n 1 (in "a-zA-Z0-9"))
             (group-n 2 (category japanese)))))
 
-
 (use-package python
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
   :hook
+  (python-ts-mode-hook . electric-operator-mode)
   (python-mode-hook . electric-operator-mode)
   :config
   (smartrep-define-key
@@ -1539,6 +1522,22 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;;                      ((> dpi 150) 140)  ; Medium DPI
   ;;                      (t 120))))        ; Low DPI
   ;;     font-size))
+  (use-package treesit-auto
+    :ensure t
+    :custom
+    (treesit-auto-install 'prompt)
+    :config
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode +1))
+
+  (use-package treesit-fold
+    :init
+    (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
+           (treesit-fold-file (concat elpa-lisp-dir "/treesit-fold/treesit-fold.el")))
+      (unless (file-exists-p treesit-fold-file)
+        (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
+    :bind
+    ("C-l o" . treesit-fold-toggle))
 
   (use-package ispell
     :defer t
