@@ -470,9 +470,12 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package migemo
   :ensure t
   :custom
-  (migemo-dictionary "/usr/share/cmigemo/utf-8/migemo-dict")
   (migemo-isearch-enable-p nil)
   :config
+  (setopt migemo-directory
+          (if (eq system-type 'gnu/linux)
+              "/usr/share/cmigemo/utf-8/migemo-dict"
+            (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict")))
   ;; C-u で migemo を有効にする isearch
   (defun kle/isearch-forward-migemo (arg)
     "通常は通常のisearch。C-uでmigemoが有効になる。"
