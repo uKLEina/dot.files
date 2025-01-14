@@ -967,7 +967,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (use-package electric-operator
   :ensure t
-  :commands (electric-operator-add-rules-for-mode electric-operator-get-rules-for-mode))
+  :defer t)
 
 (use-package expreg
   :ensure t
