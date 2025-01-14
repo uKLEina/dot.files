@@ -4,9 +4,9 @@
 (setq load-prefer-newer t)
 (setq custom-file (locate-user-emacs-file "custom.el"))
 ;; (setopt package-install-upgrade-built-in t)
-(setopt package-native-compile t)
 
 (require 'package)
+(setopt package-native-compile t)
 ;; (setq package-archives
 ;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
 ;;         ("melpa" . "https://melpa.org/packages/")
