@@ -1433,6 +1433,58 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (setopt tramp-default-method "ssh")
 
+;; (defun set-font-for-frame (frame)
+;;   "Set the font size for a specific frame based on its display resolution."
+;;   (let ((font-size (calculate-font-size-for-frame frame)))
+;;     (with-selected-frame frame
+;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
+
+;; (defun adjust-font-on-frame-events (frame)
+;;   "Adjust font size when a frame is created or moved."
+;;   (set-font-for-frame frame))
+
+;; ;; Apply font settings to existing frames and new ones
+;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
+
+;; ;; For the initial frame
+;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
+;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
+;; (set-face-attribute 'default nil :family "HackGen" :height 140)
+;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
+;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
+(set-face-attribute 'default nil :family "0xProto" :height 130)
+;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
+;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
+;; non-ASCII Unicode font
+;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
+;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
+;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
+(setq use-default-font-for-symbols nil)
+
+;; (set-face-attribute 'default nil
+;;                     :family "Ricty Discord"
+;;                     :height 140)
+;; (set-face-attribute 'variable-pitch nil
+;;                     :family "Migu 1VS"
+;;                     :height 105)
+;; (if window-system
+;;     (progn
+;;       (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
+;;       (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
+
+;; (add-hook 'text-mode-hook
+;;           #'(lambda ()
+;;               (buffer-face-set 'variable-pitch)))
+;; (add-hook 'Info-mode-hook
+;;           #'(lambda ()
+;;               (buffer-face-set 'variable-pitch)))
+(defun set-face-font-height (size)
+  (interactive "nSize: ")
+  (set-face-attribute 'default nil
+                      :height size)
+  (set-face-attribute 'variable-pitch nil
+                      :height size))
+
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
   ;;; Fix copy/paste in Wayland
@@ -1484,58 +1536,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;;                      ((> dpi 150) 140)  ; Medium DPI
   ;;                      (t 120))))        ; Low DPI
   ;;     font-size))
-
-  ;; (defun set-font-for-frame (frame)
-  ;;   "Set the font size for a specific frame based on its display resolution."
-  ;;   (let ((font-size (calculate-font-size-for-frame frame)))
-  ;;     (with-selected-frame frame
-  ;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
-
-  ;; (defun adjust-font-on-frame-events (frame)
-  ;;   "Adjust font size when a frame is created or moved."
-  ;;   (set-font-for-frame frame))
-
-  ;; ;; Apply font settings to existing frames and new ones
-  ;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
-
-  ;; ;; For the initial frame
-  ;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
-  ;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
-  ;; (set-face-attribute 'default nil :family "HackGen" :height 140)
-  ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
-  ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-  (set-face-attribute 'default nil :family "0xProto" :height 130)
-  ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
-  ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
-  ;; non-ASCII Unicode font
-  ;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
-  ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
-  ;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
-  (setq use-default-font-for-symbols nil)
-
-  ;; (set-face-attribute 'default nil
-  ;;                     :family "Ricty Discord"
-  ;;                     :height 140)
-  ;; (set-face-attribute 'variable-pitch nil
-  ;;                     :family "Migu 1VS"
-  ;;                     :height 105)
-  ;; (if window-system
-  ;;     (progn
-  ;;       (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
-  ;;       (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
-
-  ;; (add-hook 'text-mode-hook
-  ;;           #'(lambda ()
-  ;;               (buffer-face-set 'variable-pitch)))
-  ;; (add-hook 'Info-mode-hook
-  ;;           #'(lambda ()
-  ;;               (buffer-face-set 'variable-pitch)))
-  (defun set-face-font-height (size)
-    (interactive "nSize: ")
-    (set-face-attribute 'default nil
-                        :height size)
-    (set-face-attribute 'variable-pitch nil
-                        :height size))
 
   (use-package ispell
     :defer t
