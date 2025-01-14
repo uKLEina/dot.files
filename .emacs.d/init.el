@@ -68,7 +68,7 @@
 (use-package generic-x)
 (show-paren-mode +1)
 (pixel-scroll-precision-mode +1)
-(setopt pixel-scroll-precision-large-scroll-height 40.0)
+(setopt pixel-scroll-precision-large-scroll-height 40)
 (global-auto-revert-mode +1)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
