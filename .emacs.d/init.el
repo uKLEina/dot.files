@@ -437,7 +437,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
              ("C-t" . other-window-or-split)
              ("C-e" . end-of-line))
   (evil-swap-key evil-motion-state-map "j" "gj")
-  (evil-swap-key evil-motion-state-map "k" "gk"))
+  (evil-swap-key evil-motion-state-map "k" "gk")
+  (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
 (use-package evil-mode-line
   :init
