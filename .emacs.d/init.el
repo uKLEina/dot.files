@@ -472,7 +472,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
-  (migemo-directory (seq-find #'file-exists-p
+  (migemo-dictionary (seq-find #'file-exists-p
                               '("/usr/share/cmigemo/utf-8/migemo-dict"
                                 (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
   :config
