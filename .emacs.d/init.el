@@ -538,7 +538,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (use-package consult-ghq
   :ensure t
-  :defer t)
+  :defer t
+  :commands (consult-ghq--list-candidates)
+  :init
+  (defun consult-ghq-root-dir ()
+    "Directory switch to ghq project root dir."
+    (interactive)
+    (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
 
 (use-package embark-consult
   :ensure t
