@@ -238,6 +238,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
   (evil-define-key 'normal global-map (kbd "L") 'tab-next)
   (evil-define-key 'normal global-map (kbd "H") 'tab-previous)
+  (set-face-attribute 'tab-bar-tab nil
+                      :background (doom-color 'dark-blue)
+                      :foreground (doom-color 'bg)
+                      :weight 'bold)
+  (set-face-attribute 'tab-bar-tab-inactive nil
+                      :background (doom-color 'bg)
+                      :foreground (doom-color 'base6))
   )
 
 (use-package doom-themes
@@ -245,10 +252,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :hook (emacs-startup . window-divider-mode)
   :custom (window-divider-default-right-width 10)
   :config
-  (load-theme 'doom-dracula t)
-  (enable-theme 'doom-dracula)
-  (doom-themes-set-faces 'doom-dracula
-    '(font-lock-variable-name-face :foreground (doom-color 'cyan))))
+  (load-theme 'doom-dracula t))
 
 (use-package doom-modeline
   :ensure t
