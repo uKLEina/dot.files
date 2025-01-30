@@ -212,12 +212,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :hook (emacs-startup . super-save-mode)
   :custom
-  (super-save-auto-save-when-idle t))
+  (super-save-auto-save-when-idle t)
+  (super-save-hook-triggers '(mouse-leave-buffer-hook)))
 
 (use-package recentf
   :custom (recentf-auto-cleanup 10)
   :config
-  ;; recentf の メッセージをエコーエリアに表示しない
+  ;; recentf の メッセーをエコーエリアに表示しない
   (defun recentf-save-list-inhibit-message (orig-func &rest args)
     (setq inhibit-message t)
     (apply orig-func args)
@@ -1449,7 +1450,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "HackGen" :height 140)
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-(set-face-attribute 'default nil :family "0xProto" :height 130)
+;; (set-face-attribute 'default nil :family "0xProto" :height 130)
+(set-face-attribute 'default nil :family "ProtoGen" :height 130)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
@@ -1502,9 +1504,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
               nil ; should return nil if we're the current paste owner
             (shell-command-to-string "wl-paste -n | tr -d \r")))
         (setq interprogram-cut-function 'wl-copy)
-        (setq interprogram-paste-function 'wl-paste)
-        ))
-
+        (setq interprogram-paste-function 'wl-paste)))
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
@@ -1553,8 +1553,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (use-package ispell
     :defer t
     :custom
-    (ispell-program-name "aspell")
-    (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
+    (ispell-program-name "hunspell")
+    ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
     :config
     (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
 
