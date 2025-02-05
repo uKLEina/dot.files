@@ -42,7 +42,7 @@
 (column-number-mode 1)
 (setq gc-cons-threshold (* 100 gc-cons-threshold))
 (setq gc-cons-percentage 0.2)
-(setq read-process-output-max (* 1024 1024))
+(setq read-process-output-max (* 3 1024 1024))
 (setq message-log-max 100000)
 (setq enable-recursive-minibuffers t)
 (setq use-dialog-box nil)
@@ -657,7 +657,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     "check major mode before load flymake-ruff"
     (when (eq major-mode 'python-ts-mode)
       (flymake-ruff-load)))
-  :hook (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode))
+  :hook
+  (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode)
+  (python-mode . flymake-ruff-load)
+  (python-ts-mode . flymake-ruff-load)
+  )
 
 (use-package smerge-mode
   :defer t
@@ -698,9 +702,19 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
+  :init
+  (defun set-basedpyright-options ()
+    (setq-default eglot-workspace-configuration
+                  '(:basedpyright.analysis
+                    ( :inlayHints ( :variableTypes nil
+                                    :callArgumentNames nil
+                                    :functionReturnTypes nil
+                                    :genericTypes nil)))))
   :hook
-  (python-ts-mode-hook . electric-operator-mode)
-  (python-mode-hook . electric-operator-mode)
+  (python-ts-mode . electric-operator-mode)
+  (python-mode . electric-operator-mode)
+  (python-ts-mode . set-basedpyright-options)
+  (python-mode . set-basedpyright-options)
   :config
   (smartrep-define-key
       python-mode-map "C-c"
@@ -717,16 +731,48 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
     (revert-buffer t t t)))
 
-(use-package eglot
+;; (use-package eglot
+;;   :ensure t
+;;   :pin gnu
+;;   :defer t
+;;   :config
+;;   (unless (require 'eglot-booster nil t)
+;;     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
+;;   (use-package eglot-booster
+;;     :config (eglot-booster-mode +1))
+;;   ;; (assq-delete-all '(python-mode python-ts-mode) eglot-server-programs)
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '((python-mode python-ts-mode)
+;;   ;;                "basedpyright-langserver" "--stdio"))
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '((python-mode python-ts-mode)
+;;   ;;                . ,(eglot-alternatives
+;;   ;;                    '(("basedpyright-langserver" "--stdio")
+;;   ;;                      "ruff-lsp"
+;;   ;;                      "pylsp"
+;;   ;;                      ("pyright-langserver" "--stdio")
+;;   ;;                      "judi-language-server"
+;;   ;;                      "pyls"))))
+;;   (defun my-reorder-eldoc-functions ()
+;;     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
+;;     (when (and (boundp 'eldoc-documentation-functions)
+;;                (listp eldoc-documentation-functions))
+;;       (let ((flymake-fn 'flymake-eldoc-function))
+;;         (setq eldoc-documentation-functions
+;;               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+;;   (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
+;;   (setq-default eglot-workspace-configuration
+;;                 '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
+
+(use-package company
   :ensure t
-  :pin gnu
+  :after lsp-mode)
+
+(use-package lsp-mode
+  :ensure t
   :defer t
-  :config
-  (unless (require 'eglot-booster nil t)
-    (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
-  (use-package eglot-booster
-    :config (eglot-booster-mode +1))
-  (add-to-list 'eglot-server-programs '((sh-mode bash-ts-mode) . ("bash-language-server" "start")))
+  :hook (lsp-after-open . my-reorder-eldoc-functions)
+  :init
   (defun my-reorder-eldoc-functions ()
     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
     (when (and (boundp 'eldoc-documentation-functions)
@@ -734,9 +780,64 @@ frame if FRAME is nil, and to 1 if AMT is nil."
       (let ((flymake-fn 'flymake-eldoc-function))
         (setq eldoc-documentation-functions
               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
-  (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
-  (setq-default eglot-workspace-configuration
-                '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+     (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (advice-add (if (progn (require 'json)
+             (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+        'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+              (setcar orig-result command-from-exec-path))
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+    orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  :custom
+  (backup-by-copying t)
+  )
+
+(use-package lsp-pyright
+  :ensure t
+  :hook
+  (python-mode . start-lsp-for-python)
+  (python-ts-mode . start-lsp-for-python)
+  :init
+  (defun start-lsp-for-python ()
+    (require 'lsp-pyright)
+    (lsp-deferred))
+  :custom
+  (lsp-pyright-langserver-command "basedpyright")
+  ;; disable basedpyright specific features
+  (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
+  (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
+  (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
+  (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
+  )
+
+(use-package lsp-ui
+  :ensure t
+  :after lsp-mode
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  )
 
 ;; (use-package eglot-java
 ;;   :ensure t
@@ -1451,7 +1552,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
 ;; (set-face-attribute 'default nil :family "0xProto" :height 130)
-(set-face-attribute 'default nil :family "ProtoGen" :height 130)
+(set-face-attribute 'default nil :family "ProtoGen" :height 120)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
