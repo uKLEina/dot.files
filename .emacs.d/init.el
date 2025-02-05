@@ -70,6 +70,7 @@
 (pixel-scroll-precision-mode +1)
 (setopt pixel-scroll-precision-large-scroll-height 40)
 (global-auto-revert-mode +1)
+(setopt backup-by-copying t)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
@@ -808,10 +809,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
     orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  :custom
-  (backup-by-copying t)
-  )
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
 (use-package lsp-pyright
   :ensure t
