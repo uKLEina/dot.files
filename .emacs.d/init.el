@@ -765,14 +765,14 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;   (setq-default eglot-workspace-configuration
 ;;                 '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
 
-(use-package company
-  :ensure t
-  :after lsp-mode)
-
 (use-package lsp-mode
   :ensure t
   :defer t
   :hook (lsp-after-open . my-reorder-eldoc-functions)
+  :custom
+  (lsp-disabled-clients '(ruff))
+  (lsp-diagnostics-provider :flymake)
+  (lsp-completion-provider :none)
   :init
   (defun my-reorder-eldoc-functions ()
     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
@@ -832,10 +832,25 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package lsp-ui
   :ensure t
   :after lsp-mode
+  :init
+  (defun kle/lsp-ui-doc-dwim ()
+    (interactive)
+    (if (lsp-ui-doc--frame-visible-p)
+        (lsp-ui-doc-hide)
+      (lsp-ui-doc-show)))
+  :bind
+  (:map lsp-ui-mode-map
+        ("C-l C-d" . kle/lsp-ui-doc-dwim))
+  :custom
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-alignment 'window)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-max-width 150)
+  (lsp-ui-doc-max-height 30)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  )
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 ;; (use-package eglot-java
 ;;   :ensure t
