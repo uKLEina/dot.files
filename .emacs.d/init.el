@@ -49,27 +49,27 @@
 (defalias 'message-box 'message)
 (setq history-length 10000)
 (setq echo-keystrokes 0.1)
-(setq large-file-warning-threshold (* 500 1024 1024))
+(setopt large-file-warning-threshold (* 500 1024 1024))
 (setq use-short-answers t)
 (setq visible-bell t)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (defvar default-tab-width 4)
-(setq tab-stop-list '(4 8 12))
+(setopt tab-stop-list '(4 8 12))
 (setq scroll-step 1)
-(setq initial-scratch-message "")
+(setopt initial-scratch-message "")
 (setq delete-auto-save-files t)
 ;; show filename and path in title bar
 (setq frame-title-format
       '(buffer-file-name "%f"
                          (dired-directory dired-directory "%b")))
-(setq require-final-newline t)
+(setopt require-final-newline t)
 ;; デフォルト色付け
 (use-package generic-x)
-(show-paren-mode +1)
-(pixel-scroll-precision-mode +1)
+(show-paren-mode 1)
+(pixel-scroll-precision-mode 1)
 (setopt pixel-scroll-precision-large-scroll-height 40)
-(global-auto-revert-mode +1)
+(global-auto-revert-mode 1)
 (setopt backup-by-copying t)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
@@ -219,15 +219,14 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package recentf
   :custom (recentf-auto-cleanup 10)
   :config
-  ;; recentf の メッセーをエコーエリアに表示しない
+  ;; recentf の メッセージをエコーエリアに表示しない
   (defun recentf-save-list-inhibit-message (orig-func &rest args)
     (setq inhibit-message t)
     (apply orig-func args)
     (setq inhibit-message nil)
     'around)
   (advice-add 'recentf-cleanup   :around 'recentf-save-list-inhibit-message)
-  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message)
-  )
+  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message))
 
 (use-package tab-bar
   :after evil
@@ -246,8 +245,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                       :weight 'bold)
   (set-face-attribute 'tab-bar-tab-inactive nil
                       :background (doom-color 'bg)
-                      :foreground (doom-color 'base6))
-  )
+                      :foreground (doom-color 'base6)))
 
 (use-package doom-themes
   :ensure t
@@ -1512,7 +1510,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                             "#=" "!=" "!==" "=!=" "=:=" "::" ":::" ":<:" ":>:"
                             "||" "|>" "||>" "|||>" "<|" "<||" "<|||"
                             "**" "***" "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
-                            "$$" "%%" "|]" "[|" "//" "///")))
+                            "$$" "%%" "|]" "[|")))
 (use-package copilot
   :init
   ;; check dependencies
@@ -1567,7 +1565,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
 ;; (set-face-attribute 'default nil :family "0xProto" :height 130)
-(set-face-attribute 'default nil :family "ProtoGen" :height 120)
+(set-face-attribute 'default nil :family "ProtoGen" :height 130)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
