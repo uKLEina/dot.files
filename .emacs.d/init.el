@@ -1047,6 +1047,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
+  :custom
+  (magit-format-file-function #'magit-format-file-nerd-icons)
   :init
   (defun surpress-iconify (&rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
@@ -1055,9 +1057,9 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
   (advice-add 'with-editor-finish :after #'apply-iconify))
 
-(use-package magit-file-icons
-  :ensure t
-  :hook (magit-mode . magit-file-icons-mode))
+;; (use-package magit-file-icons
+;;   :ensure t
+;;   :hook (magit-mode . magit-file-icons-mode))
 
 (use-package rainbow-delimiters
   :ensure t
