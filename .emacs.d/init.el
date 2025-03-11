@@ -462,8 +462,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                                   (emacs . ,(doom-color 'magenta)))))
 
 (use-package which-key
-  :ensure t
-  :pin melpa
   :hook
   (after-init . which-key-mode)
   :custom
