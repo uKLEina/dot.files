@@ -1438,7 +1438,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                    (string-match-p "\\.tsv\\'" buffer-file-name))
                (or (not large-file-warning-threshold)
                    (< (buffer-size) large-file-warning-threshold)))
-      (csv-mode +1)))
+      (csv-mode)))
   (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
   (defun kle/smartrep-csv-setup ()
     (smartrep-define-key
@@ -1510,31 +1510,66 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                             "**" "***" "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
                             "$$" "%%" "|]" "[|")))
 
-(use-package copilot
-  :vc (:url "https://github.com/copilot-emacs/copilot.el.git" :rev :newest)
-  :init
-  ;; check dependencies
-  (use-package editorconfig
-    :ensure t
-    :defer t)
-  (use-package jsonrpc
-    :ensure t
-    :defer t)
-  (use-package s
-    :ensure t
-    :defer t)
-  (use-package f
-    :ensure t
-    :defer t)
-  :hook
-  (python-ts-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word))
+;; (use-package copilot
+;;   :vc (:url "https://github.com/copilot-emacs/copilot.el.git" :rev :newest)
+;;   :init
+;;   ;; check dependencies
+;;   (use-package editorconfig
+;;     :ensure t
+;;     :defer t)
+;;   (use-package jsonrpc
+;;     :ensure t
+;;     :defer t)
+;;   (use-package s
+;;     :ensure t
+;;     :defer t)
+;;   (use-package f
+;;     :ensure t
+;;     :defer t)
+;;   :hook
+;;   (python-ts-mode . copilot-mode)
+;;   :bind (:map copilot-completion-map
+;;               ("<tab>" . 'copilot-accept-completion)
+;;               ("TAB" . 'copilot-accept-completion)
+;;               ("C-TAB" . 'copilot-accept-completion-by-word)
+;;               ("C-<tab>" . 'copilot-accept-completion-by-word))
+;;   :custom
+;;   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
+
+(use-package chatgpt-shell
+  :ensure t
+  :defer t
   :custom
-  (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
+  (chatgpt-shell-google-key (auth-source-pass-get 'secret "gemini-key"))
+  (chatgpt-shell-prompt-header-write-git-commit "次のコミットのgitコミットメッセージを日本語で書いてください")
+  :config
+  ;; 現状の実装だとバグっててAPIレスポンスを正しく解釈できてないので修正する。
+  ;; let-alistがだめそうなのでalist-getを使うようにする。
+  (advice-add 'chatgpt-shell-google--current-generative-model-p :override
+              (lambda (api-response)
+                (let ((description (alist-get 'description api-response nil nil #'equal))
+                      (supported-methods (alist-get 'supportedGenerationMethods api-response nil nil #'equal)))
+                  (and description
+                       (not (string-match-p (rx (or "discontinued" "deprecated")) description))
+                       (seq-contains-p supported-methods "generateContent"))))))
+
+(use-package minuet
+  :ensure t
+  :defer t
+  :custom
+  (minuet-provider 'gemini)
+  :config
+  (plist-put minuet-gemini-options :model "gemini-2.0-flash-thinking-exp")
+  :bind (:map minuet-active-mode-map
+              ("<tab>" . 'minuet-accept-suggestion)
+              ("TAB" . 'minuet-accept-suggestion)
+              ("C-<left>" . 'minuet-previous-suggestion)
+              ("C-<right>" . 'minuet-next-suggestion))
+  :hook (python-ts-mode . minuet-auto-suggestion-mode))
+
+(use-package emojify
+  :ensure t
+  :hook (after-init . global-emojify-mode))
 
 (setopt debug-on-error t)
 
@@ -1559,7 +1594,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "HackGen" :height 140)
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-;; (set-face-attribute 'default nil :family "0xProto" :height 130)
+;; (set-face-attribute 'default nil :family "0xProto" :height 110)
 (set-face-attribute 'default nil :family "ProtoGen" :height 130)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
@@ -1663,6 +1698,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     :defer t
     :custom
     (ispell-program-name "hunspell")
+    (ispell-dictionary "/usr/share/hunspell/en_US.dic")
     ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
     :config
     (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
