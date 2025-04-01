@@ -632,6 +632,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (push '("*xref*" :position bottom :width 5)
         popwin:special-display-config))
 
+(use-package flycheck
+  :ensure t
+  :pin melpa
+  :defer t)
+
 (use-package flymake
   :ensure t
   :pin gnu
@@ -647,18 +652,18 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (push '(flymake-diagnostics-buffer-mode :position bottom :width 5 :noselect t)
         popwin:special-display-config))
 
-(use-package flymake-ruff
-  :ensure t
-  :init
-  (defun kle/flymake-ruff-load-python-ts-mode ()
-    "check major mode before load flymake-ruff"
-    (when (eq major-mode 'python-ts-mode)
-      (flymake-ruff-load)))
-  :hook
-  (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode)
-  (python-mode . flymake-ruff-load)
-  (python-ts-mode . flymake-ruff-load)
-  )
+;; (use-package flymake-ruff
+;;   :ensure t
+;;   ;; :init
+;;   ;; (defun kle/flymake-ruff-load-python-ts-mode ()
+;;   ;;   "check major mode before load flymake-ruff"
+;;   ;;   (when (eq major-mode 'python-ts-mode)
+;;   ;;     (flymake-ruff-load)))
+;;   :hook
+;;   ;; (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode)
+;;   (python-mode . flymake-ruff-load)
+;;   (python-ts-mode . flymake-ruff-load)
+;;   )
 
 (use-package smerge-mode
   :defer t
@@ -699,19 +704,19 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
-  :init
-  (defun set-basedpyright-options ()
-    (setq-default eglot-workspace-configuration
-                  '(:basedpyright.analysis
-                    ( :inlayHints ( :variableTypes nil
-                                    :callArgumentNames nil
-                                    :functionReturnTypes nil
-                                    :genericTypes nil)))))
+  ;; :init
+  ;; (defun set-basedpyright-options ()
+  ;;   (setq-default eglot-workspace-configuration
+  ;;                 '(:basedpyright.analysis
+  ;;                   ( :inlayHints ( :variableTypes nil
+  ;;                                   :callArgumentNames nil
+  ;;                                   :functionReturnTypes nil
+  ;;                                   :genericTypes nil)))))
   :hook
   (python-ts-mode . electric-operator-mode)
   (python-mode . electric-operator-mode)
-  (python-ts-mode . set-basedpyright-options)
-  (python-mode . set-basedpyright-options)
+  ;; (python-ts-mode . set-basedpyright-options)
+  ;; (python-mode . set-basedpyright-options)
   :config
   (smartrep-define-key
       python-mode-map "C-c"
@@ -764,19 +769,21 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 (use-package lsp-mode
   :ensure t
   :defer t
-  :hook (lsp-after-open . my-reorder-eldoc-functions)
+  ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
   :custom
-  (lsp-disabled-clients '(ruff))
-  (lsp-diagnostics-provider :flymake)
+  ;; (lsp-disabled-clients '(lsp-ruff))
+  ;; (lsp-log-io t)
+  (lsp-diagnostics-provider :flycheck)
   (lsp-completion-provider :none)
+  ;; (lsp-auto-register-remote-clients nil)
   :init
-  (defun my-reorder-eldoc-functions ()
-    "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
-    (when (and (boundp 'eldoc-documentation-functions)
-               (listp eldoc-documentation-functions))
-      (let ((flymake-fn 'flymake-eldoc-function))
-        (setq eldoc-documentation-functions
-              (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+  ;; (defun my-reorder-eldoc-functions ()
+  ;;   "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
+  ;;   (when (and (boundp 'eldoc-documentation-functions)
+  ;;              (listp eldoc-documentation-functions))
+  ;;     (let ((flymake-fn 'flymake-eldoc-function))
+  ;;       (setq eldoc-documentation-functions
+  ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or
@@ -805,7 +812,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
     orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  )
 
 (use-package lsp-pyright
   :ensure t
