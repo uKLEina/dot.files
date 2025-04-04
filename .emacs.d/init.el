@@ -700,6 +700,10 @@ frame if FRAME is nil, and to 1 if AMT is nil."
         (rx (group-n 1 (in "a-zA-Z0-9"))
             (group-n 2 (category japanese)))))
 
+(use-package docker
+  :ensure t
+  :defer t)
+
 (use-package python
   :defer t
   :custom
