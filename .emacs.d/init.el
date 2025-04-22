@@ -1545,22 +1545,22 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-(use-package chatgpt-shell
-  :ensure t
-  :defer t
-  :custom
-  (chatgpt-shell-google-key (auth-source-pass-get 'secret "gemini-key"))
-  (chatgpt-shell-prompt-header-write-git-commit "次のコミットのgitコミットメッセージを日本語で書いてください")
-  :config
-  ;; 現状の実装だとバグっててAPIレスポンスを正しく解釈できてないので修正する。
-  ;; let-alistがだめそうなのでalist-getを使うようにする。
-  (advice-add 'chatgpt-shell-google--current-generative-model-p :override
-              (lambda (api-response)
-                (let ((description (alist-get 'description api-response nil nil #'equal))
-                      (supported-methods (alist-get 'supportedGenerationMethods api-response nil nil #'equal)))
-                  (and description
-                       (not (string-match-p (rx (or "discontinued" "deprecated")) description))
-                       (seq-contains-p supported-methods "generateContent"))))))
+;; (use-package chatgpt-shell
+;;   :ensure t
+;;   :defer t
+;;   :custom
+;;   (chatgpt-shell-google-key (auth-source-pass-get 'secret "gemini-key"))
+;;   (chatgpt-shell-prompt-header-write-git-commit "次のコミットのgitコミットメッセージを日本語で書いてください")
+;;   :config
+;;   ;; 現状の実装だとバグっててAPIレスポンスを正しく解釈できてないので修正する。
+;;   ;; let-alistがだめそうなのでalist-getを使うようにする。
+;;   (advice-add 'chatgpt-shell-google--current-generative-model-p :override
+;;               (lambda (api-response)
+;;                 (let ((description (alist-get 'description api-response nil nil #'equal))
+;;                       (supported-methods (alist-get 'supportedGenerationMethods api-response nil nil #'equal)))
+;;                   (and description
+;;                        (not (string-match-p (rx (or "discontinued" "deprecated")) description))
+;;                        (seq-contains-p supported-methods "generateContent"))))))
 
 ;; (use-package minuet
 ;;   :ensure t
