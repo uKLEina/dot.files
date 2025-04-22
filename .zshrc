@@ -204,3 +204,10 @@ source ~/.zsh/zsh-completions/zsh-completions.plugin.zsh
 if [ $SHLVL = 1 ];then
   tmux
 fi
+
+# fnm
+FNM_PATH="/home/s20056/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="/home/s20056/.local/share/fnm:$PATH"
+  eval "`fnm env`"
+fi

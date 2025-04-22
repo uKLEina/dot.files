@@ -1522,31 +1522,28 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                             "**" "***" "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
                             "$$" "%%" "|]" "[|")))
 
-;; (use-package copilot
-;;   :vc (:url "https://github.com/copilot-emacs/copilot.el.git" :rev :newest)
-;;   :init
-;;   ;; check dependencies
-;;   (use-package editorconfig
-;;     :ensure t
-;;     :defer t)
-;;   (use-package jsonrpc
-;;     :ensure t
-;;     :defer t)
-;;   (use-package s
-;;     :ensure t
-;;     :defer t)
-;;   (use-package f
-;;     :ensure t
-;;     :defer t)
-;;   :hook
-;;   (python-ts-mode . copilot-mode)
-;;   :bind (:map copilot-completion-map
-;;               ("<tab>" . 'copilot-accept-completion)
-;;               ("TAB" . 'copilot-accept-completion)
-;;               ("C-TAB" . 'copilot-accept-completion-by-word)
-;;               ("C-<tab>" . 'copilot-accept-completion-by-word))
-;;   :custom
-;;   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
+(use-package copilot
+  :vc (:url "https://github.com/copilot-emacs/copilot.el"
+            :rev :newest
+            :branch "main")
+  :init
+  ;; check dependencies
+  (use-package editorconfig
+    :ensure t
+    :pin melpa
+    :defer t)
+  (use-package f
+    :ensure t
+    :defer t)
+  :hook
+  (python-ts-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word))
+  :custom
+  (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
 (use-package chatgpt-shell
   :ensure t
@@ -1565,19 +1562,19 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                        (not (string-match-p (rx (or "discontinued" "deprecated")) description))
                        (seq-contains-p supported-methods "generateContent"))))))
 
-(use-package minuet
-  :ensure t
-  :defer t
-  :custom
-  (minuet-provider 'gemini)
-  :config
-  (plist-put minuet-gemini-options :model "gemini-2.0-flash-thinking-exp")
-  :bind (:map minuet-active-mode-map
-              ("<tab>" . 'minuet-accept-suggestion)
-              ("TAB" . 'minuet-accept-suggestion)
-              ("C-<left>" . 'minuet-previous-suggestion)
-              ("C-<right>" . 'minuet-next-suggestion))
-  :hook (python-ts-mode . minuet-auto-suggestion-mode))
+;; (use-package minuet
+;;   :ensure t
+;;   :defer t
+;;   :custom
+;;   (minuet-provider 'gemini)
+;;   :config
+;;   (plist-put minuet-gemini-options :model "gemini-2.0-flash-thinking-exp")
+;;   :bind (:map minuet-active-mode-map
+;;               ("<tab>" . 'minuet-accept-suggestion)
+;;               ("TAB" . 'minuet-accept-suggestion)
+;;               ("C-<left>" . 'minuet-previous-suggestion)
+;;               ("C-<right>" . 'minuet-next-suggestion))
+;;   :hook (python-ts-mode . minuet-auto-suggestion-mode))
 
 (use-package emojify
   :ensure t
