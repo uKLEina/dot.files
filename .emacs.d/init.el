@@ -1,26 +1,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq load-prefer-newer t)
+;; (setq load-prefer-newer t)
 (setq custom-file (locate-user-emacs-file "custom.el"))
 ;; (setopt package-install-upgrade-built-in t)
 
 (require 'package)
 (setopt package-native-compile t)
-;; (setq package-archives
-;;       '(("melpa-stable" . "https://stable.melpa.org/packages/")
-;;         ("melpa" . "https://melpa.org/packages/")
-;;         ("gnu" . "https://elpa.gnu.org/packages/")))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (setq package-archive-priorities
       '(("gnu" . 30)
         ("nongnu" . 20)
         ("melpa" . 10)))
-;; (package-initialize)
-
-(unless (require 'use-package nil t)
-  (package-refresh-contents)
-  (package-install 'use-package))
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
@@ -40,8 +31,8 @@
 (save-place-mode 1)
 (line-number-mode 1)
 (column-number-mode 1)
-(setq gc-cons-threshold (* 100 gc-cons-threshold))
-(setq gc-cons-percentage 0.2)
+;(setq gc-cons-threshold (* 100 gc-cons-threshold))
+;(setq gc-cons-percentage 0.2)
 (setq read-process-output-max (* 3 1024 1024))
 (setq message-log-max 100000)
 (setq enable-recursive-minibuffers t)
@@ -183,9 +174,69 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     (unless (file-directory-p (concat elpa-lisp-dir "/" (car (last (split-string url "/"))) "/"))
       (package-vc-install url))))
 
+(setopt debug-on-error t)
+
+(setopt tramp-default-method "ssh")
+
+;;; font
+;; (defun set-font-for-frame (frame)
+;;   "Set the font size for a specific frame based on its display resolution."
+;;   (let ((font-size (calculate-font-size-for-frame frame)))
+;;     (with-selected-frame frame
+;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
+
+;; (defun adjust-font-on-frame-events (frame)
+;;   "Adjust font size when a frame is created or moved."
+;;   (set-font-for-frame frame))
+
+;; ;; Apply font settings to existing frames and new ones
+;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
+
+;; ;; For the initial frame
+;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
+;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
+;; (set-face-attribute 'default nil :family "HackGen" :height 140)
+;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
+;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
+;; (set-face-attribute 'default nil :family "0xProto" :height 110)
+(set-face-attribute 'default nil :family "ProtoGen" :height 130)
+;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
+;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
+;; non-ASCII Unicode font
+;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
+;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
+;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
+(setq use-default-font-for-symbols nil)
+
+;; (set-face-attribute 'default nil
+;;                     :family "Ricty Discord"
+;;                     :height 140)
+;; (set-face-attribute 'variable-pitch nil
+;;                     :family "Migu 1VS"
+;;                     :height 105)
+;; (if window-system
+;;     (progn
+;;       (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
+;;       (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
+
+;; (add-hook 'text-mode-hook
+;;           #'(lambda ()
+;;               (buffer-face-set 'variable-pitch)))
+;; (add-hook 'Info-mode-hook
+;;           #'(lambda ()
+;;               (buffer-face-set 'variable-pitch)))
+(defun set-face-font-height (size)
+  (interactive "nSize: ")
+  (set-face-attribute 'default nil
+                      :height size)
+  (set-face-attribute 'variable-pitch nil
+                      :height size))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; configure built-in packages before package-initialize
 (use-package server
   :init
   (when (and (not (boundp 'pgtk-initialized)) (eq system-type 'gnu/linux) (window-system))
@@ -198,6 +249,241 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (add-hook 'server-switch-hook #'raise-frame)
   (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
   :hook (emacs-startup . server-start))
+
+(use-package recentf
+  :custom (recentf-auto-cleanup 10)
+  :config
+  ;; recentf の メッセージをエコーエリアに表示しない
+  (defun recentf-save-list-inhibit-message (orig-func &rest args)
+    (setq inhibit-message t)
+    (apply orig-func args)
+    (setq inhibit-message nil)
+    'around)
+  (advice-add 'recentf-cleanup   :around 'recentf-save-list-inhibit-message)
+  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message))
+
+(use-package which-key
+  :hook
+  (after-init . which-key-mode)
+  :custom
+  (which-key-idle-delay 2.0)
+  (which-key-idle-secondary-delay 1.0)
+  :config
+  (which-key-setup-side-window-right))
+
+(use-package smerge-mode
+  :defer t
+  :config
+  (smartrep-define-key
+      smerge-mode-map "C-c ^"
+    '(("n" . smerge-next)
+      ("p" . smerge-prev)
+      ("l" . smerge-keep-lower)
+      ("u" . smerge-keep-upper)
+      ("b" . smerge-keep-base)
+      ("a" . smerge-keep-all)
+      ("E" . smerge-ediff))))
+
+(use-package winner
+  :init
+  (winner-mode +1)
+  :config
+  (defun winner-dwim (arg)
+    (interactive "p")
+    (let ((func (pcase arg
+                  (4 'winner-redo)
+                  (1 'winner-undo))))
+      (call-interactively func)
+      (run-with-timer 0.01 nil 'set 'last-command func)))
+  :bind
+  (("C-q" . winner-dwim)
+   ("C-l C-q" . quoted-insert)))
+
+(use-package hideif
+  :defer t
+  :init
+  (add-hook 'c++-mode-hook 'hide-ifdef-mode)
+  (add-hook 'c-mode-hook 'hide-ifdef-mode))
+
+(use-package cperl-mode
+  :mode (("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
+  :init
+  (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
+  (setq interpreter-mode-alist (rassq-delete-all 'perl-mode interpreter-mode-alist))
+  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
+  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
+
+(define-generic-mode 'poe-filter-mode
+  ;; Comments
+  '("#")
+  ;; Blocks
+  '("Show" "Hide")
+  '(
+    ;; Conditions
+    ("\\(ItemLevel\\|DropLevel\\|Quality\\|Rarity\\|Class\\|BaseType\\|Sockets\\|LinkedSockets\\|SocketGroup\\|Height\\|Width\\|HasExplicitMod\\|StackSize\\|GemLevel\\|Identified\\|Corrupted\\|ElderItem\\|ShaperItem\\|ElderMap\\|ShapedMap\\|MapTier\\)" . 'font-lock-variable-name-face)
+    ;; Actions
+    ("\\(SetBorderColor\\|SetTextColor\\|SetBackgroundColor\\|SetFontSize\\|PlayAlertSound\\|PlayAlertSoundPositional\\|DisableDropSound\\|CustomAlertSound\\|MinimapIcon\\|PlayEffect\\)" . 'font-lock-variable-name-face)
+    ;; Attributes
+    ("\\(True\\|False\\)" . 'font-lock-constant-face)
+    ;; Rarity
+    ("\\(Unique\\|Rare\\|Magic\\|Normal\\)" . 'font-lock-constant-face)
+    ;; Color
+    ("\\(Red\\|Green\\|Blue\\|Brown\\|White\\|Yellow\\)" . 'font-lock-constant-face)
+    ;; Shape
+    ("\\(Circle\\|Diamond\\|Hexagon\\|Square\\|Star\\|Triangle\\)" . font-lock-constant-face)
+    ;; Beam
+    ("\\(Temp\\)" . font-lock-constant-face)
+    ;; Base Type
+    ("\\(Jewel\\|Amulets\\|Belt\\|Ring\\|Wands\\|Daggers\\|One Hand\\|Shields\\|Thrusting\\|Sceptre\\|Claws\\|Currency\\|Gems\\|Flask\\|Maps\\|Piece\\)" . font-lock-constant-face)
+    ;; Item Size
+    ("\\(Small\\|Medium\\|Large\\)" . font-lock-constant-face)
+    ;; Flask Tier
+    ("\\(Greater\\|Grand\\|Giant\\|Colossal\\|Sacred\\|Hallowed\\|Sanctified\\|Divine\\|Eternal\\)" . font-lock-constant-face)
+    )
+  '(".filter\\'")
+  nil
+  "Major mode for editing Path of Exile filter file.")
+
+(use-package json-ts-mode
+  :defer t
+  :custom (json-ts-mode-indent-offset 4))
+
+(use-package org
+  :bind
+  ("C-l C-o l" . org-store-link)
+  ("C-l C-o a" . org-agenda)
+  ("C-l C-o c" . org-capture)
+  :custom
+  (org-latex-packages-alist
+   '(("" "fontspec" t)
+     ("" "xeCJK" t)))
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (sql . t))))
+
+(use-package ox
+  :defer t
+  :custom
+  (org-export-default-language "ja"))
+
+(use-package ox-latex
+  :defer t
+  :custom
+  ;; tectonic
+  (org-latex-compiler "xelatex")
+  (org-latex-pdf-process '("%latex -X compile -o %o %f"))
+  (org-latex-classes
+   '(("bxjsarticle"
+      "\\documentclass[xelatex,ja=standard,a4paper,12pt]{bxjsarticle}
+\[DEFAULT-PACKAGES]
+\[PACKAGES]
+\\setmainfont{Linux Libertine O}
+\\setsansfont{Linux Biolinum O}
+\\setmonofont{0xProto}
+\\setCJKmainfont{IPAex明朝}
+\\setCJKsansfont{IPAexゴシック}
+\\setCJKmonofont{HackGen}"
+      ("\\section{%s}" . "\\section*{%s}")
+      ("\\subsection{%s}" . "\\subsection*{%s}")
+      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+      ("\\paragraph{%s}" . "\\paragraph*{%s}")
+      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+  (org-latex-default-class "bxjsarticle"))
+
+(when (eq system-type 'gnu/linux)
+  ;;; Fix copy/paste in Wayland
+  ;; credit: yorickvP on Github
+  (if (bound-and-true-p pgtk-initialized)
+      (progn
+        (defvar wl-copy-process nil)
+        (defun wl-copy (text)
+          (setq wl-copy-process (make-process :name "wl-copy"
+                                              :buffer nil
+                                              :command '("wl-copy" "-f" "-n")
+                                              :connection-type 'pipe
+                                              :noquery t))
+          (process-send-string wl-copy-process text)
+          (process-send-eof wl-copy-process))
+        (defun wl-paste ()
+          (if (and wl-copy-process (process-live-p wl-copy-process))
+              nil ; should return nil if we're the current paste owner
+            (shell-command-to-string "wl-paste -n | tr -d \r")))
+        (setq interprogram-cut-function 'wl-copy)
+        (setq interprogram-paste-function 'wl-paste)))
+  ;; (use-package exec-path-from-shell
+  ;;   :ensure t
+  ;;   :custom
+  ;;   (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
+  ;;   :config
+  ;;   (exec-path-from-shell-initialize))
+
+                                        ;(use-package pdf-tools
+                                        ;  :ensure t
+                                        ;  :defer t
+                                        ;  :init
+                                        ;  (pdf-loader-install))
+  ;; font
+  ;; default ASCII font
+  ;; (defun calculate-font-size-for-frame (frame)
+  ;;   "Calculate the font size dynamically based on the frame's display resolution."
+  ;;   (let* ((attrs (frame-monitor-attributes frame))
+  ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
+  ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
+  ;;          (dpi (if (and mm-width pixel-width)
+  ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
+  ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
+  ;;                 96))                                  ; Default to 96 DPI if unavailable
+  ;;          (font-size (cond
+  ;;                      ((> dpi 200) 180)  ; High DPI
+  ;;                      ((> dpi 150) 140)  ; Medium DPI
+  ;;                      (t 120))))        ; Low DPI
+  ;;     font-size))
+  (use-package ispell
+    :defer t
+    :custom
+    (ispell-program-name "hunspell")
+    (ispell-dictionary "/usr/share/hunspell/en_US.dic")
+    ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
+    :config
+    (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
+
+  (use-package flyspell
+    :defer t
+    :config
+    (unbind-key "C-M-i" flyspell-mode-map)
+    (unbind-key "C-;" flyspell-mode-map)
+    (unbind-key "C-," flyspell-mode-map))
+
+  (defun file-open-file-manager ()
+    "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
+Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
+    (interactive)
+    (let* ((path (or (if (derived-mode-p 'dired-mode)
+                         (dired-current-directory)
+                       (file-name-directory (or buffer-file-name default-directory)))
+                     default-directory))
+           (wsl-p (string-match-p "microsoft" (shell-command-to-string "uname -r"))) ; WSL環境かどうかを確認
+           (distro (if wsl-p
+                       (replace-regexp-in-string "\n" "" (shell-command-to-string "lsb_release -si")) ; WSLディストリビューション名を取得
+                     nil))
+           (command (if wsl-p
+                        (concat "explorer.exe /root,'\\\\wsl$\\" distro
+                                (replace-regexp-in-string "/" "\\" path t t) "\'")
+                      (concat "nautilus --no-desktop -n " path))))
+      (message "open file manager with command: %s" command)
+      (start-process-shell-command "open-file-manager" nil command)))
+  (bind-key "C-l C-e" 'file-open-file-manager)
+  (with-eval-after-load 'dired
+    (bind-key "e" 'file-open-file-manager dired-mode-map)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; external packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(package-initialize)
 
 (use-package auto-compile
   :ensure t
@@ -216,19 +502,9 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (super-save-auto-save-when-idle t)
   (super-save-hook-triggers '(mouse-leave-buffer-hook)))
 
-(use-package recentf
-  :custom (recentf-auto-cleanup 10)
-  :config
-  ;; recentf の メッセージをエコーエリアに表示しない
-  (defun recentf-save-list-inhibit-message (orig-func &rest args)
-    (setq inhibit-message t)
-    (apply orig-func args)
-    (setq inhibit-message nil)
-    'around)
-  (advice-add 'recentf-cleanup   :around 'recentf-save-list-inhibit-message)
-  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message))
-
 (use-package tab-bar
+  ;; tab-bar is built-in, but configs depend on extra packages
+  ;; so put after package-initialize.
   :after evil
   :custom
   (tab-bar-show 1)
@@ -461,22 +737,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                                   (visual . ,(doom-color 'dark-blue))
                                   (emacs . ,(doom-color 'magenta)))))
 
-(use-package which-key
-  :hook
-  (after-init . which-key-mode)
-  :custom
-  (which-key-idle-delay 2.0)
-  (which-key-idle-secondary-delay 1.0)
-  :config
-  (which-key-setup-side-window-right))
-
 (use-package migemo
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
   (migemo-dictionary (seq-find #'file-exists-p
-                              '("/usr/share/cmigemo/utf-8/migemo-dict"
-                                (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
+                               '("/usr/share/cmigemo/utf-8/migemo-dict"
+                                 (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
   :config
   ;; C-u で migemo を有効にする isearch
   (defun kle/isearch-forward-migemo (arg)
@@ -628,6 +895,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (use-package xref
   :defer t
+  :after (popwin)
   :init
   (push '("*xref*" :position bottom :width 5)
         popwin:special-display-config))
@@ -664,19 +932,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;   (python-mode . flymake-ruff-load)
 ;;   (python-ts-mode . flymake-ruff-load)
 ;;   )
-
-(use-package smerge-mode
-  :defer t
-  :config
-  (smartrep-define-key
-      smerge-mode-map "C-c ^"
-    '(("n" . smerge-next)
-      ("p" . smerge-prev)
-      ("l" . smerge-keep-lower)
-      ("u" . smerge-keep-upper)
-      ("b" . smerge-keep-base)
-      ("a" . smerge-keep-all)
-      ("E" . smerge-ediff))))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -793,13 +1048,13 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     (or
      (when (equal (following-char) ?#)
        (let ((bytecode (read (current-buffer))))
-     (when (byte-code-function-p bytecode)
+         (when (byte-code-function-p bytecode)
            (funcall bytecode))))
      (apply old-fn args)))
   (advice-add (if (progn (require 'json)
-             (fboundp 'json-parse-buffer))
+                         (fboundp 'json-parse-buffer))
                   'json-parse-buffer
-        'json-read)
+                'json-read)
               :around
               #'lsp-booster--advice-json-parse)
   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
@@ -815,7 +1070,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
               (setcar orig-result command-from-exec-path))
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
-    orig-result)))
+        orig-result)))
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
   )
 
@@ -905,19 +1160,25 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (bind-keys :map dired-mode-map
              ("C-t" . other-window-or-split)
              )
-  (use-package dired-x)
-  (custom-set-variables '(dired-omit-files (concat dired-omit-files "\\|^\\..+$")))
-  (bind-key "C-l C-o" 'dired-omit-mode dired-mode-map)
-  (bind-key "r" 'wdired-change-to-wdired-mode dired-mode-map)
   (when (eq system-type 'gnu/linux)
-    (custom-set-variables '(dired-listing-switches "-AFDlh --group-directories-first")))
+    (setopt dired-listing-switches "-AFDlh --group-directories-first"))
   (when (eq system-type 'windows-nt)
-    (custom-set-variables '(ls-lisp-dirs-first t)))
-  (use-package dired-quick-sort
-    :ensure t
-    :commands (hydra-dired-quick-sort/body)
-    :init
-    (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map)))
+    (setopt ls-lisp-dirs-first t)))
+
+(use-package dired-x
+  :after direda
+  :custom
+  (dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+  :bind (:map dired-mode-map
+              ("C-l C-o" . dired-omit-mode)
+              ("r" . wdired-change-to-wdired-mode)))
+
+(use-package dired-quick-sort
+  :ensure t
+  :after (dired)
+  :commands (hydra-dired-quick-sort/body)
+  :init
+  (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map))
 
 (use-package all-the-icons
   :ensure t)
@@ -1003,21 +1264,19 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;   :config
 ;;   (ddskk-posframe-mode 1))
 
-(use-package image
-  :defer t
+(use-package image+
+  :ensure t
+  :after (image)
   :config
-  (use-package image+
-    :ensure t
-    :config
-    (defhydra imagex-sticky-binding (global-map "C-l i")
-      "Manipulating Image"
-      ("+" imagex-sticky-zoom-in "zoom in")
-      ("-" imagex-sticky-zoom-out "zoom out")
-      ("M" imagex-sticky-maximize "maximize")
-      ("O" imagex-sticky-restore-original "restore original")
-      ("S" imagex-sticky-save-image "save file")
-      ("r" imagex-sticky-rotate-right "rotate right")
-      ("l" imagex-sticky-rotate-left "rotate left"))))
+  (defhydra imagex-sticky-binding (global-map "C-l i")
+    "Manipulating Image"
+    ("+" imagex-sticky-zoom-in "zoom in")
+    ("-" imagex-sticky-zoom-out "zoom out")
+    ("M" imagex-sticky-maximize "maximize")
+    ("O" imagex-sticky-restore-original "restore original")
+    ("S" imagex-sticky-save-image "save file")
+    ("r" imagex-sticky-rotate-right "rotate right")
+    ("l" imagex-sticky-rotate-left "rotate left")))
 
 (use-package imenu-list
   :ensure t
@@ -1033,21 +1292,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
-
-(use-package winner
-  :init
-  (winner-mode +1)
-  :config
-  (defun winner-dwim (arg)
-    (interactive "p")
-    (let ((func (pcase arg
-                  (4 'winner-redo)
-                  (1 'winner-undo))))
-      (call-interactively func)
-      (run-with-timer 0.01 nil 'set 'last-command func)))
-  :bind
-  (("C-q" . winner-dwim)
-   ("C-l C-q" . quoted-insert)))
 
 (use-package magit
   :ensure t
@@ -1214,21 +1458,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
     :ensure t
     :pin melpa))
 
-;;; C
-(defun c/c++-mode-setup ()
-  "Hook function to setup `c-mode' and `c++-mode'."
-  (projectile-mode)
-  (hs-minor-mode 1))
-(add-hook 'c-mode-hook #'c/c++-mode-setup)
-(add-hook 'c++-mode-hook #'c/c++-mode-setup)
-
-
-(use-package hideif
-  :defer t
-  :init
-  (add-hook 'c++-mode-hook 'hide-ifdef-mode)
-  (add-hook 'c-mode-hook 'hide-ifdef-mode))
-
 (use-package web-mode
   :ensure t
   :mode (("\\.html?\\'" . web-mode)
@@ -1239,15 +1468,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :defer t)
 
-(use-package cperl-mode
-  :mode (("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
-  :init
-  (setq auto-mode-alist (rassq-delete-all 'perl-mode auto-mode-alist))
-  (setq interpreter-mode-alist (rassq-delete-all 'perl-mode interpreter-mode-alist))
-  (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
-  (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
-  (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
-
 (use-package tuareg
   :ensure t
   :mode (("\\.ml\\'" . tuareg-mode)
@@ -1255,37 +1475,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
          ("\\.mly\\'" . tuareg-mode)
          ("\\.mll\\'" . tuareg-mode)
          ("\\.mlp\\'" . tuareg-mode)))
-
-(define-generic-mode 'poe-filter-mode
-  ;; Comments
-  '("#")
-  ;; Blocks
-  '("Show" "Hide")
-  '(
-    ;; Conditions
-    ("\\(ItemLevel\\|DropLevel\\|Quality\\|Rarity\\|Class\\|BaseType\\|Sockets\\|LinkedSockets\\|SocketGroup\\|Height\\|Width\\|HasExplicitMod\\|StackSize\\|GemLevel\\|Identified\\|Corrupted\\|ElderItem\\|ShaperItem\\|ElderMap\\|ShapedMap\\|MapTier\\)" . 'font-lock-variable-name-face)
-    ;; Actions
-    ("\\(SetBorderColor\\|SetTextColor\\|SetBackgroundColor\\|SetFontSize\\|PlayAlertSound\\|PlayAlertSoundPositional\\|DisableDropSound\\|CustomAlertSound\\|MinimapIcon\\|PlayEffect\\)" . 'font-lock-variable-name-face)
-    ;; Attributes
-    ("\\(True\\|False\\)" . 'font-lock-constant-face)
-    ;; Rarity
-    ("\\(Unique\\|Rare\\|Magic\\|Normal\\)" . 'font-lock-constant-face)
-    ;; Color
-    ("\\(Red\\|Green\\|Blue\\|Brown\\|White\\|Yellow\\)" . 'font-lock-constant-face)
-    ;; Shape
-    ("\\(Circle\\|Diamond\\|Hexagon\\|Square\\|Star\\|Triangle\\)" . font-lock-constant-face)
-    ;; Beam
-    ("\\(Temp\\)" . font-lock-constant-face)
-    ;; Base Type
-    ("\\(Jewel\\|Amulets\\|Belt\\|Ring\\|Wands\\|Daggers\\|One Hand\\|Shields\\|Thrusting\\|Sceptre\\|Claws\\|Currency\\|Gems\\|Flask\\|Maps\\|Piece\\)" . font-lock-constant-face)
-    ;; Item Size
-    ("\\(Small\\|Medium\\|Large\\)" . font-lock-constant-face)
-    ;; Flask Tier
-    ("\\(Greater\\|Grand\\|Giant\\|Colossal\\|Sacred\\|Hallowed\\|Sanctified\\|Divine\\|Eternal\\)" . font-lock-constant-face)
-    )
-  '(".filter\\'")
-  nil
-  "Major mode for editing Path of Exile filter file.")
 
 (use-package powershell
   :ensure t
@@ -1351,55 +1540,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;;     (delq (assoc command TeX-command-list) TeX-command-list))
 ;;   (LaTeX-math-mode +1)
 ;;   (turn-on-reftex)
-
-(use-package json-ts-mode
-  :defer t
-  :custom (json-ts-mode-indent-offset 4))
-
-(use-package org
-  :bind
-  ("C-l C-o l" . org-store-link)
-  ("C-l C-o a" . org-agenda)
-  ("C-l C-o c" . org-capture)
-  :custom
-  (org-latex-packages-alist
-   '(("" "fontspec" t)
-     ("" "xeCJK" t)))
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)
-     (sql . t))))
-
-(use-package ox
-  :defer t
-  :custom
-  (org-export-default-language "ja"))
-
-(use-package ox-latex
-  :defer t
-  :custom
-  ;; tectonic
-  (org-latex-compiler "xelatex")
-  (org-latex-pdf-process '("%latex -X compile -o %o %f"))
-  (org-latex-classes
-   '(("bxjsarticle"
-      "\\documentclass[xelatex,ja=standard,a4paper,12pt]{bxjsarticle}
-\[DEFAULT-PACKAGES]
-\[PACKAGES]
-\\setmainfont{Linux Libertine O}
-\\setsansfont{Linux Biolinum O}
-\\setmonofont{0xProto}
-\\setCJKmainfont{IPAex明朝}
-\\setCJKsansfont{IPAexゴシック}
-\\setCJKmonofont{HackGen}"
-      ("\\section{%s}" . "\\section*{%s}")
-      ("\\subsection{%s}" . "\\subsection*{%s}")
-      ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-      ("\\paragraph{%s}" . "\\paragraph*{%s}")
-      ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
-  (org-latex-default-class "bxjsarticle"))
 
 (use-package vimrc-mode
   :ensure t
@@ -1489,10 +1629,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (diminish 'undo-tree-mode "UndoTree")
   (diminish 'super-save-mode "SSave"))
 
-(use-package eldoc-eval
-  :defer t
-  :custom
-  (eldoc-in-minibuffer-mode-lighter " EldocEval"))
+;(use-package eldoc-eval
+;  :defer t
+;  :ensure t
+;  :custom
+;  (eldoc-in-minibuffer-mode-lighter " EldocEval"))
 
 (use-package dashboard
   :ensure t
@@ -1580,84 +1721,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :ensure t
   :hook (after-init . global-emojify-mode))
 
-(setopt debug-on-error t)
-
-(setopt tramp-default-method "ssh")
-
-;; (defun set-font-for-frame (frame)
-;;   "Set the font size for a specific frame based on its display resolution."
-;;   (let ((font-size (calculate-font-size-for-frame frame)))
-;;     (with-selected-frame frame
-;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
-
-;; (defun adjust-font-on-frame-events (frame)
-;;   "Adjust font size when a frame is created or moved."
-;;   (set-font-for-frame frame))
-
-;; ;; Apply font settings to existing frames and new ones
-;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
-
-;; ;; For the initial frame
-;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
-;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
-;; (set-face-attribute 'default nil :family "HackGen" :height 140)
-;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
-;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
-;; (set-face-attribute 'default nil :family "0xProto" :height 110)
-(set-face-attribute 'default nil :family "ProtoGen" :height 130)
-;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
-;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
-;; non-ASCII Unicode font
-;; (set-fontset-font t '(#x80 . #x10ffff) (font-spec :family "Noto Mono" :size 10))
-;; (set-fontset-font t 'japanese-jisx0208 (font-spec :family "Noto Sans Mono" :size 50))
-;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
-(setq use-default-font-for-symbols nil)
-
-;; (set-face-attribute 'default nil
-;;                     :family "Ricty Discord"
-;;                     :height 140)
-;; (set-face-attribute 'variable-pitch nil
-;;                     :family "Migu 1VS"
-;;                     :height 105)
-;; (if window-system
-;;     (progn
-;;       (set-fontset-font t 'cyrillic (font-spec :family "DejaVu Sans"))
-;;       (set-fontset-font t 'greek (font-spec :family "DejaVu Sans"))))
-
-;; (add-hook 'text-mode-hook
-;;           #'(lambda ()
-;;               (buffer-face-set 'variable-pitch)))
-;; (add-hook 'Info-mode-hook
-;;           #'(lambda ()
-;;               (buffer-face-set 'variable-pitch)))
-(defun set-face-font-height (size)
-  (interactive "nSize: ")
-  (set-face-attribute 'default nil
-                      :height size)
-  (set-face-attribute 'variable-pitch nil
-                      :height size))
-
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
-  ;;; Fix copy/paste in Wayland
-  ;; credit: yorickvP on Github
-  (if (bound-and-true-p pgtk-initialized)
-      (progn
-        (defvar wl-copy-process nil)
-        (defun wl-copy (text)
-          (setq wl-copy-process (make-process :name "wl-copy"
-                                              :buffer nil
-                                              :command '("wl-copy" "-f" "-n")
-                                              :connection-type 'pipe
-                                              :noquery t))
-          (process-send-string wl-copy-process text)
-          (process-send-eof wl-copy-process))
-        (defun wl-paste ()
-          (if (and wl-copy-process (process-live-p wl-copy-process))
-              nil ; should return nil if we're the current paste owner
-            (shell-command-to-string "wl-paste -n | tr -d \r")))
-        (setq interprogram-cut-function 'wl-copy)
-        (setq interprogram-paste-function 'wl-paste)))
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
@@ -1665,11 +1730,11 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;;   :config
   ;;   (exec-path-from-shell-initialize))
 
-  ;(use-package pdf-tools
-  ;  :ensure t
-  ;  :defer t
-  ;  :init
-  ;  (pdf-loader-install))
+                                        ;(use-package pdf-tools
+                                        ;  :ensure t
+                                        ;  :defer t
+                                        ;  :init
+                                        ;  (pdf-loader-install))
   ;; font
   ;; default ASCII font
   ;; (defun calculate-font-size-for-frame (frame)
@@ -1702,45 +1767,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
         (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
     :bind
     ("C-l o" . treesit-fold-toggle))
-
-  (use-package ispell
-    :defer t
-    :custom
-    (ispell-program-name "hunspell")
-    (ispell-dictionary "/usr/share/hunspell/en_US.dic")
-    ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
-    :config
-    (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
-
-  (use-package flyspell
-    :defer t
-    :config
-    (unbind-key "C-M-i" flyspell-mode-map)
-    (unbind-key "C-;" flyspell-mode-map)
-    (unbind-key "C-," flyspell-mode-map))
-
   (use-package autodisass-java-bytecode
     :ensure t
     :defer t)
-
-  (defun file-open-file-manager ()
-    "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
-Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
-    (interactive)
-    (let* ((path (or (if (derived-mode-p 'dired-mode)
-                         (dired-current-directory)
-                       (file-name-directory (or buffer-file-name default-directory)))
-                     default-directory))
-           (wsl-p (string-match-p "microsoft" (shell-command-to-string "uname -r"))) ; WSL環境かどうかを確認
-           (distro (if wsl-p
-                       (replace-regexp-in-string "\n" "" (shell-command-to-string "lsb_release -si")) ; WSLディストリビューション名を取得
-                     nil))
-           (command (if wsl-p
-                        (concat "explorer.exe /root,'\\\\wsl$\\" distro
-                                (replace-regexp-in-string "/" "\\" path t t) "\'")
-                      (concat "nautilus --no-desktop -n " path))))
-      (message "open file manager with command: %s" command)
-      (start-process-shell-command "open-file-manager" nil command)))
-  (bind-key "C-l C-e" 'file-open-file-manager)
-  (with-eval-after-load 'dired
-    (bind-key "e" 'file-open-file-manager dired-mode-map)))
+  )
