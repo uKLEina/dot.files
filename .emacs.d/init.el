@@ -232,6 +232,8 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (set-face-attribute 'variable-pitch nil
                       :height size))
 
+(setq use-package-always-defer t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -687,6 +689,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package evil
   :ensure t
+  :demand
   :custom
   (evil-echo-state nil)
   (evil-undo-system 'undo-tree)
@@ -840,6 +843,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package corfu
   :ensure t
+  :after (evil)
   :custom ((corfu-auto t)
            (corfu-auto-delay 0)
            (corfu-auto-prefix 2)
@@ -873,6 +877,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package smartrep
   :ensure t
+  :commands (smartrep-define-key)
   :config
   (smartrep-define-key
       global-map "C-x"
@@ -1637,6 +1642,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package dashboard
   :ensure t
+  :after (evil)
   :init
   (dashboard-setup-startup-hook)
   (defun dashboard-jump-to-recent-files ()
