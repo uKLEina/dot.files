@@ -8,10 +8,12 @@
 (require 'package)
 (setopt package-native-compile t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (setq package-archive-priorities
       '(("gnu" . 30)
         ("nongnu" . 20)
-        ("melpa" . 10)))
+        ("melpa" . 10)
+        ("melpa-stable" . 0)))
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
@@ -1304,19 +1306,19 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
-(use-package transient
-  :ensure t
-  :defer t
-  :pin melpa)
+;; (use-package transient
+;;   :ensure t
+;;   :defer t
+;;   :pin melpa-stable)
 
-(use-package magit-section
-  :ensure t
-  :defer t
-  :pin melpa)
+;; (use-package magit-section
+;;   :ensure t
+;;   :defer t
+;;   :pin melpa-stable)
 
 (use-package magit
   :ensure t
-  :pin melpa
+  :pin melpa-stable
   :after (transient magit-section)
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
