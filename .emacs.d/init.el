@@ -545,6 +545,21 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
         (substring num 1)
       num))
 
+  (defun setup-initial-doom-modeline ()
+    (doom-modeline-set-modeline 'simple t))
+  (add-hook 'doom-modeline-mode-hook 'setup-initial-doom-modeline)
+
+  (defvar doom-modeline-simple-p t)
+  (defun switch-modeline ()
+    (interactive)
+    (if doom-modeline-simple-p
+        (doom-modeline-set-modeline 'verbose)
+      (doom-modeline-set-modeline 'simple))
+    (force-mode-line-update)
+    (setq doom-modeline-simple-p (not doom-modeline-simple-p)))
+  (bind-key "C-l C-m" 'switch-modeline)
+  :config
+
   (doom-modeline-def-segment my-buffer-size
     "Display current buffer size"
     (format-mode-line " %IB"))
@@ -628,20 +643,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     '(bar matches remote-host buffer-info-simple my-buffer-size)
     '(major-mode minor-modes python-venv buffer-encoding))
 
-  (defun setup-initial-doom-modeline ()
-    (doom-modeline-set-modeline 'simple t))
-  (add-hook 'doom-modeline-mode-hook 'setup-initial-doom-modeline)
-
-  (defvar doom-modeline-simple-p t)
-  (defun switch-modeline ()
-    (interactive)
-    (if doom-modeline-simple-p
-        (doom-modeline-set-modeline 'verbose)
-      (doom-modeline-set-modeline 'simple))
-    (force-mode-line-update)
-    (setq doom-modeline-simple-p (not doom-modeline-simple-p)))
-  (bind-key "C-l C-m" 'switch-modeline)
-  :config
   (setq doom-modeline-minor-modes t)
   (setq doom-modeline-major-mode-color-icon t)
   (setq doom-modeline-checker-simple-format nil))
