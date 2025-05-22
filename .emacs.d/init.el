@@ -1304,9 +1304,20 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
+(use-package transient
+  :ensure t
+  :defer t
+  :pin melpa)
+
+(use-package magit-section
+  :ensure t
+  :defer t
+  :pin melpa)
+
 (use-package magit
   :ensure t
   :pin melpa
+  :after (transient magit-section)
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
