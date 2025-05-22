@@ -913,6 +913,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 (use-package flymake
   :ensure t
   :pin gnu
+  :after (popwin)
   :commands (flymake-show-buffer-diagnostics flymake-goto-next-error flymake-goto-prev-error)
   :bind (("C-c ! l" . flymake-show-buffer-diagnostics)
          ("C-c ! n" . flymake-goto-next-error)
