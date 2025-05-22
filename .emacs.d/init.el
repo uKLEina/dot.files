@@ -1176,7 +1176,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 (use-package dired-x
   :after (dired)
   :custom
-  (dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+  (dired-omit-files "\\`[.]?#\\|\\`[.][.]?\\'\\|^\\..+$")
   :bind (:map dired-mode-map
               ("C-l C-o" . dired-omit-mode)))
 
