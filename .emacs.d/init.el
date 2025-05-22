@@ -1214,6 +1214,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
       (kle/direx-open)))
   :bind
   (("<f8>" . kle/direx-dwim))
+  :after (popwin)
   :config
   (push '(direx:direx-mode :position left :width 40 :dedicated t)
         popwin:special-display-config)
@@ -1403,6 +1404,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   :defer t
   :commands (google-translate-translate)
+  :after (popwin)
   :init
   (defvar google-translate-english-chars "[:ascii:]"
     "これらの文字が含まれているときは英語とみなす")
