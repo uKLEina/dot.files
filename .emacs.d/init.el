@@ -1306,20 +1306,9 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
-;; (use-package transient
-;;   :ensure t
-;;   :defer t
-;;   :pin melpa-stable)
-
-;; (use-package magit-section
-;;   :ensure t
-;;   :defer t
-;;   :pin melpa-stable)
-
 (use-package magit
   :ensure t
   :pin melpa-stable
-  :after (transient magit-section)
   :bind (("C-l m s" . magit-status)
          ("C-l m l c" . magit-log-current)
          ("C-l m l b" . magit-log-buffer-file))
@@ -1332,10 +1321,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
   (advice-add 'with-editor-finish :after #'apply-iconify))
-
-;; (use-package magit-file-icons
-;;   :ensure t
-;;   :hook (magit-mode . magit-file-icons-mode))
 
 (use-package rainbow-delimiters
   :ensure t
