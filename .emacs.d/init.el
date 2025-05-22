@@ -232,7 +232,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   (set-face-attribute 'variable-pitch nil
                       :height size))
 
-(setq use-package-always-defer t)
+(setopt use-package-always-defer t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; packages
@@ -1171,12 +1171,16 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (setopt ls-lisp-dirs-first t)))
 
 (use-package dired-x
-  :after direda
+  :after (dired)
   :custom
   (dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   :bind (:map dired-mode-map
-              ("C-l C-o" . dired-omit-mode)
-              ("r" . wdired-change-to-wdired-mode)))
+              ("C-l C-o" . dired-omit-mode)))
+
+(use-package wdired
+  :after (dired evil)
+  :init
+  (evil-define-key 'normal dired-mode-map (kbd "r") #'wdired-change-to-wdired-mode))
 
 (use-package dired-quick-sort
   :ensure t
