@@ -178,8 +178,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (setopt debug-on-error t)
 
-(setopt tramp-default-method "ssh")
-
 ;;; font
 ;; (defun set-font-for-frame (frame)
 ;;   "Set the font size for a specific frame based on its display resolution."
@@ -446,14 +444,14 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   ;;                      ((> dpi 150) 140)  ; Medium DPI
   ;;                      (t 120))))        ; Low DPI
   ;;     font-size))
-  (use-package ispell
-    :defer t
-    :custom
-    (ispell-program-name "hunspell")
-    (ispell-dictionary "/usr/share/hunspell/en_US.dic")
-    ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
-    :config
-    (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
+  ;; (use-package ispell
+  ;;   :defer t
+  ;;   :custom
+  ;;   (ispell-program-name "hunspell")
+  ;;   (ispell-dictionary "/usr/share/hunspell/en_US.dic")
+  ;;   ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
+  ;;   :config
+  ;;   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
 
   (use-package flyspell
     :defer t
@@ -484,8 +482,14 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (with-eval-after-load 'dired
     (bind-key "e" 'file-open-file-manager dired-mode-map)))
 
+(use-package tramp
+  :defer 1
+  :custom
+  (tramp-default-method "ssh"))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; external packages
+                                        ; external packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (package-initialize)
 
@@ -1325,9 +1329,9 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package rainbow-delimiters
   :ensure t
+  :defer 1
   :hook
-  (prog-mode . rainbow-delimiters-mode)
-  (python-ts-mode . rainbow-delimiters-mode))
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package anzu
   :ensure t
@@ -1373,6 +1377,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package highlight-symbol
   :ensure t
+  :defer 1
   :hook
   ((prog-mode . highlight-symbol-mode)
    (prog-mode . highlight-symbol-nav-mode))
@@ -1389,6 +1394,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package smartparens
   :ensure t
+  :defer 1
   :hook
   (prog-mode . smartparens-mode)
   :config
@@ -1458,16 +1464,17 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package yasnippet
   :ensure t
+  :defer 1
   :pin melpa
   :commands (yas-expand)
   :hook
   (prog-mode . yas-minor-mode)
-  (python-ts-mode . yas-minor-mode)
-  :bind (("C-<tab>" . yas-expand))
-  :config
-  (use-package yasnippet-snippets
-    :ensure t
-    :pin melpa))
+  :bind (("C-<tab>" . yas-expand)))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :pin melpa
+  :after (yasnippet))
 
 (use-package web-mode
   :ensure t
@@ -1664,6 +1671,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package ligature
   :ensure t
+  :defer 1
   :hook
   (prog-mode . ligature-mode)
   :config
