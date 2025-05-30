@@ -104,10 +104,27 @@
 (setq auto-save-interval 60)
 
 ;; window
+;; ヘルパー関数: 他のウィンドウがすべて指定されたユーティリティバッファか確認する
+(defun my-all-other-windows-are-utility-p (utility-buffer-names)
+  "Return t if all windows other than the selected one display one of the UTILITY-BUFFER-NAMES.
+Return nil if there are no other windows, or if any other window
+displays a buffer not in UTILITY-BUFFER-NAMES."
+  (let ((other-windows (remove (selected-window) (window-list))))
+    (if (null other-windows)
+        nil
+      (cl-every (lambda (w)
+                  (let ((buf-name (buffer-name (window-buffer w))))
+                    ;; member を cl-member に変更し、:test キーワード引数を使用可能にする
+                    (cl-member buf-name utility-buffer-names :test #'string=)))
+                other-windows))))
+
+;; メインの関数
 (defun other-window-or-split ()
   (interactive)
-  (when (one-window-p)
-    (split-window-horizontally))
+  (let ((utility-buffers '("*Ilist*" "*Flycheck errors*")))
+    (when (or (one-window-p)
+              (my-all-other-windows-are-utility-p utility-buffers))
+      (split-window-horizontally)))
   (other-window 1))
 
 (defun copy-buffer-file-path (use-file-name-only)
@@ -902,6 +919,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package popwin
   :ensure t
+  :demand t
   :config
   (popwin-mode +1))
 
@@ -915,7 +933,12 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 (use-package flycheck
   :ensure t
   :pin melpa
-  :defer t)
+  :defer t
+  :after (popwin)
+  :init
+  (push '(flycheck-error-list-mode :position right :width 0.2 :noselect t :stick t)
+        popwin:special-display-config))
+
 
 (use-package flymake
   :ensure t
@@ -1300,16 +1323,18 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   :defer t
   :custom
-  (imenu-list-auto-resize t)
-  (imenu-list-focus-after-activation t)
-  :hook
-  (imenu-list-after-jump . imenu-list-smart-toggle)
+  ;; (imenu-list-auto-resize t)
+  (imenu-list-position 'left)
+  (imenu-list-size 0.2)
+  ;; :hook
+  ;; (imenu-list-after-jump . imenu-list-smart-toggle)
   :bind
   ("C-;" . imenu-list-smart-toggle)
   :config
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
-  (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry)
+  )
 
 (use-package magit
   :ensure t
