@@ -1350,7 +1350,10 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (defun apply-iconify (&rest arg)
     (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
-  (advice-add 'with-editor-finish :after #'apply-iconify))
+  (advice-add 'with-editor-finish :after #'apply-iconify)
+  (push '(magit-status-mode :position right :width 0.5)
+        popwin:special-display-config)
+  )
 
 (use-package rainbow-delimiters
   :ensure t
