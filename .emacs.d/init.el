@@ -103,7 +103,7 @@
 (setq auto-save-timeout 15)
 (setq auto-save-interval 60)
 
-;; window
+;; ウィンドウのスマート分割
 ;; ヘルパー関数: 他のウィンドウがすべて指定されたユーティリティバッファか確認する
 (defun my-all-other-windows-are-utility-p (utility-buffer-names)
   "Return t if all windows other than the selected one display one of the UTILITY-BUFFER-NAMES.
@@ -118,7 +118,6 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
                     (cl-member buf-name utility-buffer-names :test #'string=)))
                 other-windows))))
 
-;; メインの関数
 (defun other-window-or-split ()
   (interactive)
   (let ((utility-buffers '("*Ilist*" "*Flycheck errors*")))
@@ -127,6 +126,23 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
       (split-window-horizontally)))
   (other-window 1))
 
+;;; ウィンドウの選択を変えた時に光らせる
+(defun my-pulse-buffer-on-window-select (frame)
+  "Pulse the entire buffer content when the selected window changes on FRAME.
+This function is intended to be added to `window-selection-change-functions`."
+  (ignore frame) ; The 'frame' argument is provided by the hook, but not used here.
+  (let ((current-win (selected-window)))
+    ;; Check if the window is live and not the minibuffer window.
+    (when (and current-win
+               (window-live-p current-win)
+               (not (window-minibuffer-p current-win)))
+      ;; Execute `pulse-momentary-highlight-region` in the context
+      ;; of the newly selected window, for the entire buffer.
+      (with-selected-window current-win
+        (pulse-momentary-highlight-region (point-min) (point-max))))))
+(add-hook 'window-selection-change-functions #'my-pulse-buffer-on-window-select)
+
+;;; ファイル名をパス付きでコピー
 (defun copy-buffer-file-path (use-file-name-only)
   "Copy the current buffer's file path to the kill ring.
 If called with a prefix argument (C-u), copy only the file name (without path)."
@@ -1010,6 +1026,8 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :hook
   (python-ts-mode . electric-operator-mode)
   (python-mode . electric-operator-mode)
+  :mode
+  (("\\.py\\'" . python-ts-mode))
   ;; (python-ts-mode . set-basedpyright-options)
   ;; (python-mode . set-basedpyright-options)
   :config
@@ -1325,7 +1343,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :custom
   ;; (imenu-list-auto-resize t)
   (imenu-list-position 'left)
-  (imenu-list-size 0.2)
+  (imenu-list-size 0.18)
   ;; :hook
   ;; (imenu-list-after-jump . imenu-list-smart-toggle)
   :bind
