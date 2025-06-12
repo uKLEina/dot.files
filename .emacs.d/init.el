@@ -1146,6 +1146,26 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
   )
 
+(with-eval-after-load 'lsp-pyright
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection
+    (lsp-stdio-connection
+     (lambda ()
+       '("basedpyright-langserver" "--stdio")))
+    :major-modes '(python-mode python-ts-mode)
+    :server-id 'pyright-remote
+    :multi-root lsp-pyright-multi-root
+    :remote? t
+    :priority 1
+    :initialized-fn (lambda (workspace)
+                      (with-lsp-workspace workspace
+                        (lsp--set-configuration
+                         (make-hash-table :test 'equal))))
+    :notification-handlers (lsp-ht ((concat lsp-pyright-langserver-command "/beginProgress") 'lsp-pyright--begin-progress-callback)
+                                   ((concat lsp-pyright-langserver-command "/reportProgress") 'lsp-pyright--report-progress-callback)
+                                   ((concat lsp-pyright-langserver-command "/endProgress") 'lsp-pyright--end-progress-callback)))))
+
 (use-package lsp-ui
   :ensure t
   :after lsp-mode
