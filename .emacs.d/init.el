@@ -1568,8 +1568,14 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   :mode (("\\.md\\'" . gfm-mode))
   :custom
-  (markdown-command "multimarkdown"))
-(setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css"))
+  (markdown-command "multimarkdown")
+  (markdown-italic-underscore t)
+  :config
+  (defconst markdown-regex-italic
+    "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)[^\\ ]\\)\\(?4:\\2\\)\\)")
+  (defconst markdown-regex-gfm-italic
+    "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)\\)\\(?4:\\2\\)\\)")
+  (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
 
 (use-package markdown-preview-mode
   :ensure t
