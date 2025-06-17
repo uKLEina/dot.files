@@ -126,21 +126,32 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
       (split-window-horizontally)))
   (other-window 1))
 
-;;; ウィンドウの選択を変えた時に光らせる
-(defun my-pulse-buffer-on-window-select (frame)
-  "Pulse the entire buffer content when the selected window changes on FRAME.
-This function is intended to be added to `window-selection-change-functions`."
-  (ignore frame) ; The 'frame' argument is provided by the hook, but not used here.
-  (let ((current-win (selected-window)))
-    ;; Check if the window is live and not the minibuffer window.
-    (when (and current-win
-               (window-live-p current-win)
-               (not (window-minibuffer-p current-win)))
-      ;; Execute `pulse-momentary-highlight-region` in the context
-      ;; of the newly selected window, for the entire buffer.
+;;; ウィンドウ選択を変えた時に光らせて分かりやすくする
+;; 直前のウィンドウを覚えておく変数
+(defvar my-last-selected-window nil
+  "The window object that was last selected.
+Used to detect window focus changes.")
+
+;; ウィンドウが変わった時に光らせる関数
+(defun my-pulse-buffer-on-window-focus-change (frame)
+  "Pulse the entire buffer when the selected window object changes."
+  (ignore frame)
+  (let ((current-win (selected-window))
+        ;; フック実行開始時点での「直前のウィンドウ」をローカル変数に保存
+        (previous-win my-last-selected-window))
+    ;; 光らせる条件の判定
+    (when (and (not (eq current-win previous-win))              ; ウィンドウが変わっていること
+               (window-live-p current-win)                      ; 現在のウィンドウが有効なこと
+               (not (window-minibuffer-p current-win))          ; ミニバッファではないこと
+               (or (not previous-win)                           ; 最初の1回目はprevious-winがnilなのでok
+                   (not (window-minibuffer-p previous-win))))   ; 直前のウィンドウがミニバッファではないこと
       (with-selected-window current-win
-        (pulse-momentary-highlight-region (point-min) (point-max))))))
-(add-hook 'window-selection-change-functions #'my-pulse-buffer-on-window-select)
+        (pulse-momentary-highlight-region (point-min) (point-max))))
+    ;; 最後に選択されたウィンドウの情報を更新
+    (setq my-last-selected-window current-win)))
+
+;; 3. 新しいフック関数を追加します。
+(add-hook 'window-selection-change-functions #'my-pulse-buffer-on-window-focus-change)
 
 ;;; ファイル名をパス付きでコピー
 (defun copy-buffer-file-path (use-file-name-only)
