@@ -2,7 +2,7 @@
 ; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (setq load-prefer-newer t)
-(setq custom-file (locate-user-emacs-file "custom.el"))
+(setopt custom-file (locate-user-emacs-file "custom.el"))
 ;; (setopt package-install-upgrade-built-in t)
 
 (require 'package)
@@ -149,8 +149,6 @@ Used to detect window focus changes.")
         (pulse-momentary-highlight-region (point-min) (point-max))))
     ;; 最後に選択されたウィンドウの情報を更新
     (setq my-last-selected-window current-win)))
-
-;; 3. 新しいフック関数を追加します。
 (add-hook 'window-selection-change-functions #'my-pulse-buffer-on-window-focus-change)
 
 ;;; ファイル名をパス付きでコピー
@@ -721,6 +719,10 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
       (apply orig-fun args)))
   (advice-add 'paredit-forward :around #'kle/paredit-forward-advice)
   (advice-add 'paredit-backward :around #'kle/paredit-backward-advice))
+
+(use-package enhanced-evil-paredit
+  :ensure t
+  :after (paredit))
 
 (use-package posframe
   :ensure t
