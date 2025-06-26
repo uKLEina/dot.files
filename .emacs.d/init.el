@@ -273,6 +273,26 @@ frame if FRAME is nil, and to 1 if AMT is nil."
                       :height size)
   (set-face-attribute 'variable-pitch nil
                       :height size))
+;; 複数行をまとめる関数
+;; 標準のdelete-indentationsは空白を入れるしかないので自作版
+(defun kle/join-lines (beg end &optional with-space)
+  "Join lines in region from BEG to END into one line.
+If WITH-SPACE is non-nil (C-u), insert a single space at each join.
+Otherwise, join lines with no space."
+  (interactive
+   (let ((with-space current-prefix-arg))
+     (if (use-region-p)
+         (list (region-beginning) (region-end) with-space)
+       (list (line-beginning-position)
+             (line-end-position 2)
+             with-space))))
+  (let ((text (buffer-substring-no-properties beg end)))
+    (delete-region beg end)
+    (insert
+     (if with-space
+         (replace-regexp-in-string "\n+" " " (string-trim text))
+       (replace-regexp-in-string "\n+" "" (string-trim text))))))
+(bind-key "M-^" #'kle/join-lines)
 
 (setopt use-package-always-defer t)
 
