@@ -1828,6 +1828,10 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
+  (use-package vterm
+    :ensure t
+    :custom
+    (vterm-max-scrollback 100000))
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
