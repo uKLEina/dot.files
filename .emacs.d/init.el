@@ -295,16 +295,23 @@ frame if FRAME is nil, and to 1 if AMT is nil."
   :hook (emacs-startup . server-start))
 
 (use-package recentf
-  :custom (recentf-auto-cleanup 10)
+  :custom
+  (recentf-auto-cleanup 10)
   :config
   ;; recentf の メッセージをエコーエリアに表示しない
-  (defun recentf-save-list-inhibit-message (orig-func &rest args)
-    (setq inhibit-message t)
-    (apply orig-func args)
-    (setq inhibit-message nil)
-    'around)
-  (advice-add 'recentf-cleanup   :around 'recentf-save-list-inhibit-message)
-  (advice-add 'recentf-save-list :around 'recentf-save-list-inhibit-message))
+  (defun kle/recentf-save-list-inhibit-message (orig-func &rest args)
+    (let ((inhibit-message t))
+      (apply orig-func args)))
+  (advice-add 'recentf-cleanup :around 'kle/recentf-save-list-inhibit-message)
+  (advice-add 'recentf-save-list :around 'kle/recentf-save-list-inhibit-message)
+  ;; ディレクトリも履歴に含めるようにしたいので、
+  ;; Diredでディレクトリを開いたときにrecentfリストに追加する
+  (defun kle/recentf-add-dired-directory ()
+    (when (and (boundp 'dired-directory) dired-directory)
+      (recentf-add-file dired-directory)))
+  (add-hook 'dired-mode-hook #'kle/recentf-add-dired-directory)
+  ;; バッファ切り替えだけで最近開いた判定にする
+  (add-hook 'buffer-list-update-hook #'recentf-track-opened-file))
 
 (use-package which-key
   :hook
