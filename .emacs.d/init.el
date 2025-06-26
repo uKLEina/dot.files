@@ -903,6 +903,15 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   )
 
+(use-package nerd-icons
+  :ensure t)
+
+(use-package nerd-icons-completion
+  ;; :after marginalia
+  :config
+  (nerd-icons-completion-mode)
+  (nerd-icons-completion-marginalia-setup))
+
 (use-package wgrep
   :ensure t
   )
