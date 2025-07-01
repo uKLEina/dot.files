@@ -1279,10 +1279,13 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   ;; fix keybind for SKK
   (dired-bind-jump nil)
   (dired-kill-when-opening-new-dired-buffer t)
+  :init
+  (evil-set-initial-state 'dired-mode 'emacs)
   :config
   (bind-keys :map dired-mode-map
              ("C-t" . other-window-or-split)
-             )
+             ("j" . dired-next-line)
+             ("k" . dired-previous-line))
   (when (eq system-type 'gnu/linux)
     (setopt dired-listing-switches "-AFDlh --group-directories-first"))
   (when (eq system-type 'windows-nt)
@@ -1298,7 +1301,14 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 (use-package wdired
   :after (dired evil)
   :init
-  (evil-define-key 'normal dired-mode-map (kbd "r") #'wdired-change-to-wdired-mode))
+  (defun kle/wdired-evil-fix ()
+    "Evil fix for wdired. Stay Normal mode when entering WDired."
+    (progn
+      (evil-normal-state)
+      (forward-char)))
+  (add-hook 'wdired-mode-hook #'kle/wdired-evil-fix)
+  :bind (:map dired-mode-map
+              ("r" . wdired-change-to-wdired-mode)))
 
 (use-package dired-quick-sort
   :ensure t
