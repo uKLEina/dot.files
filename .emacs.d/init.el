@@ -1359,6 +1359,12 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (evil-set-initial-state 'neotree-mode 'emacs)
   :custom
   (neo-theme 'nerd-icons)
+  (neo-smart-open t)
+  (neo-force-change-root t)
+  (neo-autorefresh t)
+  (neo-window-fixed-size nil)
+  (neo-show-hidden-files t)
+  ;; (neo-vc-integration '(char))
   :config
   (bind-keys :map neotree-mode-map
              ("j" . neotree-next-line)
