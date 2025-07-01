@@ -1353,6 +1353,17 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
 ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
 
+(use-package neotree
+  :ensure t
+  :init
+  (evil-set-initial-state 'neotree-mode 'emacs)
+  :custom
+  (neo-theme 'nerd-icons)
+  :config
+  (bind-keys :map neotree-mode-map
+             ("j" . neotree-next-line)
+             ("k" . neotree-previous-line)))
+
 (use-package skk
   :ensure ddskk
   :bind
