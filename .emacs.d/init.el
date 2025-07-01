@@ -1316,32 +1316,32 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup))
 
-(use-package direx
-  :ensure t
-  :init
-  (defun kle/direx-open ()
-    (interactive)
-    (or (ignore-errors
-          (direx-project:jump-to-project-root-other-window))
-        (direx:jump-to-directory-other-window)))
-  (defun kle/direx-dwim ()
-    (interactive)
-    (if (derived-mode-p 'direx:direx-mode)
-        (kill-buffer)
-      (kle/direx-open)))
-  :bind
-  (("<f8>" . kle/direx-dwim))
-  :after (popwin)
-  :config
-  (push '(direx:direx-mode :position left :width 40 :dedicated t)
-        popwin:special-display-config)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "j") 'direx:next-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "k") 'direx:previous-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "J") 'direx:next-sibling-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "K") 'direx:previous-sibling-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
-  (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
+;; (use-package direx
+;;   :ensure t
+;;   :init
+;;   (defun kle/direx-open ()
+;;     (interactive)
+;;     (or (ignore-errors
+;;           (direx-project:jump-to-project-root-other-window))
+;;         (direx:jump-to-directory-other-window)))
+;;   (defun kle/direx-dwim ()
+;;     (interactive)
+;;     (if (derived-mode-p 'direx:direx-mode)
+;;         (kill-buffer)
+;;       (kle/direx-open)))
+;;   :bind
+;;   (("<f8>" . kle/direx-dwim))
+;;   :after (popwin)
+;;   :config
+;;   (push '(direx:direx-mode :position left :width 40 :dedicated t)
+;;         popwin:special-display-config)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "j") 'direx:next-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "k") 'direx:previous-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "J") 'direx:next-sibling-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "K") 'direx:previous-sibling-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
 
 (use-package skk
   :ensure ddskk
