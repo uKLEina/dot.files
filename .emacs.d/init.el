@@ -120,7 +120,7 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
 
 (defun other-window-or-split ()
   (interactive)
-  (let ((utility-buffers '("*Ilist*" "*Flycheck errors*")))
+  (let ((utility-buffers '("*Ilist*" "*Flycheck errors*" " *NeoTree*")))
     (when (or (one-window-p)
               (my-all-other-windows-are-utility-p utility-buffers))
       (split-window-horizontally)))
@@ -1357,18 +1357,21 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :ensure t
   :init
   (evil-set-initial-state 'neotree-mode 'emacs)
+  :bind
+  (("<f8>" . neotree-toggle))
   :custom
   (neo-theme 'nerd-icons)
   (neo-smart-open t)
   (neo-force-change-root t)
   (neo-autorefresh t)
-  (neo-window-fixed-size nil)
+  (neo-window-fixed-size t)
   (neo-show-hidden-files t)
   (neo-vc-integration '(face))
   :config
   (bind-keys :map neotree-mode-map
              ("j" . neotree-next-line)
-             ("k" . neotree-previous-line)))
+             ("k" . neotree-previous-line)
+             ("C-t" . other-window-or-split)))
 
 (use-package skk
   :ensure ddskk
