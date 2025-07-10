@@ -993,7 +993,12 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   :after (popwin)
   :init
   (push '("*xref*" :position bottom :width 5)
-        popwin:special-display-config))
+        popwin:special-display-config)
+  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+  :bind
+  (:map xref--xref-buffer-mode-map
+        ("j" . xref-next-line)
+        ("k" . xref-prev-line)))
 
 (use-package flycheck
   :ensure t
