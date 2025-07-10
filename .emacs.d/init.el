@@ -1897,7 +1897,16 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (use-package vterm
     :ensure t
     :custom
-    (vterm-max-scrollback 100000))
+    (vterm-max-scrollback 100000)
+    :init
+    (push '("*vterm*" :position bottom :width 15)
+        popwin:special-display-config))
+  (use-package vterm-toggle
+    :ensure t
+    :bind
+    (("<f10>" . vterm-toggle))
+    (:map vterm-mode-map
+          ("<f10>" . vterm-toggle)))
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
