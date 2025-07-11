@@ -1,7 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (setq load-prefer-newer t)
 (setopt custom-file (locate-user-emacs-file "custom.el"))
 ;; (setopt package-install-upgrade-built-in t)
 
@@ -55,8 +54,6 @@
       '(buffer-file-name "%f"
                          (dired-directory dired-directory "%b")))
 (setopt require-final-newline t)
-;; デフォルト色付け
-(use-package generic-x)
 (show-paren-mode 1)
 (pixel-scroll-precision-mode 1)
 (setopt pixel-scroll-precision-large-scroll-height 40)
@@ -463,6 +460,14 @@ Otherwise, join lines with no space."
       ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
   (org-latex-default-class "bxjsarticle"))
 
+(use-package tramp
+  :defer 1
+  :custom
+  (tramp-default-method "ssh"))
+
+;; デフォルト色付け
+(use-package generic-x)
+
 (when (eq system-type 'gnu/linux)
   ;;; Fix copy/paste in Wayland
   ;; credit: yorickvP on Github
@@ -548,12 +553,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (bind-key "C-l C-e" 'file-open-file-manager)
   (with-eval-after-load 'dired
     (bind-key "e" 'file-open-file-manager dired-mode-map)))
-
-(use-package tramp
-  :defer 1
-  :custom
-  (tramp-default-method "ssh"))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; External packages
