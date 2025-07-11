@@ -8,7 +8,7 @@
 (setopt package-native-compile t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
-(setq package-archive-priorities
+(setopt package-archive-priorities
       '(("gnu" . 30)
         ("nongnu" . 20)
         ("melpa" . 10)
@@ -24,7 +24,7 @@
 
 ;;; customize
 (set-language-environment "Japanese")
-(auto-compression-mode +1)
+(auto-compression-mode 1)
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-file-coding-system 'utf-8)
 
@@ -44,7 +44,6 @@
 (setq visible-bell t)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-(defvar default-tab-width 4)
 (setopt tab-stop-list '(4 8 12))
 (setq scroll-step 1)
 (setopt initial-scratch-message "")
@@ -69,7 +68,7 @@
     (when (re-search-backward "/[^/]+/?" nil t)
       (forward-char 1)
       (delete-region (point) current-pt))))
-(define-key minibuffer-local-map (kbd "M-h") 'my-minibuffer-delete-parent-directory)
+(bind-key "M-h" 'my-minibuffer-delete-parent-directory minibuffer-local-map)
 
 ;; バッファの開始・終端を明示する
 (setq-default indicate-buffer-boundaries 'left)
@@ -91,9 +90,9 @@
 ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
-(custom-set-variables
- '(backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
- '(auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t))))
+(setopt backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
+(setopt auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
+
 ;; バックアップまでの間隔も短くする
 (setq auto-save-timeout 15)
 (setq auto-save-interval 60)
@@ -352,7 +351,7 @@ Otherwise, join lines with no space."
 
 (use-package winner
   :init
-  (winner-mode +1)
+  (winner-mode 1)
   :config
   (defun winner-dwim (arg)
     (interactive "p")
