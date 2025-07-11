@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Basic Settings
+;; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (setq load-prefer-newer t)
 (setopt custom-file (locate-user-emacs-file "custom.el"))
@@ -33,8 +33,6 @@
 (save-place-mode 1)
 (line-number-mode 1)
 (column-number-mode 1)
-;(setq gc-cons-threshold (* 100 gc-cons-threshold))
-;(setq gc-cons-percentage 0.2)
 (setq read-process-output-max (* 3 1024 1024))
 (setq message-log-max 100000)
 (setq enable-recursive-minibuffers t)
@@ -297,7 +295,7 @@ Otherwise, join lines with no space."
 (setopt use-package-always-defer t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; packages
+;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; configure built-in packages before package-initialize
@@ -558,7 +556,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; external packages
+;; External packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (package-initialize)
 
@@ -1214,8 +1212,8 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     :priority 1
     :initialized-fn (lambda (workspace)
                       (with-lsp-workspace workspace
-                        (lsp--set-configuration
-                         (make-hash-table :test 'equal))))
+                                          (lsp--set-configuration
+                                           (make-hash-table :test 'equal))))
     :notification-handlers (lsp-ht ((concat lsp-pyright-langserver-command "/beginProgress") 'lsp-pyright--begin-progress-callback)
                                    ((concat lsp-pyright-langserver-command "/reportProgress") 'lsp-pyright--report-progress-callback)
                                    ((concat lsp-pyright-langserver-command "/endProgress") 'lsp-pyright--end-progress-callback)))))
@@ -1802,12 +1800,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (diminish 'undo-tree-mode "UndoTree")
   (diminish 'super-save-mode "SSave"))
 
-;(use-package eldoc-eval
-;  :defer t
-;  :ensure t
-;  :custom
-;  (eldoc-in-minibuffer-mode-lighter " EldocEval"))
-
 (use-package dashboard
   :ensure t
   :after (evil)
@@ -1904,7 +1896,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (vterm-max-scrollback 100000)
     :init
     (push '("*vterm*" :position bottom :width 15)
-        popwin:special-display-config))
+          popwin:special-display-config))
   (use-package vterm-toggle
     :ensure t
     :bind
