@@ -724,39 +724,67 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (emacs-lisp-mode . enable-paredit-mode)
   :init
   ;; Evil compatibility fix
-  (defun kle/paredit-forward-advice (orig-fun &rest args)
-    (if (and (bound-and-true-p evil-mode)
-             (or (evil-normal-state-p) (evil-visual-state-p)))
-        (progn
-          (funcall orig-fun)
-          (unless (or (eolp) (bobp))  ;; 行末・行頭でなければ1文字戻る
-            (backward-char)))
-      (apply orig-fun args)))
+  (defun my/paredit-forward-visual-advice (orig-fn &rest args)
+    "Advice for `paredit-forward' to move cursor back one char in visual state."
+    (apply orig-fn args)
+    (when (evil-visual-state-p)
+      (backward-char 1)))
 
-  (defun kle/paredit-backward-advice (orig-fun &rest args)
-    (if (and (bound-and-true-p evil-mode)
-             (or (evil-normal-state-p) (evil-visual-state-p)))
-        (progn
-          (if (eolp)
-              (forward-line 1)  ;; 行末なら次の行の行頭へ
-            (forward-char))     ;; それ以外なら1文字先へ
-          (funcall orig-fun))
-      (apply orig-fun args)))
-  (advice-add 'paredit-forward :around #'kle/paredit-forward-advice)
-  (advice-add 'paredit-backward :around #'kle/paredit-backward-advice))
+  (defun my/paredit-backward-advice (orig-fn &rest args)
+    "Advice for `paredit-backward' to handle evil-mode cursor position.
+Moves cursor forward before calling the original function when on a
+closing delimiter in normal or visual state."
+    (when (save-excursion (and (not (eobp)) (eq (char-syntax (char-after)) ?\))))
+      (cond
+       ((evil-visual-state-p)
+        (forward-char 1))
+       ((evil-normal-state-p)
+        (if (eolp)
+            (forward-line 1)
+          (forward-char 1)))))
+    (apply orig-fn args))
+  (advice-add 'paredit-backward :around #'my/paredit-backward-advice)
+  (advice-add 'paredit-forward :around #'my/paredit-forward-visual-advice))
 
 (use-package enhanced-evil-paredit
   :ensure t
   :after (paredit))
 
 (use-package posframe
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package multiple-cursors
   :ensure t
-  :bind
-  (("C-S-m" . 'mc/edit-lines)))
+  :init
+  (defun my/evil-visual-mc-edit-lines ()
+    "From evil visual mode, create multiple cursors on the selected lines.
+For visual-line mode ('V'), places cursors at the beginning of each line.
+For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
+    (interactive)
+    (when (evil-visual-state-p)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (evil-exit-visual-state)
+        (evil-emacs-state)
+        (goto-char beg)
+        ;; For char/block mode, make region inclusive by adjusting 'end'
+        (if (and (not (eq evil-visual-selection 'line)) (> end beg))
+            (setq end (1- end)))
+        (push-mark end t t)
+        ;; Use the correct function based on selection type
+        (if (eq evil-visual-selection 'line)
+            (mc/edit-beginnings-of-lines)
+          (mc/edit-lines)))))
+
+  (defun my/mc-finish-switch-to-evil-normal ()
+    "When leaving multiple-cursors-mode, return to evil-normal-state."
+    (when (eq evil-state 'emacs)
+      (evil-normal-state)))
+
+  (with-eval-after-load 'evil
+    (evil-define-key 'visual global-map (kbd "gM") 'my/evil-visual-mc-edit-lines))
+  :hook
+  (multiple-cursors-mode-disabled . my/mc-finish-switch-to-evil-normal))
 
 (use-package undo-tree
   :ensure t
