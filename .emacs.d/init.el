@@ -888,6 +888,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (completion-category-overrides '((file (styles basic partial-completion))))
   (orderless-matching-styles '(orderless-literal orderless-regexp orderless-initialism)))
 
+(use-package nerd-icons-completion
+  :ensure t
+  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
+
 (use-package marginalia
   :ensure t
   :init
@@ -929,12 +933,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package nerd-icons
   :ensure t)
-
-(use-package nerd-icons-completion
-  ;; :after marginalia
-  :config
-  (nerd-icons-completion-mode)
-  (nerd-icons-completion-marginalia-setup))
 
 (use-package wgrep
   :ensure t
@@ -1356,12 +1354,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package all-the-icons
   :ensure t)
+
 (use-package all-the-icons-dired
   :ensure t
   :hook (dired-mode . all-the-icons-dired-mode))
-(use-package all-the-icons-completion
-  :ensure t
-  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup))
 
 ;; (use-package direx
 ;;   :ensure t
