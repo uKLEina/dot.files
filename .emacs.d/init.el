@@ -1267,6 +1267,14 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config
+  (require 'dap-python)
+  (dap-auto-configure-mode 1)
+  (setq dap-python-debugger 'debugpy))
+
 ;; (use-package eglot-java
 ;;   :ensure t
 ;;   :init
@@ -1959,11 +1967,14 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;;     font-size))
   (use-package treesit-auto
     :ensure t
+    :commands
+    (global-treesit-auto-mode)
     :custom
     (treesit-auto-install 'prompt)
+    :init
+    (global-treesit-auto-mode 1)
     :config
-    (treesit-auto-add-to-auto-mode-alist 'all)
-    (global-treesit-auto-mode +1))
+    (treesit-auto-add-to-auto-mode-alist 'all))
 
   (use-package treesit-fold
     :init
