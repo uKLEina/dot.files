@@ -1880,10 +1880,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-(use-package copilot-chat
-  :ensure t
-  :custom (copilot-chat-commit-prompt
-"あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。
+(defvar copilot-chat-commit-prompt-jp
+  "あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。
 与えられる入力は以下です:
 - 現在のブランチ名 (例: feature/ABC-123-new-feature)
 - git status の要約 (staged のみ)
@@ -1959,7 +1957,16 @@ BREAKING CHANGE: 下限未満入力時の戻り値が nil から error に変更
 曖昧な場合は最も保守的な (より一般的な) type を選ぶ。
 内容がテスト追加中心なら test:, ビルド設定中心なら build:, リファクタ中心なら refactor: を選択。
 破壊的変更が diff から明白でない場合は ! や BREAKING CHANGE を付けない。
-出力はコミットメッセージ以外一切含めない。"))
+出力はコミットメッセージ以外一切含めない。")
+(defvar copilot-chat-prompt-review-jp
+  "あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。下記のコードをレビューしてください。\n")
+(use-package copilot-chat
+  :ensure t
+  :custom
+  (copilot-chat-default-model "claude-sonnet-4")
+  ;; JP prompt
+  (copilot-chat-commit-prompt copilot-chat-commit-prompt-jp)
+  (copilot-chat-prompt-review copilot-chat-prompt-review-jp))
 
   ;; (use-package gptel
   ;;   :ensure t
