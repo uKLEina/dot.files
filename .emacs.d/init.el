@@ -235,7 +235,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
 ;; (set-face-attribute 'default nil :family "0xProto" :height 110)
-(set-face-attribute 'default nil :family "ProtoGen" :height 130)
+(set-face-attribute 'default nil :family "ProtoGen" :height 140)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
@@ -1352,12 +1352,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :init
   (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map))
 
-(use-package all-the-icons
-  :ensure t)
-
-(use-package all-the-icons-dired
+(use-package nerd-icons-dired
   :ensure t
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . nerd-icons-dired-mode))
 
 ;; (use-package direx
 ;;   :ensure t
