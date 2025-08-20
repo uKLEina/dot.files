@@ -1881,15 +1881,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-
-(defvar copilot-chat-prompt-review-jp
-  "あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。下記のコードをレビューしてください。\n")
 (use-package copilot-chat
   :ensure t
   :custom
   (copilot-chat-default-model "claude-sonnet-4")
-  ;; JP prompt
-  (copilot-chat-prompt-review copilot-chat-prompt-review-jp)
+  (copilot-chat-follow t)
   :init
   (defun my/copilot-chat-buffer-setup ()
     "Copilot Chatバッファの初期設定"
@@ -1900,7 +1896,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                   copilot-chat-markdown-poly-mode-hook))
     (add-hook hook #'my/copilot-chat-buffer-setup))
   :config
-  ;; JP commit
+  ;; JP prompt
   (setopt copilot-chat-commit-prompt
           (concat
            copilot-chat-commit-prompt
@@ -1911,6 +1907,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ---
 
 "))
+  (setopt copilot-chat-prompt-review
+          (concat copilot-chat-prompt-review "Use Japanese for the output language.\n"))
   ;; 自動保存機能
   (defun my/copilot-chat-auto-save ()
     "Copilot Chatセッションを自動保存"
@@ -1921,9 +1919,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                 (or (copilot-chat-file-path instance)
                     (format "%s/%s_%s.el"
                             copilot-chat-default-save-dir
+                            current-date
                             (replace-regexp-in-string
-                             "/" "_" (copilot-chat-directory instance))
-                            current-date)))
+                             "/" "_" (copilot-chat-directory instance)))))
                (default-dir (file-name-directory default-path))
                (default-file (file-name-nondirectory default-path))
                (file (format "%s/%s" default-dir default-file)))
