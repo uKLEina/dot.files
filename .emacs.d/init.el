@@ -1880,84 +1880,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
 
-(defvar copilot-chat-commit-prompt-jp
-  "あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。
-与えられる入力は以下です:
-- 現在のブランチ名 (例: feature/ABC-123-new-feature)
-- git status の要約 (staged のみ)
-- staged 変更の git diff --cached 出力 (<git_context> 内)
-これらを解析し *単一の Git コミットメッセージ* を Conventional Commits v1.0.0 に厳密準拠で日本語記述してください。
 
-==================================================
-Conventional Commits 1.0.0 概要 (抜粋)
---------------------------------------------------
-書式:
-<type>[オプション scope][!]: <短い説明>
-
-[オプション本文]
-
-[オプションフッタ]
-主な type:
-- feat: 新機能
-- fix: バグ修正
-- build / chore / ci / docs / style / refactor / perf / test も許可
-BREAKING CHANGE は:
-- type(scope)! の ! 、
-  もしくはフッタに BREAKING CHANGE: 説明
-1 行目は type(+scope) と説明をコロン+空白で接続。
-scope は () 内。! は破壊的変更。説明は短く本質的に。
-
-詳細ルール(要点):
-1. 1 行目の説明は命令形 / 名詞句。文末に句点を付けない。
-2. 72 文字以内 (推奨 50 前後)。
-3. 本文がある場合、1 行目と本文の間に空行 1 行。
-4. 本文は段落自由だがここでは箇条書き (- ) を基本とする。
-5. フッタ (例: BREAKING CHANGE:, Refs:) は本文と 1 行空ける。
-6. BREAKING CHANGE は ! かフッタで明示 (両方も可)。
-7. 差分に含まれない不確定要素を断定しない。
-8. 機微情報や社内専用語は推測で挿入しない。
-
-==================================================
-出力要件
---------------------------------------------------
-- 出力は *コミットメッセージ本文のみ*。余計な前置きや囲い禁止。
-- 1 行目: <type>(必要ならscope)!: 日本語要約
-  (要約は簡潔 / 主語省略可 / 名詞止めまたは命令形 / 句点不要)
-- 本文を書く場合:
-  - 1 行目との間に 1 空行
-  - 各行を \"- \" で始め 72 桁以内で折り返し
-  - 変更理由 / 背景 / 影響 / リスク / 移行手順など必要最小限
-- 破壊的変更なら:
-  - ! を type または type(scope) の直後に付加
-  または
-  - 本文末尾空行後に BREAKING CHANGE: 説明
-- Refs / Issue などが diff / status から明確な場合のみフッタに記述
-- 余計な英語説明・不要な装飾・コードブロック禁止
-- 生成後に追加説明を付けない (コミット本文のみ)
-
-==================================================
-例 (日本語化例)
---------------------------------------------------
-feat(core): 設定キャッシュ層を追加
-
-- 起動時の設定読み込み回数を削減
-- 既存 public API への破壊的変更なし
-
-fix(parser)!: 無効な境界値処理を修正
-
-- 下限未満入力で例外が発生していた
-- リトライ時の状態遷移を是正
-BREAKING CHANGE: 下限未満入力時の戻り値が nil から error に変更
-
-==================================================
-指示
---------------------------------------------------
-今与えられる <git_context> を厳密に読み、上記仕様を満たす1つの最適な日本語コミットメッセージだけを返してください。
-本文やフッタが不要なほど小さい変更なら 1 行のみでも可。
-曖昧な場合は最も保守的な (より一般的な) type を選ぶ。
-内容がテスト追加中心なら test:, ビルド設定中心なら build:, リファクタ中心なら refactor: を選択。
-破壊的変更が diff から明白でない場合は ! や BREAKING CHANGE を付けない。
-出力はコミットメッセージ以外一切含めない。")
 (defvar copilot-chat-prompt-review-jp
   "あなたは熟練したソフトウェアエンジニアかつ厳密なコードレビュアです。下記のコードをレビューしてください。\n")
 (use-package copilot-chat
@@ -1965,8 +1888,52 @@ BREAKING CHANGE: 下限未満入力時の戻り値が nil から error に変更
   :custom
   (copilot-chat-default-model "claude-sonnet-4")
   ;; JP prompt
-  (copilot-chat-commit-prompt copilot-chat-commit-prompt-jp)
-  (copilot-chat-prompt-review copilot-chat-prompt-review-jp))
+  (copilot-chat-prompt-review copilot-chat-prompt-review-jp)
+  :init
+  (defun my/copilot-chat-buffer-setup ()
+    "Copilot Chatバッファの初期設定"
+    (when (string-prefix-p "*Copilot Chat" (buffer-name))
+      (setq-local truncate-lines nil
+                  word-wrap t)))
+  (dolist (hook '(copilot-chat-org-poly-mode-hook
+                  copilot-chat-markdown-poly-mode-hook))
+    (add-hook hook #'my/copilot-chat-buffer-setup))
+  :config
+  ;; JP commit
+  (setopt copilot-chat-commit-prompt
+          (concat
+           copilot-chat-commit-prompt
+           "### OUTPUT LANGUAGE
+- Use Japanese for the commit message.
+- Type keywords like feat or fix should not be translated into Japanese. Use as is.
+
+---
+
+"))
+  ;; 自動保存機能
+  (defun my/copilot-chat-auto-save ()
+    "Copilot Chatセッションを自動保存"
+    (let ((instance (copilot-chat--current-instance))
+          (current-date (format-time-string "%Y_%m_%d_%H%M%S")))
+      (when instance
+        (let* ((default-path
+                (or (copilot-chat-file-path instance)
+                    (format "%s/%s_%s.el"
+                            copilot-chat-default-save-dir
+                            (replace-regexp-in-string
+                             "/" "_" (copilot-chat-directory instance))
+                            current-date)))
+               (default-dir (file-name-directory default-path))
+               (default-file (file-name-nondirectory default-path))
+               (file (format "%s/%s" default-dir default-file)))
+          (copilot-chat--save-instance instance file)
+          ;; (setf (copilot-chat-file-path instance) file)
+          (message "Saved instance to %s" file)))))
+  (defun my/auto-save-on-response-complete (instance content &optional buffer)
+    "レスポンス完了時に自動保存を実行"
+    (when (string= content copilot-chat--magic)
+      (run-with-timer 0.1 nil #'my/copilot-chat-auto-save)))
+  (advice-add 'copilot-chat-prompt-cb :after #'my/auto-save-on-response-complete))
 
   ;; (use-package gptel
   ;;   :ensure t
