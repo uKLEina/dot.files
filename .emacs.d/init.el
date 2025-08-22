@@ -1913,29 +1913,88 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 "))
   (setopt copilot-chat-prompt-review
           (concat copilot-chat-prompt-review "Use Japanese for the output language.\n"))
-  ;; 自動保存機能
-  (defun my/copilot-chat-auto-save ()
-    "Copilot Chatセッションを自動保存"
-    (let ((instance (copilot-chat--current-instance))
-          (current-date (format-time-string "%Y_%m_%d_%H%M%S")))
+
+  ;; ファイルパス管理用のハッシュテーブル
+  (defvar my/copilot-chat-file-paths (make-hash-table :test 'equal)
+    "チャットインスタンスとファイルパスのマッピング")
+
+  (defun my/get-chat-file-path (instance)
+    "チャットインスタンスのファイルパスを取得"
+    (let ((instance-id (format "%s" instance)))
+      (gethash instance-id my/copilot-chat-file-paths)))
+
+  (defun my/set-chat-file-path (instance file-path)
+    "チャットインスタンスのファイルパスを設定"
+    (let ((instance-id (format "%s" instance)))
+      (puthash instance-id file-path my/copilot-chat-file-paths)))
+
+  (defun my/generate-chat-filename (instance)
+    "チャットの内容から適切なファイル名を生成"
+    (let* ((history (copilot-chat-history instance))
+           (first-user-message
+            (cl-find-if (lambda (msg)
+                         (and (plist-get msg :content)
+                              (equal (plist-get msg :role) "user")))
+                       (reverse history)))
+           (content (when first-user-message
+                     (plist-get first-user-message :content)))
+           (current-date (format-time-string "%Y%m%d"))
+           (dir-name (file-name-nondirectory
+                     (directory-file-name
+                      (copilot-chat-directory instance))))
+           (safe-filename ""))
+
+      (when content
+        ;; 最初の質問から適切なファイル名を生成
+        (setq safe-filename
+              (replace-regexp-in-string
+               "[^a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF-]" "_"
+               (substring content 0 (min 30 (length content)))))
+        ;; 連続するアンダースコアを一つに
+        (setq safe-filename
+              (replace-regexp-in-string "_+" "_" safe-filename))
+        ;; 前後のアンダースコアを除去
+        (setq safe-filename
+              (string-trim safe-filename "_")))
+
+      ;; ファイル名が空の場合はデフォルト名を使用
+      (when (or (not safe-filename) (string-empty-p safe-filename))
+        (setq safe-filename "chat"))
+
+      (format "%s_%s_%s.el" current-date dir-name safe-filename)))
+
+  (defun my/copilot-chat-smart-save ()
+    "スマート自動保存：初回は名前を生成、以降は上書き"
+    (let ((instance (copilot-chat--current-instance)))
       (when instance
-        (let* ((default-path
-                (or (copilot-chat-file-path instance)
-                    (format "%s/%s_%s.el"
-                            copilot-chat-default-save-dir
-                            current-date
-                            (replace-regexp-in-string
-                             "/" "_" (copilot-chat-directory instance)))))
-               (default-dir (file-name-directory default-path))
-               (default-file (file-name-nondirectory default-path))
-               (file (format "%s/%s" default-dir default-file)))
-          (copilot-chat--save-instance instance file)
-          ;; (setf (copilot-chat-file-path instance) file)
-          (message "Saved instance to %s" file)))))
+        (let* ((existing-path (my/get-chat-file-path instance))
+               (default-dir (expand-file-name copilot-chat-default-save-dir))
+               (file-path
+                (if existing-path
+                    existing-path  ; 既存のパスがあれば使用
+                  (progn
+                    ;; ディレクトリが存在しない場合は作成
+                    (unless (file-directory-p default-dir)
+                      (make-directory default-dir t))
+                    ;; 新しいファイル名を生成
+                    (expand-file-name
+                     (my/generate-chat-filename instance)
+                     default-dir)))))
+
+          ;; 保存実行
+          (copilot-chat--save-instance instance file-path)
+          (my/set-chat-file-path instance file-path)
+
+          ;; 初回保存の場合はメッセージを詳細に
+          (if existing-path
+              (message "Chat updated: %s" (file-name-nondirectory file-path))
+            (message "Chat saved as: %s" (file-name-nondirectory file-path)))))))
+
   (defun my/auto-save-on-response-complete (instance content &optional buffer)
-    "レスポンス完了時に自動保存を実行"
+    "レスポンス完了時にスマート自動保存を実行"
     (when (string= content copilot-chat--magic)
-      (run-with-timer 0.1 nil #'my/copilot-chat-auto-save)))
+      (run-with-timer 0.1 nil #'my/copilot-chat-smart-save)))
+
   (advice-add 'copilot-chat-prompt-cb :after #'my/auto-save-on-response-complete))
 
   ;; (use-package gptel
