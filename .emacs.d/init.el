@@ -1808,6 +1808,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (csv-align-style 'auto)
   (csv-align-max-width 200))
 
+(use-package yaml-pro
+  :ensure t
+  :hook (yaml-mode . yaml-pro-mode))
+
 (use-package open-junk-file
   :ensure t
   :custom
