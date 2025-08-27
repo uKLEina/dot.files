@@ -5,7 +5,6 @@
 ;; (setopt package-install-upgrade-built-in t)
 
 (require 'package)
-(setopt package-native-compile t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 (setopt package-archive-priorities
@@ -22,42 +21,52 @@
            ("C-l C-<tab>" . tab-to-tab-stop)
            ("C-M-y" . duplicate-dwim))
 
-;;; customize
-(set-language-environment "Japanese")
-(auto-compression-mode 1)
-(prefer-coding-system 'utf-8)
-(set-default 'buffer-file-coding-system 'utf-8)
+(defun my/setup-basic-config ()
+  "基本設定のセットアップ"
+  (set-language-environment "Japanese")
+  (prefer-coding-system 'utf-8)
+  (set-default 'buffer-file-coding-system 'utf-8)
+  (setq read-process-output-max (* 3 1024 1024))
+  (setq message-log-max 100000)
+  (setq enable-recursive-minibuffers t)
+  (setq use-dialog-box nil)
+  (defalias 'message-box 'message)
+  (setq history-length 10000)
+  (setq echo-keystrokes 0.1)
+  (setopt large-file-warning-threshold (* 500 1024 1024))
+  (setq use-short-answers t)
+  (setq visible-bell t)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  (setopt tab-stop-list '(4 8 12))
+  (setq scroll-step 1)
+  (setopt initial-scratch-message "")
+  (setq delete-auto-save-files t)
+  (setq frame-title-format
+        '(buffer-file-name "%f"
+                           (dired-directory dired-directory "%b")))
+  (setopt require-final-newline t)
+  (setopt backup-by-copying t)
+  (setq-default indicate-buffer-boundaries 'left)
+  (setopt backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
+  (setopt auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
+  (setq auto-save-timeout 15)
+  (setq auto-save-interval 60))
+(add-hook 'emacs-startup-hook #'my/setup-basic-config)
 
-(savehist-mode 1)
-(save-place-mode 1)
-(line-number-mode 1)
-(column-number-mode 1)
-(setq read-process-output-max (* 3 1024 1024))
-(setq message-log-max 100000)
-(setq enable-recursive-minibuffers t)
-(setq use-dialog-box nil)
-(defalias 'message-box 'message)
-(setq history-length 10000)
-(setq echo-keystrokes 0.1)
-(setopt large-file-warning-threshold (* 500 1024 1024))
-(setq use-short-answers t)
-(setq visible-bell t)
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-(setopt tab-stop-list '(4 8 12))
-(setq scroll-step 1)
-(setopt initial-scratch-message "")
-(setq delete-auto-save-files t)
-;; show filename and path in title bar
-(setq frame-title-format
-      '(buffer-file-name "%f"
-                         (dired-directory dired-directory "%b")))
-(setopt require-final-newline t)
-(show-paren-mode 1)
-(pixel-scroll-precision-mode 1)
+(defun my/setup-modes ()
+  "各種モードの有効化"
+  (auto-compression-mode 1)
+  (savehist-mode 1)
+  (save-place-mode 1)
+  (line-number-mode 1)
+  (column-number-mode 1)
+  (show-paren-mode 1)
+  (pixel-scroll-precision-mode 1)
+  (global-auto-revert-mode 1))
+(run-with-idle-timer 0.5 nil #'my/setup-modes)
+
 (setopt pixel-scroll-precision-large-scroll-height 40)
-(global-auto-revert-mode 1)
-(setopt backup-by-copying t)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
@@ -70,8 +79,6 @@
       (delete-region (point) current-pt))))
 (bind-key "M-h" 'my-minibuffer-delete-parent-directory minibuffer-local-map)
 
-;; バッファの開始・終端を明示する
-(setq-default indicate-buffer-boundaries 'left)
 
 ;;; visible spaces
 (defface f-bg-aquamarine '((t (:background "medium aquamarine"))) nil)
@@ -88,14 +95,6 @@
      ("[ ]+$" 0 f-bg-gray append))))
 (advice-add 'font-lock-mode :before #'visible-spaces)
 ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; バックアップファイルはうっとおしいので一箇所にまとめてしまう
-(setopt backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
-(setopt auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
-
-;; バックアップまでの間隔も短くする
-(setq auto-save-timeout 15)
-(setq auto-save-interval 60)
 
 ;; ウィンドウのスマート分割
 ;; ヘルパー関数: 他のウィンドウがすべて指定されたユーティリティバッファか確認する
@@ -309,6 +308,7 @@ Otherwise, join lines with no space."
   :hook (emacs-startup . server-start))
 
 (use-package recentf
+  :hook (emacs-startup . recentf-mode)
   :custom
   (recentf-auto-cleanup 10)
   :config
@@ -598,17 +598,22 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package doom-themes
   :ensure t
-  :hook (emacs-startup . window-divider-mode)
-  :custom (window-divider-default-right-width 10)
-  :config
-  (load-theme 'doom-dracula t))
+  :custom
+  (window-divider-default-right-width 10)
+  :hook
+  (after-init . my/setup-doom-themes)
+  :init
+  (defun my/setup-doom-themes ()
+    (load-theme 'doom-dracula t)
+    (window-divider-mode 1)))
 
 (use-package doom-modeline
   :ensure t
+  ;; :defer 2
   :hook
   (emacs-startup . doom-modeline-mode)
   :commands (doom-modeline-def-modeline doom-modeline-def-segment)
-  :init
+  :config
   (defun remove-padding-zero (num)
     (if (string= (substring num 0 1) "0")
         (substring num 1)
@@ -627,8 +632,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (force-mode-line-update)
     (setq doom-modeline-simple-p (not doom-modeline-simple-p)))
   (bind-key "C-l C-m" 'switch-modeline)
-  :config
-
   (doom-modeline-def-segment my-buffer-size
     "Display current buffer size"
     (format-mode-line " %IB"))
@@ -793,7 +796,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package evil
   :ensure t
-  :demand
+  :demand t
   :custom
   (evil-echo-state nil)
   (evil-undo-system 'undo-tree)
@@ -1084,11 +1087,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
             (group-n 2 (category japanese)))))
 
 (use-package docker
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package python
-  :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
   ;; :init
@@ -1099,9 +1100,13 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;;                                   :callArgumentNames nil
   ;;                                   :functionReturnTypes nil
   ;;                                   :genericTypes nil)))))
+  :init
+  (defun my/python-init-setup ()
+    (setq tab-width python-indent-offset)
+    (electric-operator-mode 1))
   :hook
-  (python-ts-mode . electric-operator-mode)
-  (python-mode . electric-operator-mode)
+  (python-ts-mode . my/python-init-setup)
+  (python-mode . my/python-init-setup)
   :mode
   (("\\.py\\'" . python-ts-mode))
   ;; (python-ts-mode . set-basedpyright-options)
@@ -1157,7 +1162,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package lsp-mode
   :ensure t
-  :defer t
   ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
   :custom
   ;; (lsp-disabled-clients '(lsp-ruff))
@@ -1181,12 +1185,17 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
          (when (byte-code-function-p bytecode)
            (funcall bytecode))))
      (apply old-fn args)))
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
+  (with-eval-after-load 'json
+    (advice-add (if (fboundp 'json-parse-buffer)
+                    'json-parse-buffer
+                  'json-read)
+                :around #'lsp-booster--advice-json-parse))
+  ;; (advice-add (if (progn (require 'json)
+  ;;                        (fboundp 'json-parse-buffer))
+  ;;                 'json-parse-buffer
+  ;;               'json-read)
+  ;;             :around
+  ;;             #'lsp-booster--advice-json-parse)
   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
     "Prepend emacs-lsp-booster command to lsp CMD."
     (let ((orig-result (funcall old-fn cmd test?)))
@@ -1201,14 +1210,15 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
         orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  (with-eval-after-load 'lsp-mode
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+  ;; (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
   )
 
 (use-package lsp-pyright
   :ensure t
   :hook
-  (python-mode . start-lsp-for-python)
-  (python-ts-mode . start-lsp-for-python)
+  ((python-mode python-ts-mode) . start-lsp-for-python)
   :init
   (defun start-lsp-for-python ()
     (require 'lsp-pyright)
@@ -1568,7 +1578,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package smartparens
   :ensure t
-  :defer 1
   :hook
   (prog-mode . smartparens-mode)
   :config
@@ -1576,12 +1585,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil))
 
 (use-package sudo-edit
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package google-translate
   :ensure t
-  :defer t
   :commands (google-translate-translate)
   :after (popwin)
   :init
@@ -1833,7 +1840,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package dashboard
   :ensure t
-  :after (evil)
   :init
   (dashboard-setup-startup-hook)
   (defun dashboard-jump-to-recent-files ()
@@ -1843,9 +1849,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
         (search-backward search-label (point-min) t))
       (back-to-indentation)))
   :config
-  (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
-  (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
-  (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files))
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
+    (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
+    (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)))
 
 (use-package ligature
   :ensure t
@@ -1862,103 +1869,49 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                             "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
                             "$$" "%%" "|]" "[|")))
 
-(use-package copilot
-  :vc (:url "https://github.com/copilot-emacs/copilot.el"
-            :rev :newest
-            :branch "main")
-  :init
-  ;; check dependencies
-  (use-package editorconfig
-    :ensure t
-    :pin melpa
-    :defer t)
-  (use-package f
-    :ensure t
-    :defer t)
-  :hook
-  (python-ts-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word))
+(use-package aidermacs
+  :ensure t
+  :pin melpa
   :custom
-  (warning-suppress-log-types '((copilot copilot-exceeds-max-char))))
+  (aidermacs-default-chat-mode 'ask)
+  (aidermacs-exit-kills-buffer t)
+  :bind (("C-c a" . aidermacs-transient-menu)))
 
-(use-package copilot-chat
+(use-package gptel
+  :ensure t
+  :pin melpa
+  :custom
+  (gptel-api-key (getenv "OPENAI_API_KEY"))
+  (gptel-model 'gpt-5))
+
+(use-package gptel-magit
+  :ensure t
+  :hook (magit-mode . gptel-magit-install)
+  :config
+  (setopt gptel-magit-commit-prompt
+          (concat gptel-magit-prompt-conventional-commits
+                  "\n- Use Japanese for the commit message.
+- Type keywords like feat or fix should not be translated into Japanese. Use as is."))
+  (setopt gptel-magit-diff-explain-prompt
+          (concat gptel-magit-diff-explain-prompt
+                  " Use Japanase for the answer.")))
+
+(use-package minuet
   :ensure t
   :custom
-  (copilot-chat-default-model "claude-sonnet-4")
-  (copilot-chat-follow t)
-  :init
-  (defun my/copilot-chat-buffer-setup ()
-    "Copilot Chatバッファの初期設定"
-    (when (string-prefix-p "*Copilot Chat" (buffer-name))
-      (setq-local truncate-lines nil
-                  word-wrap t)))
-  (dolist (hook '(copilot-chat-org-poly-mode-hook
-                  copilot-chat-markdown-poly-mode-hook))
-    (add-hook hook #'my/copilot-chat-buffer-setup))
+  (minuet-provider 'openai)
   :config
-  ;; JP prompt
-  (setopt copilot-chat-commit-prompt
-          (concat
-           copilot-chat-commit-prompt
-           "### OUTPUT LANGUAGE
-- Use Japanese for the commit message.
-- Type keywords like feat or fix should not be translated into Japanese. Use as is.
+  (plist-put minuet-openai-options :model "gpt-4.1-mini")
+  :bind (:map minuet-active-mode-map
+              ("<tab>" . 'minuet-accept-suggestion)
+              ("TAB" . 'minuet-accept-suggestion)
+              ("C-<left>" . 'minuet-previous-suggestion)
+              ("C-<right>" . 'minuet-next-suggestion))
+  :hook (python-ts-mode . minuet-auto-suggestion-mode))
 
----
-
-"))
-  (setopt copilot-chat-prompt-review
-          (concat copilot-chat-prompt-review "Use Japanese for the output language.\n"))
-
-  (defun my/auto-save-on-response-complete (instance content &optional buffer)
-    "レスポンス完了時に自動保存"
-    (when (string= content copilot-chat--magic)
-      (run-with-timer 0.1 nil #'copilot-chat-save)))
-  (advice-add 'copilot-chat-prompt-cb :after #'my/auto-save-on-response-complete))
-
-  ;; (use-package gptel
-  ;;   :ensure t
-  ;;   :config
-  ;;   (gptel-make-gh-copilot "Copilot"))
-
-  ;; (use-package chatgpt-shell
-  ;;   :ensure t
-  ;;   :defer t
-  ;;   :custom
-  ;;   (chatgpt-shell-google-key (auth-source-pass-get 'secret "gemini-key"))
-  ;;   (chatgpt-shell-prompt-header-write-git-commit "次のコミットのgitコミットメッセージを日本語で書いてください")
-  ;;   :config
-  ;;   ;; 現状の実装だとバグっててAPIレスポンスを正しく解釈できてないので修正する。
-  ;;   ;; let-alistがだめそうなのでalist-getを使うようにする。
-  ;;   (advice-add 'chatgpt-shell-google--current-generative-model-p :override
-  ;;               (lambda (api-response)
-  ;;                 (let ((description (alist-get 'description api-response nil nil #'equal))
-  ;;                       (supported-methods (alist-get 'supportedGenerationMethods api-response nil nil #'equal)))
-  ;;                   (and description
-  ;;                        (not (string-match-p (rx (or "discontinued" "deprecated")) description))
-  ;;                        (seq-contains-p supported-methods "generateContent"))))))
-
-  ;; (use-package minuet
-  ;;   :ensure t
-  ;;   :defer t
-  ;;   :custom
-  ;;   (minuet-provider 'gemini)
-  ;;   :config
-  ;;   (plist-put minuet-gemini-options :model "gemini-2.0-flash-thinking-exp")
-  ;;   :bind (:map minuet-active-mode-map
-  ;;               ("<tab>" . 'minuet-accept-suggestion)
-  ;;               ("TAB" . 'minuet-accept-suggestion)
-  ;;               ("C-<left>" . 'minuet-previous-suggestion)
-  ;;               ("C-<right>" . 'minuet-next-suggestion))
-  ;;   :hook (python-ts-mode . minuet-auto-suggestion-mode))
-
-  (use-package emojify
-    :ensure t
-    :hook (after-init . global-emojify-mode))
+(use-package emojify
+  :ensure t
+  :hook (after-init . global-emojify-mode))
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
