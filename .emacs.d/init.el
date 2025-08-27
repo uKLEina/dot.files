@@ -1894,7 +1894,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 - Type keywords like feat or fix should not be translated into Japanese. Use as is."))
   (setopt gptel-magit-diff-explain-prompt
           (concat gptel-magit-diff-explain-prompt
-                  " Use Japanase for the answer.")))
+                  " Use Japanase for the answer."))
+  (defun my-gptel-magit--format-commit-message (message)
+    message)
+  (advice-add 'gptel-magit--format-commit-message :override
+              #'my-gptel-magit--format-commit-message))
 
 (use-package minuet
   :ensure t
