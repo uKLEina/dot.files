@@ -2046,7 +2046,8 @@ Refs: #123
   (defun my-gptel-magit--format-commit-message (message)
     message)
   (advice-add 'gptel-magit--format-commit-message :override
-              #'my-gptel-magit--format-commit-message))
+              #'my-gptel-magit--format-commit-message)
+  (setq gptel-magit-model 'gpt-4.1))
 
 (use-package minuet
   :ensure t
