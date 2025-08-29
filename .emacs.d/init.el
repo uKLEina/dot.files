@@ -2053,8 +2053,6 @@ Refs: #123
   :ensure t
   :custom
   (minuet-provider 'openai)
-  :config
-  (plist-put minuet-openai-options :model "gpt-4.1-mini")
   :bind (:map minuet-active-mode-map
               ("<tab>" . 'minuet-accept-suggestion)
               ("TAB" . 'minuet-accept-suggestion)
