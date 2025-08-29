@@ -2053,6 +2053,8 @@ Refs: #123
   :ensure t
   :custom
   (minuet-provider 'openai)
+  (minuet-request-timeout 10)
+  (minuet-n-completions 1)
   :bind (:map minuet-active-mode-map
               ("<tab>" . 'minuet-accept-suggestion)
               ("TAB" . 'minuet-accept-suggestion)
