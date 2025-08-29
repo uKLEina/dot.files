@@ -2047,7 +2047,7 @@ Refs: #123
     message)
   (advice-add 'gptel-magit--format-commit-message :override
               #'my-gptel-magit--format-commit-message)
-  (setq gptel-magit-model 'gpt-5-nano))
+  (setq gptel-magit-model 'gpt-4.1-mini))
 
 (use-package minuet
   :ensure t
