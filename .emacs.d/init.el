@@ -551,9 +551,9 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (with-eval-after-load 'dired
     (bind-key "e" 'file-open-file-manager dired-mode-map)))
 
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ;; External packages
-;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; External packages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (package-initialize)
 
 (use-package auto-compile
@@ -566,471 +566,477 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (auto-compile-display-buffer nil)
   (auto-compile-mode-line-counter t))
 
-;; (use-package super-save
-;;   :ensure t
-;;   :hook (emacs-startup . super-save-mode)
-;;   :custom
-;;   (super-save-auto-save-when-idle t)
-;;   (super-save-hook-triggers '(mouse-leave-buffer-hook)))
+(use-package super-save
+  :ensure t
+  :hook (emacs-startup . super-save-mode)
+  :custom
+  (super-save-auto-save-when-idle t)
+  (super-save-hook-triggers '(mouse-leave-buffer-hook)))
 
-;; (use-package tab-bar
-;;   ;; tab-bar is built-in, but configs depend on extra packages
-;;   ;; so put after package-initialize.
-;;   :after evil
-;;   :custom
-;;   (tab-bar-show 1)
-;;   (tab-bar-new-button-show nil)
-;;   (tab-bar-close-button-show nil)
-;;   :config
-;;   (evil-define-key 'normal global-map (kbd "T") 'tab-new)
-;;   (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
-;;   (evil-define-key 'normal global-map (kbd "L") 'tab-next)
-;;   (evil-define-key 'normal global-map (kbd "H") 'tab-previous)
-;;   (set-face-attribute 'tab-bar-tab nil
-;;                       :background (doom-color 'dark-blue)
-;;                       :foreground (doom-color 'bg)
-;;                       :weight 'bold)
-;;   (set-face-attribute 'tab-bar-tab-inactive nil
-;;                       :background (doom-color 'bg)
-;;                       :foreground (doom-color 'base6)))
+(use-package tab-bar
+  ;; tab-bar is built-in, but configs depend on extra packages
+  ;; so put after package-initialize.
+  :custom
+  (tab-bar-show 1)
+  (tab-bar-new-button-show nil)
+  (tab-bar-close-button-show nil)
+  :config
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal global-map (kbd "T") 'tab-new)
+    (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
+    (evil-define-key 'normal global-map (kbd "L") 'tab-next)
+    (evil-define-key 'normal global-map (kbd "H") 'tab-previous))
+  (with-eval-after-load 'doom-themes
+    (set-face-attribute 'tab-bar-tab nil
+                        :background (doom-color 'dark-blue)
+                        :foreground (doom-color 'bg)
+                        :weight 'bold)
+    (set-face-attribute 'tab-bar-tab-inactive nil
+                        :background (doom-color 'bg)
+                        :foreground (doom-color 'base6))))
 
-;; (use-package doom-themes
-;;   :ensure t
-;;   :custom
-;;   (window-divider-default-right-width 10)
-;;   :hook
-;;   (after-init . my/setup-doom-themes)
-;;   :init
-;;   (defun my/setup-doom-themes ()
-;;     (load-theme 'doom-dracula t)
-;;     (window-divider-mode 1)))
+(use-package doom-themes
+  :ensure t
+  :custom
+  (window-divider-default-right-width 10)
+  :hook
+  (after-init . my/setup-doom-themes)
+  :init
+  (defun my/setup-doom-themes ()
+    (load-theme 'doom-dracula t)
+    (window-divider-mode 1)))
 
-;; (use-package doom-modeline
-;;   :ensure t
-;;   ;; :defer 2
-;;   :hook
-;;   (emacs-startup . doom-modeline-mode)
-;;   :commands (doom-modeline-def-modeline doom-modeline-def-segment)
-;;   :config
-;;   (defun remove-padding-zero (num)
-;;     (if (string= (substring num 0 1) "0")
-;;         (substring num 1)
-;;       num))
+(use-package doom-modeline
+  :ensure t
+  ;; :defer 2
+  :hook
+  (emacs-startup . doom-modeline-mode)
+  :commands (doom-modeline-def-modeline doom-modeline-def-segment)
+  :config
+  (defun remove-padding-zero (num)
+    (if (string= (substring num 0 1) "0")
+        (substring num 1)
+      num))
 
-;;   (defun setup-initial-doom-modeline ()
-;;     (doom-modeline-set-modeline 'simple t))
-;;   (add-hook 'doom-modeline-mode-hook 'setup-initial-doom-modeline)
+  (defun setup-initial-doom-modeline ()
+    (doom-modeline-set-modeline 'simple t))
+  (add-hook 'doom-modeline-mode-hook 'setup-initial-doom-modeline)
 
-;;   (defvar doom-modeline-simple-p t)
-;;   (defun switch-modeline ()
-;;     (interactive)
-;;     (if doom-modeline-simple-p
-;;         (doom-modeline-set-modeline 'verbose)
-;;       (doom-modeline-set-modeline 'simple))
-;;     (force-mode-line-update)
-;;     (setq doom-modeline-simple-p (not doom-modeline-simple-p)))
-;;   (bind-key "C-l C-m" 'switch-modeline)
-;;   (doom-modeline-def-segment my-buffer-size
-;;     "Display current buffer size"
-;;     (format-mode-line " %IB"))
+  (defvar doom-modeline-simple-p t)
+  (defun switch-modeline ()
+    (interactive)
+    (if doom-modeline-simple-p
+        (doom-modeline-set-modeline 'verbose)
+      (doom-modeline-set-modeline 'simple))
+    (force-mode-line-update)
+    (setq doom-modeline-simple-p (not doom-modeline-simple-p)))
+  (bind-key "C-l C-m" 'switch-modeline)
+  (doom-modeline-def-segment my-buffer-size
+    "Display current buffer size"
+    (format-mode-line " %IB"))
 
-;;   (doom-modeline-def-segment projectile-project-name
-;;     "Display Projectile project name"
-;;     (if (and (boundp 'projectile-mode) projectile-mode)
-;;         (propertize (format " [%s]" (projectile-default-project-name (projectile-project-root)))
-;;                     'face (if (doom-modeline--active)
-;;                               '(:foreground "#8cd0d3" :weight bold)
-;;                             'mode-line-inactive))
-;;       ""))
+  (doom-modeline-def-segment projectile-project-name
+    "Display Projectile project name"
+    (if (and (boundp 'projectile-mode) projectile-mode)
+        (propertize (format " [%s]" (projectile-default-project-name (projectile-project-root)))
+                    'face (if (doom-modeline--active)
+                              '(:foreground "#8cd0d3" :weight bold)
+                            'mode-line-inactive))
+      ""))
 
-;;   ;; (doom-modeline-def-segment linum-colnum
-;;   ;;   "Display current linum/colnum"
-;;   ;;   (propertize (format " Ln %s, Col %s"
-;;   ;;                       (format-mode-line "%l")
-;;   ;;                       (format-mode-line "%c"))
-;;   ;;               'face (if (doom-modeline--active)
-;;   ;;                         '(:foreground "#8cd0d3" :weight bold)
-;;   ;;                       'mode-line-inactive)))
+  ;; (doom-modeline-def-segment linum-colnum
+  ;;   "Display current linum/colnum"
+  ;;   (propertize (format " Ln %s, Col %s"
+  ;;                       (format-mode-line "%l")
+  ;;                       (format-mode-line "%c"))
+  ;;               'face (if (doom-modeline--active)
+  ;;                         '(:foreground "#8cd0d3" :weight bold)
+  ;;                       'mode-line-inactive)))
 
-;;   (doom-modeline-def-segment datetime
-;;     "Display datetime on modeline"
-;;     (let* ((system-time-locale "C")
-;;            (dow (format "%s" (format-time-string "%a")))
-;;            (month (format "%s" (remove-padding-zero (format-time-string "%m")) ))
-;;            (day (format "%s" (remove-padding-zero (format-time-string "%d"))))
-;;            (hour (format "%s" (remove-padding-zero (format-time-string "%I"))))
-;;            (minute (format-time-string "%M"))
-;;            (am-pm (format-time-string "%p")))
-;;       (propertize
-;;        (concat
-;;         " "
-;;         hour
-;;         ":"
-;;         minute
-;;         am-pm
-;;         "  "
-;;         )
-;;        'help-echo "Show calendar"
-;;        'mouse-face '(:box 1)
-;;        'local-map (make-mode-line-mouse-map
-;;                    'mouse-1 (lambda () (interactive) (calendar))))))
+  (doom-modeline-def-segment datetime
+    "Display datetime on modeline"
+    (let* ((system-time-locale "C")
+           (dow (format "%s" (format-time-string "%a")))
+           (month (format "%s" (remove-padding-zero (format-time-string "%m")) ))
+           (day (format "%s" (remove-padding-zero (format-time-string "%d"))))
+           (hour (format "%s" (remove-padding-zero (format-time-string "%I"))))
+           (minute (format-time-string "%M"))
+           (am-pm (format-time-string "%p")))
+      (propertize
+       (concat
+        " "
+        hour
+        ":"
+        minute
+        am-pm
+        "  "
+        )
+       'help-echo "Show calendar"
+       'mouse-face '(:box 1)
+       'local-map (make-mode-line-mouse-map
+                   'mouse-1 (lambda () (interactive) (calendar))))))
 
-;;   (doom-modeline-def-segment python-venv
-;;     "Display current python venv name"
-;;     (if (eq major-mode 'python-mode)
-;;         (let ((venv-name (if (or (not (boundp 'pyvenv-virtual-env-name))
-;;                                  (eq pyvenv-virtual-env-name nil))
-;;                              "GLOBAL"
-;;                            pyvenv-virtual-env-name)))
-;;           (propertize (format " [%s]" venv-name)
-;;                       'face (if (doom-modeline--active)
-;;                                 '(:foreground "#f0dfaf" :weight bold)
-;;                               'mode-line-inactive)))
-;;       ""))
+  (doom-modeline-def-segment python-venv
+    "Display current python venv name"
+    (if (eq major-mode 'python-mode)
+        (let ((venv-name (if (or (not (boundp 'pyvenv-virtual-env-name))
+                                 (eq pyvenv-virtual-env-name nil))
+                             "GLOBAL"
+                           pyvenv-virtual-env-name)))
+          (propertize (format " [%s]" venv-name)
+                      'face (if (doom-modeline--active)
+                                '(:foreground "#f0dfaf" :weight bold)
+                              'mode-line-inactive)))
+      ""))
 
-;;   (doom-modeline-def-segment csv-index
-;;     "Display current csv column index"
-;;     (if (derived-mode-p 'csv-mode)
-;;         (format " F%d" (csv--field-index))
-;;       ""))
+  (doom-modeline-def-segment csv-index
+    "Display current csv column index"
+    (if (derived-mode-p 'csv-mode)
+        (format " F%d" (csv--field-index))
+      ""))
 
-;;   ;; ;; you can use featurep to check if library is loaded or not
-;;   ;; (with-eval-after-load 'evil
-;;   ;;   (doom-modeline-def-segment evil-state-seg
-;;   ;;     "Display current Evil State."
-;;   ;;     (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
-;;   ;;                 'face '(:weight bold)))
-;;   ;;   )
-;;   (doom-modeline-def-modeline 'simple
-;;     ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
-;;     ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
-;;     ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
-;;     '(bar modals matches remote-host buffer-info buffer-position csv-index)
-;;     '(projectile-project-name vcs check battery datetime)
-;;     )
+  ;; ;; you can use featurep to check if library is loaded or not
+  ;; (with-eval-after-load 'evil
+  ;;   (doom-modeline-def-segment evil-state-seg
+  ;;     "Display current Evil State."
+  ;;     (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
+  ;;                 'face '(:weight bold)))
+  ;;   )
+  (doom-modeline-def-modeline 'simple
+    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
+    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
+    ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
+    '(bar modals matches remote-host buffer-info buffer-position csv-index)
+    '(projectile-project-name vcs check battery datetime)
+    )
 
-;;   (doom-modeline-def-modeline 'verbose
-;;     '(bar matches remote-host buffer-info-simple my-buffer-size)
-;;     '(major-mode minor-modes python-venv buffer-encoding))
+  (doom-modeline-def-modeline 'verbose
+    '(bar matches remote-host buffer-info-simple my-buffer-size)
+    '(major-mode minor-modes python-venv buffer-encoding))
 
-;;   (setq doom-modeline-minor-modes t)
-;;   (setq doom-modeline-major-mode-color-icon t)
-;;   (setq doom-modeline-checker-simple-format nil))
+  (setq doom-modeline-minor-modes t)
+  (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-checker-simple-format nil))
 
-;; (use-package paredit
-;;   :ensure t
-;;   :hook
-;;   (emacs-lisp-mode . enable-paredit-mode)
-;;   :init
-;;   ;; Evil compatibility fix
-;;   (defun my/paredit-forward-visual-advice (orig-fn &rest args)
-;;     "Advice for `paredit-forward' to move cursor back one char in visual state."
-;;     (apply orig-fn args)
-;;     (when (evil-visual-state-p)
-;;       (backward-char 1)))
+(use-package paredit
+  :ensure t
+  :hook
+  (emacs-lisp-mode . enable-paredit-mode)
+  :init
+  ;; Evil compatibility fix
+  (defun my/paredit-forward-visual-advice (orig-fn &rest args)
+    "Advice for `paredit-forward' to move cursor back one char in visual state."
+    (apply orig-fn args)
+    (when (evil-visual-state-p)
+      (backward-char 1)))
 
-;;   (defun my/paredit-backward-advice (orig-fn &rest args)
-;;     "Advice for `paredit-backward' to handle evil-mode cursor position.
-;; Moves cursor forward before calling the original function when on a
-;; closing delimiter in normal or visual state."
-;;     (when (save-excursion (and (not (eobp)) (eq (char-syntax (char-after)) ?\))))
-;;       (cond
-;;        ((evil-visual-state-p)
-;;         (forward-char 1))
-;;        ((evil-normal-state-p)
-;;         (if (eolp)
-;;             (forward-line 1)
-;;           (forward-char 1)))))
-;;     (apply orig-fn args))
-;;   (advice-add 'paredit-backward :around #'my/paredit-backward-advice)
-;;   (advice-add 'paredit-forward :around #'my/paredit-forward-visual-advice))
+  (defun my/paredit-backward-advice (orig-fn &rest args)
+    "Advice for `paredit-backward' to handle evil-mode cursor position.
+Moves cursor forward before calling the original function when on a
+closing delimiter in normal or visual state."
+    (when (save-excursion (and (not (eobp)) (eq (char-syntax (char-after)) ?\))))
+      (cond
+       ((evil-visual-state-p)
+        (forward-char 1))
+       ((evil-normal-state-p)
+        (if (eolp)
+            (forward-line 1)
+          (forward-char 1)))))
+    (apply orig-fn args))
+  (advice-add 'paredit-backward :around #'my/paredit-backward-advice)
+  (advice-add 'paredit-forward :around #'my/paredit-forward-visual-advice))
 
 ;; (use-package enhanced-evil-paredit
 ;;   :ensure t
 ;;   :after (paredit))
 
-;; (use-package posframe
-;;   :ensure t)
+(use-package posframe
+  :ensure t)
 
-;; (use-package multiple-cursors
-;;   :ensure t
-;;   :init
-;;   (defun my/evil-visual-mc-edit-lines ()
-;;     "From evil visual mode, create multiple cursors on the selected lines.
-;; For visual-line mode ('V'), places cursors at the beginning of each line.
-;; For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
-;;     (interactive)
-;;     (when (evil-visual-state-p)
-;;       (let ((beg (region-beginning))
-;;             (end (region-end)))
-;;         (evil-exit-visual-state)
-;;         (evil-emacs-state)
-;;         (goto-char beg)
-;;         ;; For char/block mode, make region inclusive by adjusting 'end'
-;;         (if (and (not (eq evil-visual-selection 'line)) (> end beg))
-;;             (setq end (1- end)))
-;;         (push-mark end t t)
-;;         ;; Use the correct function based on selection type
-;;         (if (eq evil-visual-selection 'line)
-;;             (mc/edit-beginnings-of-lines)
-;;           (mc/edit-lines)))))
+(use-package multiple-cursors
+  :ensure t
+  :init
+  (defun my/evil-visual-mc-edit-lines ()
+    "From evil visual mode, create multiple cursors on the selected lines.
+For visual-line mode ('V'), places cursors at the beginning of each line.
+For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
+    (interactive)
+    (when (evil-visual-state-p)
+      (let ((beg (region-beginning))
+            (end (region-end)))
+        (evil-exit-visual-state)
+        (evil-emacs-state)
+        (goto-char beg)
+        ;; For char/block mode, make region inclusive by adjusting 'end'
+        (if (and (not (eq evil-visual-selection 'line)) (> end beg))
+            (setq end (1- end)))
+        (push-mark end t t)
+        ;; Use the correct function based on selection type
+        (if (eq evil-visual-selection 'line)
+            (mc/edit-beginnings-of-lines)
+          (mc/edit-lines)))))
 
-;;   (defun my/mc-finish-switch-to-evil-normal ()
-;;     "When leaving multiple-cursors-mode, return to evil-normal-state."
-;;     (when (eq evil-state 'emacs)
-;;       (evil-normal-state)))
+  (defun my/mc-finish-switch-to-evil-normal ()
+    "When leaving multiple-cursors-mode, return to evil-normal-state."
+    (when (eq evil-state 'emacs)
+      (evil-normal-state)))
 
-;;   (with-eval-after-load 'evil
-;;     (evil-define-key 'visual global-map (kbd "gM") 'my/evil-visual-mc-edit-lines))
-;;   :hook
-;;   (multiple-cursors-mode-disabled . my/mc-finish-switch-to-evil-normal))
+  (with-eval-after-load 'evil
+    (evil-define-key 'visual global-map (kbd "gM") 'my/evil-visual-mc-edit-lines))
+  :hook
+  (multiple-cursors-mode-disabled . my/mc-finish-switch-to-evil-normal))
 
-;; (use-package undo-tree
-;;   :ensure t
-;;   :init
-;;   (global-undo-tree-mode +1)
-;;   :custom
-;;   (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
+(use-package undo-tree
+  :ensure t
+  :init
+  (global-undo-tree-mode +1)
+  :custom
+  (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
 
-;; (use-package evil
-;;   :ensure t
-;;   :demand t
-;;   :custom
-;;   (evil-echo-state nil)
-;;   (evil-undo-system 'undo-tree)
-;;   :init
-;;   (defun evil-swap-key (map key1 key2)
-;;     "Swap KEY1 and KEY2 in MAP."
-;;     (let ((def1 (lookup-key map key1))
-;;           (def2 (lookup-key map key2)))
-;;       (define-key map key1 def2)
-;;       (define-key map key2 def1)))
-;;   :config
-;;   (evil-mode 1)
-;;   (defun kle/evil-scroll-line-down-1 ()
-;;     (interactive)
-;;     (evil-scroll-line-down 1)
-;;     (forward-line 1))
-;;   (defun kle/evil-scroll-line-up-1 ()
-;;     (interactive)
-;;     (evil-scroll-line-up 1)
-;;     (forward-line -1))
-;;   (bind-keys :map evil-normal-state-map
-;;              ("M-." . xref-find-definitions)
-;;              ("J" . kle/evil-scroll-line-down-1)
-;;              ("K" . kle/evil-scroll-line-up-1)
-;;              ("C-e" . end-of-line)
-;;              ("C-t" . other-window-or-split)
-;;              :map evil-insert-state-map
-;;              ("C-t" . other-window-or-split)
-;;              ("C-e" . end-of-line))
-;;   (evil-swap-key evil-motion-state-map "j" "gj")
-;;   (evil-swap-key evil-motion-state-map "k" "gk")
-;;   (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
+(use-package evil
+    :ensure t
+    :demand t
+    :custom
+    (evil-echo-state nil)
+    (evil-undo-system 'undo-tree)
+    :init
+    (defun evil-swap-key (map key1 key2)
+      "Swap KEY1 and KEY2 in MAP."
+      (let ((def1 (lookup-key map key1))
+            (def2 (lookup-key map key2)))
+        (define-key map key1 def2)
+        (define-key map key2 def1)))
+    :config
+    (evil-mode 1)
+    (defun kle/evil-scroll-line-down-1 ()
+      (interactive)
+      (evil-scroll-line-down 1)
+      (forward-line 1))
+    (defun kle/evil-scroll-line-up-1 ()
+      (interactive)
+      (evil-scroll-line-up 1)
+      (forward-line -1))
+    (bind-keys :map evil-normal-state-map
+               ("M-." . xref-find-definitions)
+               ("J" . kle/evil-scroll-line-down-1)
+               ("K" . kle/evil-scroll-line-up-1)
+               ("C-e" . end-of-line)
+               ("C-t" . other-window-or-split)
+               :map evil-insert-state-map
+               ("C-t" . other-window-or-split)
+               ("C-e" . end-of-line))
+    (evil-swap-key evil-motion-state-map "j" "gj")
+    (evil-swap-key evil-motion-state-map "k" "gk")
+    (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
-;; (use-package evil-mode-line
-;;   :init
-;;   (let* ((site-lisp-dir "~/.emacs.d/elisp")
-;;          (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
-;;          (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
-;;     (unless (and (file-exists-p mode-line-color-file) (file-exists-p evil-mode-line-file))
-;;       (use-package url)
-;;       (unless (file-directory-p site-lisp-dir)
-;;         (mkdir site-lisp-dir))
-;;       (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)
-;;       (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
-;;     (add-to-list 'load-path site-lisp-dir))
-;;   :custom (evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-;;                                   (insert . ,(doom-darken (doom-color 'green) 0.5))
-;;                                   (visual . ,(doom-color 'dark-blue))
-;;                                   (emacs . ,(doom-color 'magenta)))))
+(use-package evil-mode-line
+  :init
+  (let* ((site-lisp-dir "~/.emacs.d/elisp")
+         (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
+         (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
+    (unless (and (file-exists-p mode-line-color-file) (file-exists-p evil-mode-line-file))
+      (use-package url)
+      (unless (file-directory-p site-lisp-dir)
+        (mkdir site-lisp-dir))
+      (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)
+      (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
+    (add-to-list 'load-path site-lisp-dir))
+  :config
+  (with-eval-after-load 'doom-themes
+    (setopt evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+                                   (insert . ,(doom-darken (doom-color 'green) 0.5))
+                                   (visual . ,(doom-color 'dark-blue))
+                                   (emacs . ,(doom-color 'magenta))))))
+;; (require 'evil-mode-line)
 
-;; (use-package migemo
-;;   :ensure t
-;;   :custom
-;;   (migemo-isearch-enable-p nil)
-;;   (migemo-dictionary (seq-find #'file-exists-p
-;;                                '("/usr/share/cmigemo/utf-8/migemo-dict"
-;;                                  (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
-;;   :config
-;;   ;; C-u で migemo を有効にする isearch
-;;   (defun kle/isearch-forward-migemo (arg)
-;;     "通常は通常のisearch。C-uでmigemoが有効になる。"
-;;     (interactive "P")
-;;     (let ((migemo-isearch-enable-p arg))
-;;       (isearch-forward)))
-;;   (defun kle/isearch-backward-migemo (arg)
-;;     "通常は通常のisearch。C-uでmigemoが有効になる(後方検索)。"
-;;     (interactive "P")
-;;     (let ((migemo-isearch-enable-p arg))
-;;       (isearch-backward)))
-;;   (bind-key "C-s" 'kle/isearch-forward-migemo)
-;;   (bind-key "C-r" 'kle/isearch-backward-migemo))
+(use-package migemo
+  :ensure t
+  :custom
+  (migemo-isearch-enable-p nil)
+  (migemo-dictionary (seq-find #'file-exists-p
+                               '("/usr/share/cmigemo/utf-8/migemo-dict"
+                                 (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
+  :config
+  ;; C-u で migemo を有効にする isearch
+  (defun kle/isearch-forward-migemo (arg)
+    "通常は通常のisearch。C-uでmigemoが有効になる。"
+    (interactive "P")
+    (let ((migemo-isearch-enable-p arg))
+      (isearch-forward)))
+  (defun kle/isearch-backward-migemo (arg)
+    "通常は通常のisearch。C-uでmigemoが有効になる(後方検索)。"
+    (interactive "P")
+    (let ((migemo-isearch-enable-p arg))
+      (isearch-backward)))
+  (bind-key "C-s" 'kle/isearch-forward-migemo)
+  (bind-key "C-r" 'kle/isearch-backward-migemo))
 
-;; (use-package ripgrep
-;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   (ripgrep-executable (seq-find #'file-exists-p
-;;                                 '("/usr/bin/rg"
-;;                                   (expand-file-name "~/bin/rg"))))
-;;   (ripgrep-arguments '("-S")))
+(use-package ripgrep
+  :ensure t
+  :defer t
+  :custom
+  (ripgrep-executable (seq-find #'file-exists-p
+                                '("/usr/bin/rg"
+                                  (expand-file-name "~/bin/rg"))))
+  (ripgrep-arguments '("-S")))
 
-;; (use-package vertico
-;;   :ensure t
-;;   :init
-;;   (vertico-mode))
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode))
 
-;; (use-package orderless
-;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   (completion-styles '(orderless basic))
-;;   (completion-category-overrides '((file (styles basic partial-completion))))
-;;   (orderless-matching-styles '(orderless-literal orderless-regexp orderless-initialism)))
+(use-package orderless
+  :ensure t
+  :defer t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion))))
+  (orderless-matching-styles '(orderless-literal orderless-regexp orderless-initialism)))
 
-;; (use-package nerd-icons-completion
-;;   :ensure t
-;;   :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
+(use-package nerd-icons-completion
+  :ensure t
+  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
-;; (use-package marginalia
-;;   :ensure t
-;;   :init
-;;   (marginalia-mode))
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode))
 
-;; (use-package embark
-;;   :ensure t
-;;   :bind
-;;   (("C-S-i" . embark-act)
-;;    ("M-i" . embark-dwim)))
+(use-package embark
+  :ensure t
+  :bind
+  (("C-S-i" . embark-act)
+   ("M-i" . embark-dwim)))
 
-;; (use-package consult
-;;   :ensure t
-;;   :bind
-;;   (("C-x b" . consult-buffer)
-;;    ("M-i" . consult-line-thing-at-point)
-;;    ("C-M-g" . consult-ripgrep)
-;;    ("M-g g" . consult-goto-line)
-;;    )
-;;   :config
-;;   ;; cosult-line-thing-at-point
-;;   (consult-customize consult-line :add-history (seq-some #'thing-at-point '(region symbol)))
-;;   (defalias 'consult-line-thing-at-point 'consult-line)
-;;   (consult-customize consult-line-thing-at-point :initial (thing-at-point 'symbol)))
+(use-package consult
+  :ensure t
+  :bind
+  (("C-x b" . consult-buffer)
+   ("M-i" . consult-line-thing-at-point)
+   ("C-M-g" . consult-ripgrep)
+   ("M-g g" . consult-goto-line)
+   )
+  :config
+  ;; cosult-line-thing-at-point
+  (consult-customize consult-line :add-history (seq-some #'thing-at-point '(region symbol)))
+  (defalias 'consult-line-thing-at-point 'consult-line)
+  (consult-customize consult-line-thing-at-point :initial (thing-at-point 'symbol)))
 
-;; (use-package consult-ghq
-;;   :ensure t
-;;   :defer t
-;;   :commands (consult-ghq--list-candidates)
-;;   :init
-;;   (defun consult-ghq-root-dir ()
-;;     "Directory switch to ghq project root dir."
-;;     (interactive)
-;;     (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
+(use-package consult-ghq
+  :ensure t
+  :defer t
+  :commands (consult-ghq--list-candidates)
+  :init
+  (defun consult-ghq-root-dir ()
+    "Directory switch to ghq project root dir."
+    (interactive)
+    (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
 
-;; (use-package embark-consult
-;;   :ensure t
-;;   )
+(use-package embark-consult
+  :ensure t
+  )
 
-;; (use-package nerd-icons
-;;   :ensure t)
+(use-package nerd-icons
+  :ensure t)
 
-;; (use-package wgrep
-;;   :ensure t
-;;   )
+(use-package wgrep
+  :ensure t
+  )
 
-;; (use-package ace-jump-mode
-;;   :ensure t
-;;   :defer t)
+(use-package ace-jump-mode
+  :ensure t
+  :defer t)
 
-;; (use-package ace-isearch
-;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   (ace-isearch-function 'ace-jump-char-mode)
-;;   (ace-isearch-use-function-from-isearch nil)
-;;   (ace-isearch-jump-delay 0.8)
-;;   :init
-;;   (global-ace-isearch-mode +1))
+(use-package ace-isearch
+  :ensure t
+  :defer t
+  :custom
+  (ace-isearch-function 'ace-jump-char-mode)
+  (ace-isearch-use-function-from-isearch nil)
+  (ace-isearch-jump-delay 0.8)
+  :init
+  (global-ace-isearch-mode +1))
 
-;; (use-package corfu
-;;   :ensure t
-;;   :after (evil)
-;;   :custom ((corfu-auto t)
-;;            (corfu-auto-delay 0)
-;;            (corfu-auto-prefix 2)
-;;            (corfu-cycle t)
-;;            (corfu-on-exact-match nil)
-;;            (tab-always-indent 'complete))
-;;   :bind (:map corfu-map
-;;               ("C-n" . corfu-next)
-;;               ("C-p" . corfu-previous))
-;;   :init (global-corfu-mode +1)
-;;   :config
-;;   (define-key evil-insert-state-map (kbd "C-n") nil)
-;;   (define-key evil-insert-state-map (kbd "C-p") nil)
-;;   (evil-define-key 'insert corfu-map (kbd "C-n") 'corfu-next)
-;;   (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)
-;;   )
+(use-package corfu
+  :ensure t
+  :after (evil)
+  :custom ((corfu-auto t)
+           (corfu-auto-delay 0)
+           (corfu-auto-prefix 2)
+           (corfu-cycle t)
+           (corfu-on-exact-match nil)
+           (tab-always-indent 'complete))
+  :bind (:map corfu-map
+              ("C-n" . corfu-next)
+              ("C-p" . corfu-previous))
+  :init (global-corfu-mode +1)
+  :config
+  (define-key evil-insert-state-map (kbd "C-n") nil)
+  (define-key evil-insert-state-map (kbd "C-p") nil)
+  (evil-define-key 'insert corfu-map (kbd "C-n") 'corfu-next)
+  (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)
+  )
 
-;; (use-package cape
-;;   :ensure t
-;;   :bind (("C-:" . cape-dabbrev))
-;;   )
+(use-package cape
+  :ensure t
+  :bind (("C-:" . cape-dabbrev))
+  )
 
-;; (use-package kind-icon
-;;   :ensure t
-;;   :after corfu
-;;   :custom
-;;   (kind-icon-blend-background t)
-;;   (kind-icon-default-face 'corfu-default) ; only needed with blend-background
-;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  (kind-icon-blend-background t)
+  (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-;; (use-package smartrep
-;;   :ensure t
-;;   :commands (smartrep-define-key)
-;;   :config
-;;   (smartrep-define-key
-;;       global-map "C-x"
-;;     '(("}" . enlarge-window-horizontally)
-;;       ("{" . shrink-window-horizontally)
-;;       ("o" . other-window)))
-;;   (smartrep-define-key
-;;       global-map "C-l"
-;;     '(("<tab>" . tab-to-tab-stop)))
-;;   (smartrep-define-key
-;;       global-map "C-x"
-;;     '(("C-+" . kle/zoom-frame)
-;;       ("C--" . kle/zoom-frame-out)))
-;;   )
+(use-package smartrep
+  :ensure t
+  :commands (smartrep-define-key)
+  :config
+  (smartrep-define-key
+      global-map "C-x"
+    '(("}" . enlarge-window-horizontally)
+      ("{" . shrink-window-horizontally)
+      ("o" . other-window)))
+  (smartrep-define-key
+      global-map "C-l"
+    '(("<tab>" . tab-to-tab-stop)))
+  (smartrep-define-key
+      global-map "C-x"
+    '(("C-+" . kle/zoom-frame)
+      ("C--" . kle/zoom-frame-out)))
+  )
 
 ;; (use-package popwin
 ;;   :ensure t
-;;   :demand t
-;;   :config
-;;   (popwin-mode +1))
-
-;; (use-package xref
-;;   :defer t
-;;   :after (popwin)
 ;;   :init
-;;   (push '("*xref*" :position bottom :width 5)
-;;         popwin:special-display-config)
-;;   (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
-;;   :bind
-;;   (:map xref--xref-buffer-mode-map
-;;         ("j" . xref-next-line)
-;;         ("k" . xref-prev-line)))
+;;   (popwin-mode 1))
+(use-package shackle
+  :ensure t
+  :init (setopt shackle-rules nil))
 
-;; (use-package flycheck
-;;   :ensure t
-;;   :pin melpa
-;;   :defer t
-;;   :after (popwin)
-;;   :init
-;;   (push '(flycheck-error-list-mode :position right :width 0.2 :noselect t :stick t)
-;;         popwin:special-display-config))
+(use-package xref
+  ;; :defer t
+  ;; :after (popwin)
+  :init
+  ;; (push '("*xref*" :position bottom :width 5)
+  ;;       popwin:special-display-config)
+  (add-to-list 'shackle-rules '("\\*xref\\*" :align 'below :size 5))
+  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+  :bind
+  (:map xref--xref-buffer-mode-map
+        ("j" . xref-next-line)
+        ("k" . xref-prev-line)))
+
+(use-package flycheck
+  :ensure t
+  :pin melpa
+  ;; :init
+  ;; (push '(flycheck-error-list-mode :position right :width 0.2 :noselect t :stick t)
+  ;;       popwin:special-display-config)
+  )
 
 
 ;; (use-package flymake
@@ -1836,21 +1842,21 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 ;;   (diminish 'undo-tree-mode "UndoTree")
 ;;   (diminish 'super-save-mode "SSave"))
 
-;; (use-package dashboard
-;;   :ensure t
-;;   :init
-;;   (dashboard-setup-startup-hook)
-;;   (defun dashboard-jump-to-recent-files ()
-;;     (interactive)
-;;     (let ((search-label "Recent Files:"))
-;;       (unless (search-forward search-label (point-max) t)
-;;         (search-backward search-label (point-min) t))
-;;       (back-to-indentation)))
-;;   :config
-;;   (with-eval-after-load 'evil
-;;     (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
-;;     (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
-;;     (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)))
+(use-package dashboard
+  :ensure t
+  :init
+  (dashboard-setup-startup-hook)
+  (defun dashboard-jump-to-recent-files ()
+    (interactive)
+    (let ((search-label "Recent Files:"))
+      (unless (search-forward search-label (point-max) t)
+        (search-backward search-label (point-min) t))
+      (back-to-indentation)))
+  :config
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
+    (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
+    (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)))
 
 ;; (use-package ligature
 ;;   :ensure t
