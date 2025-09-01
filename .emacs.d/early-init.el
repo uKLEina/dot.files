@@ -1,9 +1,11 @@
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.8
-      package-enable-at-startup nil
       load-prefer-newer nil
       file-name-handler-alist nil
       site-run-file nil)  ; site-start.elの読み込みを無効
+(setopt package-enable-at-startup nil
+        package-quickstart t
+        package-native-compile t)
 
 ;; native-compileの最適化
 (setq native-comp-deferred-compilation t
@@ -34,7 +36,3 @@
 (setq warning-suppress-types '((package reinitialization)
                                (package cl-functions)
                                (comp)))
-
-;; パッケージの事前最適化
-(setq package-quickstart t
-      package-native-compile t)
