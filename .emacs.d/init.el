@@ -3,6 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setopt custom-file (locate-user-emacs-file "custom.el"))
 ;; (setopt package-install-upgrade-built-in t)
+(setopt initial-major-mode 'fundamental-mode)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-\\"))
@@ -335,7 +336,6 @@ Otherwise, join lines with no space."
   (which-key-setup-side-window-right))
 
 ;; (use-package smerge-mode
-;;   :defer t
 ;;   :config
 ;;   (smartrep-define-key
 ;;       smerge-mode-map "C-c ^"
@@ -363,7 +363,6 @@ Otherwise, join lines with no space."
    ("C-l C-q" . quoted-insert)))
 
 ;; (use-package hideif
-;;   :defer t
 ;;   :init
 ;;   (add-hook 'c++-mode-hook 'hide-ifdef-mode)
 ;;   (add-hook 'c-mode-hook 'hide-ifdef-mode))
@@ -409,7 +408,6 @@ Otherwise, join lines with no space."
 ;;   "Major mode for editing Path of Exile filter file.")
 
 (use-package json-ts-mode
-  :defer t
   :custom (json-ts-mode-indent-offset 4))
 
 (use-package org
@@ -429,12 +427,10 @@ Otherwise, join lines with no space."
      (sql . t))))
 
 (use-package ox
-  :defer t
   :custom
   (org-export-default-language "ja"))
 
 (use-package ox-latex
-  :defer t
   :custom
   ;; tectonic
   (org-latex-compiler "xelatex")
@@ -458,7 +454,6 @@ Otherwise, join lines with no space."
   (org-latex-default-class "bxjsarticle"))
 
 (use-package tramp
-  :defer 1
   :custom
   (tramp-default-method "ssh"))
 
@@ -494,7 +489,6 @@ Otherwise, join lines with no space."
 
   ;; (use-package pdf-tools
   ;;  :ensure t
-  ;;  :defer t
   ;;  :init
   ;;  (pdf-loader-install))
   ;; font
@@ -514,7 +508,6 @@ Otherwise, join lines with no space."
   ;;                      (t 120))))        ; Low DPI
   ;;     font-size))
   ;; (use-package ispell
-  ;;   :defer t
   ;;   :custom
   ;;   (ispell-program-name "hunspell")
   ;;   (ispell-dictionary "/usr/share/hunspell/en_US.dic")
@@ -523,7 +516,6 @@ Otherwise, join lines with no space."
   ;;   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
 
 ;;   (use-package flyspell
-;;     :defer t
 ;;     :config
 ;;     (unbind-key "C-M-i" flyspell-mode-map)
 ;;     (unbind-key "C-;" flyspell-mode-map)
@@ -608,7 +600,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 
 (use-package doom-modeline
   :ensure t
-  ;; :defer 2
   :hook
   (emacs-startup . doom-modeline-mode)
   :commands (doom-modeline-def-modeline doom-modeline-def-segment)
@@ -829,25 +820,25 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (evil-swap-key evil-motion-state-map "k" "gk")
     (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
-(use-package evil-mode-line
-  :init
-  (let* ((site-lisp-dir "~/.emacs.d/elisp")
-         (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
-         (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
-    (unless (and (file-exists-p mode-line-color-file) (file-exists-p evil-mode-line-file))
-      (use-package url)
-      (unless (file-directory-p site-lisp-dir)
-        (mkdir site-lisp-dir))
-      (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)
-      (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
-    (add-to-list 'load-path site-lisp-dir))
-  :config
-  (with-eval-after-load 'doom-themes
-    (setopt evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-                                   (insert . ,(doom-darken (doom-color 'green) 0.5))
-                                   (visual . ,(doom-color 'dark-blue))
-                                   (emacs . ,(doom-color 'magenta))))))
-;; (require 'evil-mode-line)
+;; (use-package evil-mode-line
+;;   :init
+;;   (let* ((site-lisp-dir "~/.emacs.d/elisp")
+;;          (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
+;;          (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
+;;     (unless (and (file-exists-p mode-line-color-file) (file-exists-p evil-mode-line-file))
+;;       (use-package url)
+;;       (unless (file-directory-p site-lisp-dir)
+;;         (mkdir site-lisp-dir))
+;;       (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)
+;;       (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
+;;     (add-to-list 'load-path site-lisp-dir))
+;;   :config
+;;   (with-eval-after-load 'doom-themes
+;;     (setopt evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
+;;                                    (insert . ,(doom-darken (doom-color 'green) 0.5))
+;;                                    (visual . ,(doom-color 'dark-blue))
+;;                                    (emacs . ,(doom-color 'magenta))))))
+;; ;; (require 'evil-mode-line)
 
 (use-package migemo
   :ensure t
@@ -873,7 +864,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package ripgrep
   :ensure t
-  :defer t
   :custom
   (ripgrep-executable (seq-find #'file-exists-p
                                 '("/usr/bin/rg"
@@ -887,7 +877,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package orderless
   :ensure t
-  :defer t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion))))
@@ -924,7 +913,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package consult-ghq
   :ensure t
-  :defer t
   :commands (consult-ghq--list-candidates)
   :init
   (defun consult-ghq-root-dir ()
@@ -933,23 +921,19 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
 
 (use-package embark-consult
-  :ensure t
-  )
+  :ensure t)
 
 (use-package nerd-icons
   :ensure t)
 
 (use-package wgrep
-  :ensure t
-  )
+  :ensure t)
 
 (use-package ace-jump-mode
-  :ensure t
-  :defer t)
+  :ensure t)
 
 (use-package ace-isearch
   :ensure t
-  :defer t
   :custom
   (ace-isearch-function 'ace-jump-char-mode)
   (ace-isearch-use-function-from-isearch nil)
@@ -1015,10 +999,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;   (popwin-mode 1))
 (use-package shackle
   :ensure t
-  :init (setopt shackle-rules nil))
+  :init (setq shackle-rules nil))
 
 (use-package xref
-  ;; :defer t
   ;; :after (popwin)
   :init
   ;; (push '("*xref*" :position bottom :width 5)
@@ -1068,17 +1051,16 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;; ;;   (python-ts-mode . flymake-ruff-load)
 ;; ;;   )
 
-;; (use-package highlight-indent-guides
-;;   :ensure t
-;;   :hook
-;;   (python-mode . highlight-indent-guides-mode)
-;;   (python-ts-mode . highlight-indent-guides-mode)
-;;   :custom
-;;   (highlight-indent-guides-method 'column))
+(use-package highlight-indent-guides
+  :ensure t
+  :hook
+  (python-mode . highlight-indent-guides-mode)
+  (python-ts-mode . highlight-indent-guides-mode)
+  :custom
+  (highlight-indent-guides-method 'column))
 
 ;; (use-package pangu-spacing
 ;;   :ensure t
-;;   :defer t
 ;;   :custom
 ;;   (pangu-spacing-real-insert-separtor t)
 ;;   :config
@@ -1090,151 +1072,141 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;         (rx (group-n 1 (in "a-zA-Z0-9"))
 ;;             (group-n 2 (category japanese)))))
 
-;; (use-package docker
-;;   :ensure t)
+(use-package docker
+  :ensure t)
 
-;; (use-package python
-;;   :custom
-;;   (eldoc-echo-area-use-multiline-p nil)
-;;   ;; :init
-;;   ;; (defun set-basedpyright-options ()
-;;   ;;   (setq-default eglot-workspace-configuration
-;;   ;;                 '(:basedpyright.analysis
-;;   ;;                   ( :inlayHints ( :variableTypes nil
-;;   ;;                                   :callArgumentNames nil
-;;   ;;                                   :functionReturnTypes nil
-;;   ;;                                   :genericTypes nil)))))
-;;   :init
-;;   (defun my/python-init-setup ()
-;;     (setq tab-width python-indent-offset)
-;;     (electric-operator-mode 1))
-;;   :hook
-;;   (python-ts-mode . my/python-init-setup)
-;;   (python-mode . my/python-init-setup)
-;;   :mode
-;;   (("\\.py\\'" . python-ts-mode))
-;;   ;; (python-ts-mode . set-basedpyright-options)
-;;   ;; (python-mode . set-basedpyright-options)
+(use-package python
+  :custom
+  (eldoc-echo-area-use-multiline-p nil)
+  ;; :init
+  ;; (defun set-basedpyright-options ()
+  ;;   (setq-default eglot-workspace-configuration
+  ;;                 '(:basedpyright.analysis
+  ;;                   ( :inlayHints ( :variableTypes nil
+  ;;                                   :callArgumentNames nil
+  ;;                                   :functionReturnTypes nil
+  ;;                                   :genericTypes nil)))))
+  :init
+  (defun my/python-init-setup ()
+    (setq tab-width python-indent-offset)
+    (electric-operator-mode 1))
+  :hook
+  (python-ts-mode . my/python-init-setup)
+  (python-mode . my/python-init-setup)
+  :mode
+  (("\\.py\\'" . python-ts-mode))
+  ;; (python-ts-mode . set-basedpyright-options)
+  ;; (python-mode . set-basedpyright-options)
+  :config
+  (smartrep-define-key
+      python-mode-map "C-c"
+    '(("<" . python-indent-shift-left)
+      (">" . python-indent-shift-right)))
+  (smartrep-define-key
+      python-ts-mode-map "C-c"
+    '(("<" . python-indent-shift-left)
+      (">" . python-indent-shift-right)))
+  (defun ruff-fix-buffer ()
+    "Use ruff to fix lint violations in the current buffer."
+    (interactive)
+    (shell-command-to-string (format "ruff check --fix %s" (buffer-file-name)))
+    (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
+    (revert-buffer t t t)))
+
+;; (use-package eglot
+;;   :ensure t
+;;   :pin gnu
 ;;   :config
-;;   (smartrep-define-key
-;;       python-mode-map "C-c"
-;;     '(("<" . python-indent-shift-left)
-;;       (">" . python-indent-shift-right)))
-;;   (smartrep-define-key
-;;       python-ts-mode-map "C-c"
-;;     '(("<" . python-indent-shift-left)
-;;       (">" . python-indent-shift-right)))
-;;   (defun ruff-fix-buffer ()
-;;     "Use ruff to fix lint violations in the current buffer."
-;;     (interactive)
-;;     (shell-command-to-string (format "ruff check --fix %s" (buffer-file-name)))
-;;     (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
-;;     (revert-buffer t t t)))
+;;   (unless (require 'eglot-booster nil t)
+;;     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
+;;   (use-package eglot-booster
+;;     :config (eglot-booster-mode +1))
+;;   ;; (assq-delete-all '(python-mode python-ts-mode) eglot-server-programs)
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '((python-mode python-ts-mode)
+;;   ;;                "basedpyright-langserver" "--stdio"))
+;;   ;; (add-to-list 'eglot-server-programs
+;;   ;;              '((python-mode python-ts-mode)
+;;   ;;                . ,(eglot-alternatives
+;;   ;;                    '(("basedpyright-langserver" "--stdio")
+;;   ;;                      "ruff-lsp"
+;;   ;;                      "pylsp"
+;;   ;;                      ("pyright-langserver" "--stdio")
+;;   ;;                      "judi-language-server"
+;;   ;;                      "pyls"))))
+;;   (defun my-reorder-eldoc-functions ()
+;;     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
+;;     (when (and (boundp 'eldoc-documentation-functions)
+;;                (listp eldoc-documentation-functions))
+;;       (let ((flymake-fn 'flymake-eldoc-function))
+;;         (setq eldoc-documentation-functions
+;;               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+;;   (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
+;;   (setq-default eglot-workspace-configuration
+;;                 '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
 
-;; ;; (use-package eglot
-;; ;;   :ensure t
-;; ;;   :pin gnu
-;; ;;   :defer t
-;; ;;   :config
-;; ;;   (unless (require 'eglot-booster nil t)
-;; ;;     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
-;; ;;   (use-package eglot-booster
-;; ;;     :config (eglot-booster-mode +1))
-;; ;;   ;; (assq-delete-all '(python-mode python-ts-mode) eglot-server-programs)
-;; ;;   ;; (add-to-list 'eglot-server-programs
-;; ;;   ;;              '((python-mode python-ts-mode)
-;; ;;   ;;                "basedpyright-langserver" "--stdio"))
-;; ;;   ;; (add-to-list 'eglot-server-programs
-;; ;;   ;;              '((python-mode python-ts-mode)
-;; ;;   ;;                . ,(eglot-alternatives
-;; ;;   ;;                    '(("basedpyright-langserver" "--stdio")
-;; ;;   ;;                      "ruff-lsp"
-;; ;;   ;;                      "pylsp"
-;; ;;   ;;                      ("pyright-langserver" "--stdio")
-;; ;;   ;;                      "judi-language-server"
-;; ;;   ;;                      "pyls"))))
-;; ;;   (defun my-reorder-eldoc-functions ()
-;; ;;     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
-;; ;;     (when (and (boundp 'eldoc-documentation-functions)
-;; ;;                (listp eldoc-documentation-functions))
-;; ;;       (let ((flymake-fn 'flymake-eldoc-function))
-;; ;;         (setq eldoc-documentation-functions
-;; ;;               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
-;; ;;   (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
-;; ;;   (setq-default eglot-workspace-configuration
-;; ;;                 '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
+(use-package lsp-mode
+  :ensure t
+  ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
+  :custom
+  ;; (lsp-disabled-clients '(lsp-ruff))
+  ;; (lsp-log-io t)
+  (lsp-diagnostics-provider :flycheck)
+  (lsp-completion-provider :none)
+  ;; (lsp-auto-register-remote-clients nil)
+  :init
+  ;; (defun my-reorder-eldoc-functions ()
+  ;;   "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
+  ;;   (when (and (boundp 'eldoc-documentation-functions)
+  ;;              (listp eldoc-documentation-functions))
+  ;;     (let ((flymake-fn 'flymake-eldoc-function))
+  ;;       (setq eldoc-documentation-functions
+  ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+              (setcar orig-result command-from-exec-path))
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
-;; (use-package lsp-mode
-;;   :ensure t
-;;   ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
-;;   :custom
-;;   ;; (lsp-disabled-clients '(lsp-ruff))
-;;   ;; (lsp-log-io t)
-;;   (lsp-diagnostics-provider :flycheck)
-;;   (lsp-completion-provider :none)
-;;   ;; (lsp-auto-register-remote-clients nil)
-;;   :init
-;;   ;; (defun my-reorder-eldoc-functions ()
-;;   ;;   "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
-;;   ;;   (when (and (boundp 'eldoc-documentation-functions)
-;;   ;;              (listp eldoc-documentation-functions))
-;;   ;;     (let ((flymake-fn 'flymake-eldoc-function))
-;;   ;;       (setq eldoc-documentation-functions
-;;   ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
-;;   (defun lsp-booster--advice-json-parse (old-fn &rest args)
-;;     "Try to parse bytecode instead of json."
-;;     (or
-;;      (when (equal (following-char) ?#)
-;;        (let ((bytecode (read (current-buffer))))
-;;          (when (byte-code-function-p bytecode)
-;;            (funcall bytecode))))
-;;      (apply old-fn args)))
-;;   (with-eval-after-load 'json
-;;     (advice-add (if (fboundp 'json-parse-buffer)
-;;                     'json-parse-buffer
-;;                   'json-read)
-;;                 :around #'lsp-booster--advice-json-parse))
-;;   ;; (advice-add (if (progn (require 'json)
-;;   ;;                        (fboundp 'json-parse-buffer))
-;;   ;;                 'json-parse-buffer
-;;   ;;               'json-read)
-;;   ;;             :around
-;;   ;;             #'lsp-booster--advice-json-parse)
-;;   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-;;     "Prepend emacs-lsp-booster command to lsp CMD."
-;;     (let ((orig-result (funcall old-fn cmd test?)))
-;;       (if (and (not test?)                             ;; for check lsp-server-present?
-;;                (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-;;                lsp-use-plists
-;;                (not (functionp 'json-rpc-connection))  ;; native json-rpc
-;;                (executable-find "emacs-lsp-booster"))
-;;           (progn
-;;             (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-;;               (setcar orig-result command-from-exec-path))
-;;             (message "Using emacs-lsp-booster for %s!" orig-result)
-;;             (cons "emacs-lsp-booster" orig-result))
-;;         orig-result)))
-;;   (with-eval-after-load 'lsp-mode
-;;     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
-;;   ;; (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-;;   )
-
-;; (use-package lsp-pyright
-;;   :ensure t
-;;   :hook
-;;   ((python-mode python-ts-mode) . start-lsp-for-python)
-;;   :init
-;;   (defun start-lsp-for-python ()
-;;     (require 'lsp-pyright)
-;;     (lsp-deferred))
-;;   :custom
-;;   (lsp-pyright-langserver-command "basedpyright")
-;;   ;; disable basedpyright specific features
-;;   (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
-;;   (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
-;;   (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
-;;   (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
-;;   )
+(use-package lsp-pyright
+  :ensure t
+  :hook
+  ((python-mode python-ts-mode) . start-lsp-for-python)
+  :init
+  (defun start-lsp-for-python ()
+    (require 'lsp-pyright)
+    (lsp-deferred))
+  :custom
+  (lsp-pyright-langserver-command "basedpyright")
+  ;; disable basedpyright specific features
+  (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
+  (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
+  (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
+  (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
 
 ;; (with-eval-after-load 'lsp-pyright
 ;;   (lsp-register-client
@@ -1256,214 +1228,213 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;                                    ((concat lsp-pyright-langserver-command "/reportProgress") 'lsp-pyright--report-progress-callback)
 ;;                                    ((concat lsp-pyright-langserver-command "/endProgress") 'lsp-pyright--end-progress-callback)))))
 
-;; (use-package lsp-ui
+(use-package lsp-ui
+  :ensure t
+  :after lsp-mode
+  :init
+  (defun kle/lsp-ui-doc-dwim ()
+    (interactive)
+    (if (lsp-ui-doc--frame-visible-p)
+        (lsp-ui-doc-hide)
+      (lsp-ui-doc-show)))
+  :bind
+  (:map lsp-ui-mode-map
+        ("C-l C-d" . kle/lsp-ui-doc-dwim))
+  :custom
+  (lsp-ui-doc-header t)
+  (lsp-ui-doc-include-signature t)
+  (lsp-ui-doc-alignment 'window)
+  (lsp-ui-doc-position 'top)
+  (lsp-ui-doc-max-width 150)
+  (lsp-ui-doc-max-height 30)
+  :config
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+
+(use-package dap-mode
+  :ensure t
+  :after lsp-mode
+  :config
+  (require 'dap-python)
+  (dap-auto-configure-mode 1)
+  (setq dap-python-debugger 'debugpy))
+
+;; (use-package eglot-java
 ;;   :ensure t
-;;   :after lsp-mode
 ;;   :init
-;;   (defun kle/lsp-ui-doc-dwim ()
+;;   (defun kle/eglot-java--install-lsp-server ()
+;;     "Install specific version of the Eclipse JDT LSP server."
 ;;     (interactive)
-;;     (if (lsp-ui-doc--frame-visible-p)
-;;         (lsp-ui-doc-hide)
-;;       (lsp-ui-doc-show)))
+;;     (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
+;;            (dest-dir                     (expand-file-name destination-dir))
+;;            (download-metadata            (eglot-java--parse-jdtls-download-metadata
+;;                                           (eglot-java--read-json-from-url eglot-java-eclipse-jdt-ls-dl-metadata-url)))
+;;            (download-url                 "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
+;;            (download-version             "0.57.0")
+;;            (dest-filename                (file-name-nondirectory download-url))
+;;            (dest-abspath                 (expand-file-name dest-filename dest-dir))
+;;            (dest-versionfile             (expand-file-name eglot-java-filename-version-jdtls dest-dir))
+;;            (large-file-warning-threshold nil))
+;;       (message "Installing Eclipse JDT LSP server, please wait...")
+;;       (eglot-java--download-file download-url dest-abspath)
+
+;;       (message "Extracting Eclipse JDT LSP archive, please wait...")
+;;       (let ((b (find-file dest-abspath)))
+;;         (switch-to-buffer b)
+;;         (goto-char (point-min))
+;;         (tar-untar-buffer)
+;;         (kill-buffer b))
+;;       (delete-file dest-abspath)
+
+;;       (eglot-java--record-version-info download-version dest-versionfile)
+
+;;       (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
+;;   :custom
+;;   (eglot-java-eglot-server-programs-manual-updates t))
+
+;;; dired
+(use-package lv :ensure t)
+(use-package dired
+  :custom
+  ;; fix keybind for SKK
+  (dired-bind-jump nil)
+  (dired-kill-when-opening-new-dired-buffer t)
+  :init
+  (evil-set-initial-state 'dired-mode 'emacs)
+  :config
+  (bind-keys :map dired-mode-map
+             ("C-t" . other-window-or-split)
+             ("j" . dired-next-line)
+             ("k" . dired-previous-line))
+  (when (eq system-type 'gnu/linux)
+    (setopt dired-listing-switches "-AFDlh --group-directories-first"))
+  (when (eq system-type 'windows-nt)
+    (setopt ls-lisp-dirs-first t)))
+
+(use-package dired-x
+  :after (dired)
+  :custom
+  (dired-omit-files "\\`[.]?#\\|\\`[.][.]?\\'\\|^\\..+$")
+  :bind (:map dired-mode-map
+              ("C-l C-o" . dired-omit-mode)))
+
+(use-package wdired
+  :after (dired evil)
+  :init
+  (defun kle/wdired-evil-fix ()
+    "Evil fix for wdired. Stay Normal mode when entering WDired."
+    (progn
+      (evil-normal-state)
+      (forward-char)))
+  (add-hook 'wdired-mode-hook #'kle/wdired-evil-fix)
+  :bind (:map dired-mode-map
+              ("r" . wdired-change-to-wdired-mode)))
+
+(use-package dired-quick-sort
+  :ensure t
+  :after (dired)
+  :commands (hydra-dired-quick-sort/body)
+  :init
+  (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map))
+
+(use-package nerd-icons-dired
+  :ensure t
+  :hook (dired-mode . nerd-icons-dired-mode))
+
+;; (use-package direx
+;;   :ensure t
+;;   :init
+;;   (defun kle/direx-open ()
+;;     (interactive)
+;;     (or (ignore-errors
+;;           (direx-project:jump-to-project-root-other-window))
+;;         (direx:jump-to-directory-other-window)))
+;;   (defun kle/direx-dwim ()
+;;     (interactive)
+;;     (if (derived-mode-p 'direx:direx-mode)
+;;         (kill-buffer)
+;;       (kle/direx-open)))
 ;;   :bind
-;;   (:map lsp-ui-mode-map
-;;         ("C-l C-d" . kle/lsp-ui-doc-dwim))
-;;   :custom
-;;   (lsp-ui-doc-header t)
-;;   (lsp-ui-doc-include-signature t)
-;;   (lsp-ui-doc-alignment 'window)
-;;   (lsp-ui-doc-position 'top)
-;;   (lsp-ui-doc-max-width 150)
-;;   (lsp-ui-doc-max-height 30)
+;;   (("<f8>" . kle/direx-dwim))
+;;   :after (popwin)
 ;;   :config
-;;   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-;;   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+;;   (push '(direx:direx-mode :position left :width 40 :dedicated t)
+;;         popwin:special-display-config)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "j") 'direx:next-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "k") 'direx:previous-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "J") 'direx:next-sibling-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "K") 'direx:previous-sibling-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
+;;   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
 
-;; (use-package dap-mode
+(use-package neotree
+  :ensure t
+  :init
+  (evil-set-initial-state 'neotree-mode 'emacs)
+  :bind
+  (("<f8>" . neotree-toggle))
+  (:map neotree-mode-map
+        ("j" . neotree-next-line)
+        ("k" . neotree-previous-line)
+        ("C-t" . other-window-or-split))
+  :custom
+  (neo-theme 'nerd-icons)
+  (neo-smart-open t)
+  (neo-force-change-root t)
+  (neo-autorefresh t)
+  (neo-window-fixed-size t)
+  (neo-show-hidden-files t)
+  (neo-vc-integration '(face)))
+
+(use-package skk
+  :ensure ddskk
+  :bind
+  (("C-x j" . skk-auto-fill-mode)
+   ("C-x C-j" . skk-mode))
+  :custom
+  (skk-user-directory "~/.skk.d")
+  (skk-dcomp-activate t)
+  (skk-show-candidates-always-pop-to-buffer t)
+  (skk-isearch-start-mode 'latin)
+  (skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+  (skk-extra-jisyo-file-list
+   '("~/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.fullname"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.geo"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.propernoun"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.station"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.law"
+     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.okinawa"))
+  (skk-show-annotation t)
+  (skk-annotation-delay 0.01)
+  (skk-show-candidates-nth-henkan-char 3)
+  :config
+  (use-package skk-hint)
+  (use-package skk-study)
+  ;; Isearch setting.
+  (defun skk-isearch-setup-maybe ()
+    (require 'skk-vars)
+    (when (or (eq skk-isearch-mode-enable 'always)
+              (and (boundp 'skk-mode)
+                   skk-mode
+                   skk-isearch-mode-enable))
+      (skk-isearch-mode-setup)))
+
+  (defun skk-isearch-cleanup-maybe ()
+    (require 'skk-vars)
+    (when (and (featurep 'skk-isearch)
+               skk-isearch-mode-enable)
+      (skk-isearch-mode-cleanup)))
+
+  (add-hook 'isearch-mode-hook #'skk-isearch-setup-maybe)
+  (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
+
+;; (use-package ddskk-posframe
 ;;   :ensure t
-;;   :after lsp-mode
+;;   :after skk
 ;;   :config
-;;   (require 'dap-python)
-;;   (dap-auto-configure-mode 1)
-;;   (setq dap-python-debugger 'debugpy))
-
-;; ;; (use-package eglot-java
-;; ;;   :ensure t
-;; ;;   :init
-;; ;;   (defun kle/eglot-java--install-lsp-server ()
-;; ;;     "Install specific version of the Eclipse JDT LSP server."
-;; ;;     (interactive)
-;; ;;     (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
-;; ;;            (dest-dir                     (expand-file-name destination-dir))
-;; ;;            (download-metadata            (eglot-java--parse-jdtls-download-metadata
-;; ;;                                           (eglot-java--read-json-from-url eglot-java-eclipse-jdt-ls-dl-metadata-url)))
-;; ;;            (download-url                 "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
-;; ;;            (download-version             "0.57.0")
-;; ;;            (dest-filename                (file-name-nondirectory download-url))
-;; ;;            (dest-abspath                 (expand-file-name dest-filename dest-dir))
-;; ;;            (dest-versionfile             (expand-file-name eglot-java-filename-version-jdtls dest-dir))
-;; ;;            (large-file-warning-threshold nil))
-;; ;;       (message "Installing Eclipse JDT LSP server, please wait...")
-;; ;;       (eglot-java--download-file download-url dest-abspath)
-
-;; ;;       (message "Extracting Eclipse JDT LSP archive, please wait...")
-;; ;;       (let ((b (find-file dest-abspath)))
-;; ;;         (switch-to-buffer b)
-;; ;;         (goto-char (point-min))
-;; ;;         (tar-untar-buffer)
-;; ;;         (kill-buffer b))
-;; ;;       (delete-file dest-abspath)
-
-;; ;;       (eglot-java--record-version-info download-version dest-versionfile)
-
-;; ;;       (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
-;; ;;   :custom
-;; ;;   (eglot-java-eglot-server-programs-manual-updates t))
-
-;; ;;; dired
-;; (use-package lv :ensure t :defer t)
-;; (use-package dired
-;;   :defer t
-;;   :custom
-;;   ;; fix keybind for SKK
-;;   (dired-bind-jump nil)
-;;   (dired-kill-when-opening-new-dired-buffer t)
-;;   :init
-;;   (evil-set-initial-state 'dired-mode 'emacs)
-;;   :config
-;;   (bind-keys :map dired-mode-map
-;;              ("C-t" . other-window-or-split)
-;;              ("j" . dired-next-line)
-;;              ("k" . dired-previous-line))
-;;   (when (eq system-type 'gnu/linux)
-;;     (setopt dired-listing-switches "-AFDlh --group-directories-first"))
-;;   (when (eq system-type 'windows-nt)
-;;     (setopt ls-lisp-dirs-first t)))
-
-;; (use-package dired-x
-;;   :after (dired)
-;;   :custom
-;;   (dired-omit-files "\\`[.]?#\\|\\`[.][.]?\\'\\|^\\..+$")
-;;   :bind (:map dired-mode-map
-;;               ("C-l C-o" . dired-omit-mode)))
-
-;; (use-package wdired
-;;   :after (dired evil)
-;;   :init
-;;   (defun kle/wdired-evil-fix ()
-;;     "Evil fix for wdired. Stay Normal mode when entering WDired."
-;;     (progn
-;;       (evil-normal-state)
-;;       (forward-char)))
-;;   (add-hook 'wdired-mode-hook #'kle/wdired-evil-fix)
-;;   :bind (:map dired-mode-map
-;;               ("r" . wdired-change-to-wdired-mode)))
-
-;; (use-package dired-quick-sort
-;;   :ensure t
-;;   :after (dired)
-;;   :commands (hydra-dired-quick-sort/body)
-;;   :init
-;;   (bind-key "S" 'hydra-dired-quick-sort/body dired-mode-map))
-
-;; (use-package nerd-icons-dired
-;;   :ensure t
-;;   :hook (dired-mode . nerd-icons-dired-mode))
-
-;; ;; (use-package direx
-;; ;;   :ensure t
-;; ;;   :init
-;; ;;   (defun kle/direx-open ()
-;; ;;     (interactive)
-;; ;;     (or (ignore-errors
-;; ;;           (direx-project:jump-to-project-root-other-window))
-;; ;;         (direx:jump-to-directory-other-window)))
-;; ;;   (defun kle/direx-dwim ()
-;; ;;     (interactive)
-;; ;;     (if (derived-mode-p 'direx:direx-mode)
-;; ;;         (kill-buffer)
-;; ;;       (kle/direx-open)))
-;; ;;   :bind
-;; ;;   (("<f8>" . kle/direx-dwim))
-;; ;;   :after (popwin)
-;; ;;   :config
-;; ;;   (push '(direx:direx-mode :position left :width 40 :dedicated t)
-;; ;;         popwin:special-display-config)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "j") 'direx:next-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "k") 'direx:previous-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "J") 'direx:next-sibling-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "K") 'direx:previous-sibling-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
-;; ;;   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
-
-;; (use-package neotree
-;;   :ensure t
-;;   :init
-;;   (evil-set-initial-state 'neotree-mode 'emacs)
-;;   :bind
-;;   (("<f8>" . neotree-toggle))
-;;   (:map neotree-mode-map
-;;         ("j" . neotree-next-line)
-;;         ("k" . neotree-previous-line)
-;;         ("C-t" . other-window-or-split))
-;;   :custom
-;;   (neo-theme 'nerd-icons)
-;;   (neo-smart-open t)
-;;   (neo-force-change-root t)
-;;   (neo-autorefresh t)
-;;   (neo-window-fixed-size t)
-;;   (neo-show-hidden-files t)
-;;   (neo-vc-integration '(face)))
-
-;; (use-package skk
-;;   :ensure ddskk
-;;   :bind
-;;   (("C-x j" . skk-auto-fill-mode)
-;;    ("C-x C-j" . skk-mode))
-;;   :custom
-;;   (skk-user-directory "~/.skk.d")
-;;   (skk-dcomp-activate t)
-;;   (skk-show-candidates-always-pop-to-buffer t)
-;;   (skk-isearch-start-mode 'latin)
-;;   (skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
-;;   (skk-extra-jisyo-file-list
-;;    '("~/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.fullname"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.geo"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.propernoun"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.station"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.law"
-;;      "~/.emacs.d/skk-get-jisyo/SKK-JISYO.okinawa"))
-;;   (skk-show-annotation t)
-;;   (skk-annotation-delay 0.01)
-;;   (skk-show-candidates-nth-henkan-char 3)
-;;   :config
-;;   (use-package skk-hint)
-;;   (use-package skk-study)
-;;   ;; Isearch setting.
-;;   (defun skk-isearch-setup-maybe ()
-;;     (require 'skk-vars)
-;;     (when (or (eq skk-isearch-mode-enable 'always)
-;;               (and (boundp 'skk-mode)
-;;                    skk-mode
-;;                    skk-isearch-mode-enable))
-;;       (skk-isearch-mode-setup)))
-
-;;   (defun skk-isearch-cleanup-maybe ()
-;;     (require 'skk-vars)
-;;     (when (and (featurep 'skk-isearch)
-;;                skk-isearch-mode-enable)
-;;       (skk-isearch-mode-cleanup)))
-
-;;   (add-hook 'isearch-mode-hook #'skk-isearch-setup-maybe)
-;;   (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
-
-;; ;; (use-package ddskk-posframe
-;; ;;   :ensure t
-;; ;;   :after skk
-;; ;;   :config
-;; ;;   (ddskk-posframe-mode 1))
+;;   (ddskk-posframe-mode 1))
 
 ;; (use-package image+
 ;;   :ensure t
@@ -1479,276 +1450,264 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;     ("r" imagex-sticky-rotate-right "rotate right")
 ;;     ("l" imagex-sticky-rotate-left "rotate left")))
 
-;; (use-package imenu-list
+(use-package imenu-list
+  :ensure t
+  :custom
+  ;; (imenu-list-auto-resize t)
+  (imenu-list-position 'left)
+  (imenu-list-size 0.18)
+  ;; :hook
+  ;; (imenu-list-after-jump . imenu-list-smart-toggle)
+  :bind
+  ("C-;" . imenu-list-smart-toggle)
+  :config
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
+  (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
+
+(use-package magit
+  :ensure t
+  :pin melpa-stable
+  :bind (("C-l m s" . magit-status)
+         ("C-l m l c" . magit-log-current)
+         ("C-l m l b" . magit-log-buffer-file))
+  :custom
+  (magit-format-file-function #'magit-format-file-nerd-icons)
+  :config
+  (defun surpress-iconify (&rest arg)
+    (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+  (defun apply-iconify (&rest arg)
+    (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
+  (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
+  (advice-add 'with-editor-finish :after #'apply-iconify)
+  ;; (push '(magit-status-mode :position right :width 0.5)
+  ;;       popwin:special-display-config)
+  )
+
+(use-package rainbow-delimiters
+  :ensure t
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
+
+(use-package anzu
+  :ensure t
+  :pin melpa
+  :custom
+  (anzu-mode-lighter "")
+  (anzu-deactivate-region t)
+  (anzu-search-threshold 1000)
+  :bind
+  (("C-M-%" . anzu-query-replace-at-cursor)         ; replace currnet string in entire buffer with query
+   ("C-M-#" . anzu-query-replace-at-cursor-thing)   ; replace currnet string only in cursor thing(function etc.)
+   ))
+
+(use-package backward-forward
+  :ensure t
+  :init
+  (backward-forward-mode 1)
+  :config
+  (setq backward-forward-evil-compatibility-mode t)
+  (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
+  (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
+  :bind
+  (:map backward-forward-mode-map
+        ("C-l C-a" . backward-forward-previous-location)
+        ("C-l C-f" . backward-forward-next-location)))
+
+(use-package electric-operator
+  :ensure t)
+
+(use-package expreg
+  :ensure t
+  :bind
+  (("C-M-]" . expreg-expand)
+   ("C-M-:" . expreg-contract)))
+
+;; (use-package origami
 ;;   :ensure t
-;;   :defer t
-;;   :custom
-;;   ;; (imenu-list-auto-resize t)
-;;   (imenu-list-position 'left)
-;;   (imenu-list-size 0.18)
-;;   ;; :hook
-;;   ;; (imenu-list-after-jump . imenu-list-smart-toggle)
 ;;   :bind
-;;   ("C-;" . imenu-list-smart-toggle)
-;;   :config
-;;   (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
-;;   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
-;;   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry)
+;;   ("C-l o" . origami-recursively-toggle-node)
 ;;   )
 
-;; (use-package magit
-;;   :ensure t
-;;   :pin melpa-stable
-;;   :bind (("C-l m s" . magit-status)
-;;          ("C-l m l c" . magit-log-current)
-;;          ("C-l m l b" . magit-log-buffer-file))
-;;   :custom
-;;   (magit-format-file-function #'magit-format-file-nerd-icons)
-;;   :init
-;;   (defun surpress-iconify (&rest arg)
-;;     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
-;;   (defun apply-iconify (&rest arg)
-;;     (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
-;;   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
-;;   (advice-add 'with-editor-finish :after #'apply-iconify)
-;;   (push '(magit-status-mode :position right :width 0.5)
-;;         popwin:special-display-config)
-;;   )
+(use-package highlight-symbol
+  :ensure t
+  :hook
+  ((prog-mode . highlight-symbol-mode)
+   (prog-mode . highlight-symbol-nav-mode))
+  :custom
+  (highlight-symbol-idle-delay 0.5)
+  (highlight-symbol-occurrence-message '(explicit))
+  :custom-face
+  ;; auto highlight darker for Doom Dracula theme
+  (highlight-symbol-face ((t (:background "#1b1d26"))))
+  :bind
+  ("C-l C-s" . highlight-symbol)
+  ("M-n" . highlight-symbol-next)
+  ("M-p" . highlight-symbol-prev))
 
-;; (use-package rainbow-delimiters
-;;   :ensure t
-;;   :defer 1
-;;   :hook
-;;   (prog-mode . rainbow-delimiters-mode))
+(use-package smartparens
+  :ensure t
+  :hook
+  (prog-mode . smartparens-mode)
+  :config
+  (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
+  (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil))
 
-;; (use-package anzu
-;;   :ensure t
-;;   :pin melpa
-;;   :init (global-anzu-mode +1)
-;;   :custom
-;;   (anzu-mode-lighter "")
-;;   (anzu-deactivate-region t)
-;;   (anzu-search-threshold 1000)
-;;   :bind
-;;   (("C-M-%" . anzu-query-replace-at-cursor)         ; replace currnet string in entire buffer with query
-;;    ("C-M-#" . anzu-query-replace-at-cursor-thing)   ; replace currnet string only in cursor thing(function etc.)
-;;    ))
+(use-package sudo-edit
+  :ensure t)
 
-;; (use-package backward-forward
-;;   :ensure t
-;;   :init
-;;   (backward-forward-mode +1)
+(use-package google-translate
+  :ensure t
+  :commands (google-translate-translate)
+  :init
+  (defvar google-translate-english-chars "[:ascii:]"
+    "これらの文字が含まれているときは英語とみなす")
+  (defun google-translate-enja-or-jaen (&optional string)
+    "regionか現在位置の単語を翻訳する。C-u付きでquery指定も可能"
+    (interactive)
+    (setq string
+          (cond ((stringp string) string)
+                (current-prefix-arg
+                 (read-string "Google Translate: "))
+                ((use-region-p)
+                 (buffer-substring (region-beginning) (region-end)))
+                (t
+                 (thing-at-point 'word))))
+    (let* ((asciip (string-match
+                    (format "\\`[%s]+\\'" google-translate-english-chars)
+                    string)))
+      (run-at-time 0.1 nil 'deactivate-mark)
+      (google-translate-translate
+       (if asciip "en" "ja")
+       (if asciip "ja" "en")
+       string)))
+  (bind-key "C-l C-t" 'google-translate-enja-or-jaen)
+  :config
+  (use-package google-translate-smooth-ui))
+
+(use-package visual-regexp-steroids
+  :ensure t
+  :bind
+  (("M-%" . vr/query-replace)))
+
+(use-package google-this
+  :ensure t
+  :bind
+  (("C-l g" . google-this)))
+
+(use-package projectile
+  :ensure t
+  :commands (projectile-project-root)
+  :bind-keymap ("C-l p" . projectile-command-map)
+  :config
+  (when (executable-find "ghq")
+    (projectile-load-known-projects)
+    (setq projectile-known-projects
+          (delete-dups
+           (append projectile-known-projects
+                   (mapcar
+                    (lambda (x) (abbreviate-file-name x))
+                    (split-string (shell-command-to-string "ghq list --full-path"))))))))
+
+(use-package yasnippet
+  :ensure t
+  :pin melpa
+  :commands (yas-expand)
+  :hook
+  (prog-mode . yas-minor-mode)
+  :bind (("C-<tab>" . yas-expand)))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :pin melpa
+  :after (yasnippet))
+
+(use-package web-mode
+  :ensure t
+  :mode (("\\.html?\\'" . web-mode)
+         ("\\.vue\\'" . web-mode)
+         ("\\.js\\'" . web-mode)))
+
+(use-package typescript-mode
+  :ensure t)
+
+(use-package tuareg
+  :ensure t
+  :mode (("\\.ml\\'" . tuareg-mode)
+         ("\\.mli\\'" . tuareg-mode)
+         ("\\.mly\\'" . tuareg-mode)
+         ("\\.mll\\'" . tuareg-mode)
+         ("\\.mlp\\'" . tuareg-mode)))
+
+(use-package powershell
+  :ensure t
+  :mode (("\\.ps1'" . powershell-mode)))
+
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\'" . gfm-mode))
+  :custom
+  (markdown-command "multimarkdown")
+  (markdown-italic-underscore t)
+  :config
+  (defconst markdown-regex-italic
+    "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)[^\\ ]\\)\\(?4:\\2\\)\\)")
+  (defconst markdown-regex-gfm-italic
+    "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)\\)\\(?4:\\2\\)\\)")
+  (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
+
+(use-package markdown-preview-mode
+  :ensure t)
+
+(use-package rust-mode
+  :ensure t
+  :hook
+  ((rust-mode . smartparens-mode)
+   (rust-mode . electric-operator-mode))
+  :custom
+  (rust-format-on-save t))
+
+(use-package racer
+  :ensure t
+  :hook
+  ((rust-mode . racer-mode)
+   (racer-mode . eldoc-mode))
+  :config
+  (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
+
+(use-package auctex
+ :ensure t
+ :mode (("\\.tex\\'" . TeX-tex-mode)
+        ("\\.latex\\'" . TeX-tex-mode))
+ :custom
+ (TeX-auto-save t)
+ (TeX-parse-self t)
+ ;; use tectonic as tex engine
+ (TeX-engine-alist '((tectonic                          ; engine symbol
+                      "Tectonic"                        ; engine name
+                      "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
+                      "tectonic -X watch"               ; shell command for compiling LaTeX documents
+                      nil                               ; shell command for compiling ConTeXt documents
+                      )))
+ (TeX-engine 'tectonic)
+ (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
+ (TeX-check-TeX nil)
+ :config
+ (use-package tex
+   :config
+   (let ((tex-list (assoc "TeX" TeX-command-list))
+         (latex-list (assoc "LaTeX" TeX-command-list)))
+     (setf (cadr tex-list) "%(tex)"
+           (cadr latex-list) "%l")))
+ )
 ;;   :config
-;;   (setq backward-forward-evil-compatibility-mode t)
-;;   (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
-;;   (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
-;;   :bind
-;;   (:map backward-forward-mode-map
-;;         ("C-l C-a" . backward-forward-previous-location)
-;;         ("C-l C-f" . backward-forward-next-location)))
-
-;; (use-package electric-operator
-;;   :ensure t
-;;   :defer t)
-
-;; (use-package expreg
-;;   :ensure t
-;;   :bind
-;;   (("C-M-]" . expreg-expand)
-;;    ("C-M-:" . expreg-contract)))
-
-;; ;; (use-package origami
-;; ;;   :ensure t
-;; ;;   :bind
-;; ;;   ("C-l o" . origami-recursively-toggle-node)
-;; ;;   )
-
-;; (use-package highlight-symbol
-;;   :ensure t
-;;   :defer 1
-;;   :hook
-;;   ((prog-mode . highlight-symbol-mode)
-;;    (prog-mode . highlight-symbol-nav-mode))
-;;   :custom
-;;   (highlight-symbol-idle-delay 0.5)
-;;   (highlight-symbol-occurrence-message '(explicit))
-;;   :custom-face
-;;   ;; auto highlight darker for Doom Dracula theme
-;;   (highlight-symbol-face ((t (:background "#1b1d26"))))
-;;   :bind
-;;   ("C-l C-s" . highlight-symbol)
-;;   ("M-n" . highlight-symbol-next)
-;;   ("M-p" . highlight-symbol-prev))
-
-;; (use-package smartparens
-;;   :ensure t
-;;   :hook
-;;   (prog-mode . smartparens-mode)
-;;   :config
-;;   (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
-;;   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil))
-
-;; (use-package sudo-edit
-;;   :ensure t)
-
-;; (use-package google-translate
-;;   :ensure t
-;;   :commands (google-translate-translate)
-;;   :after (popwin)
-;;   :init
-;;   (defvar google-translate-english-chars "[:ascii:]"
-;;     "これらの文字が含まれているときは英語とみなす")
-;;   (defun google-translate-enja-or-jaen (&optional string)
-;;     "regionか現在位置の単語を翻訳する。C-u付きでquery指定も可能"
-;;     (interactive)
-;;     (setq string
-;;           (cond ((stringp string) string)
-;;                 (current-prefix-arg
-;;                  (read-string "Google Translate: "))
-;;                 ((use-region-p)
-;;                  (buffer-substring (region-beginning) (region-end)))
-;;                 (t
-;;                  (thing-at-point 'word))))
-;;     (let* ((asciip (string-match
-;;                     (format "\\`[%s]+\\'" google-translate-english-chars)
-;;                     string)))
-;;       (run-at-time 0.1 nil 'deactivate-mark)
-;;       (google-translate-translate
-;;        (if asciip "en" "ja")
-;;        (if asciip "ja" "en")
-;;        string)))
-;;   (bind-key "C-l C-t" 'google-translate-enja-or-jaen)
-;;   :config
-;;   (use-package google-translate-smooth-ui)
-;;   (push '("*Google Translate*" :position bottom :width 30)
-;;         popwin:special-display-config))
-
-;; (use-package visual-regexp-steroids
-;;   :ensure t
-;;   :bind
-;;   (("M-%" . vr/query-replace)))
-
-;; (use-package google-this
-;;   :ensure t
-;;   :bind
-;;   (("C-l g" . google-this)))
-
-;; (use-package projectile
-;;   :ensure t
-;;   :commands (projectile-project-root)
-;;   :bind-keymap ("C-l p" . projectile-command-map)
-;;   :config
-;;   (when (executable-find "ghq")
-;;     (projectile-load-known-projects)
-;;     (setq projectile-known-projects
-;;           (delete-dups
-;;            (append projectile-known-projects
-;;                    (mapcar
-;;                     (lambda (x) (abbreviate-file-name x))
-;;                     (split-string (shell-command-to-string "ghq list --full-path"))))))))
-
-;; (use-package yasnippet
-;;   :ensure t
-;;   :defer 1
-;;   :pin melpa
-;;   :commands (yas-expand)
-;;   :hook
-;;   (prog-mode . yas-minor-mode)
-;;   :bind (("C-<tab>" . yas-expand)))
-
-;; (use-package yasnippet-snippets
-;;   :ensure t
-;;   :pin melpa
-;;   :after (yasnippet))
-
-;; (use-package web-mode
-;;   :ensure t
-;;   :mode (("\\.html?\\'" . web-mode)
-;;          ("\\.vue\\'" . web-mode)
-;;          ("\\.js\\'" . web-mode)))
-
-;; (use-package typescript-mode
-;;   :ensure t
-;;   :defer t)
-
-;; (use-package tuareg
-;;   :ensure t
-;;   :mode (("\\.ml\\'" . tuareg-mode)
-;;          ("\\.mli\\'" . tuareg-mode)
-;;          ("\\.mly\\'" . tuareg-mode)
-;;          ("\\.mll\\'" . tuareg-mode)
-;;          ("\\.mlp\\'" . tuareg-mode)))
-
-;; (use-package powershell
-;;   :ensure t
-;;   :mode (("\\.ps1'" . powershell-mode)))
-
-;; (use-package markdown-mode
-;;   :ensure t
-;;   :mode (("\\.md\\'" . gfm-mode))
-;;   :custom
-;;   (markdown-command "multimarkdown")
-;;   (markdown-italic-underscore t)
-;;   :config
-;;   (defconst markdown-regex-italic
-;;     "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \n\t\\]\\|[^ \n\t]\\(?:.\\|\n[^\n]\\)[^\\ ]\\)\\(?4:\\2\\)\\)")
-;;   (defconst markdown-regex-gfm-italic
-;;     "\\(?:^\\|[^\\]\\)\\(?1:\\(?2:[_]\\)\\(?3:[^ \\]\\2\\|[^ ]\\(?:.\\|\n[^\n]\\)\\)\\(?4:\\2\\)\\)")
-;;   (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
-
-;; (use-package markdown-preview-mode
-;;   :ensure t
-;;   :defer t)
-
-;; (use-package rust-mode
-;;   :ensure t
-;;   :defer t
-;;   :hook
-;;   ((rust-mode . smartparens-mode)
-;;    (rust-mode . electric-operator-mode))
-;;   :custom
-;;   (rust-format-on-save t))
-
-;; (use-package racer
-;;   :ensure t
-;;   :hook
-;;   ((rust-mode . racer-mode)
-;;    (racer-mode . eldoc-mode))
-;;   :config
-;;   (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
-
-;; (use-package auctex
-;;   :ensure t
-;;   :mode (("\\.tex\\'" . TeX-tex-mode)
-;;          ("\\.latex\\'" . TeX-tex-mode))
-;;   :custom
-;;   (TeX-auto-save t)
-;;   (TeX-parse-self t)
-;;   ;; use tectonic as tex engine
-;;   (TeX-engine-alist '((tectonic                          ; engine symbol
-;;                        "Tectonic"                        ; engine name
-;;                        "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
-;;                        "tectonic -X watch"               ; shell command for compiling LaTeX documents
-;;                        nil                               ; shell command for compiling ConTeXt documents
-;;                        )))
-;;   (TeX-engine 'tectonic)
-;;   (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
-;;   (TeX-check-TeX nil)
-;;   :config
-;;   (use-package tex
-;;     :config
-;;     (let ((tex-list (assoc "TeX" TeX-command-list))
-;;           (latex-list (assoc "LaTeX" TeX-command-list)))
-;;       (setf (cadr tex-list) "%(tex)"
-;;             (cadr latex-list) "%l"))))
-;; ;;   :config
-;; ;;   (TeX-source-correlate-mode +1)
-;; ;;   (use-package pdf-sync)
-;; ;;   (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
-;; ;;   (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
-;; ;;     (delq (assoc command TeX-command-list) TeX-command-list))
-;; ;;   (LaTeX-math-mode +1)
-;; ;;   (turn-on-reftex)
+;;   (TeX-source-correlate-mode +1)
+;;   (use-package pdf-sync)
+;;   (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
+;;   (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
+;;     (delq (assoc command TeX-command-list) TeX-command-list))
+;;   (LaTeX-math-mode +1)
+;;   (turn-on-reftex)
 
 ;; (use-package vimrc-mode
 ;;   :ensure t
