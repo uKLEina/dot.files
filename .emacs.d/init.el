@@ -1882,7 +1882,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5))
+  (gptel-model 'gpt-5-mini))
 
 (use-package gptel-magit
   :ensure t

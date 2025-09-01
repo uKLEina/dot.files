@@ -28,7 +28,7 @@
                   load-prefer-newer t
                   file-name-handler-alist my/startup-file-name-handler-alist
                   native-comp-jit-compilation t))
-          99)  ; 他のhookより後に実行
+          t)
 
 ;; 警告の抑制
 (setq warning-suppress-types '((package reinitialization)
