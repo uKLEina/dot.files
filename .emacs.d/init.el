@@ -225,7 +225,7 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
 ;; (set-face-attribute 'default nil :family "0xProto" :height 110)
-(set-face-attribute 'default nil :family "ProtoGen" :height 120)
+(set-face-attribute 'default nil :family "ProtoGen" :height 140)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
@@ -546,7 +546,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; External packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(package-initialize)
+;; (package-initialize)
 
 (use-package auto-compile
   :ensure t
@@ -1709,97 +1709,94 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;   (LaTeX-math-mode +1)
 ;;   (turn-on-reftex)
 
-;; (use-package vimrc-mode
-;;   :ensure t
-;;   :defer t)
+(use-package vimrc-mode
+  :ensure t
+  :defer t)
 
-;; (use-package yaml-mode
-;;   :ensure t
-;;   :defer t
-;;   :init
-;;   (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
-;;   (defun kle/yaml-indent-shift-right (beg end)
-;;     (interactive "r")
-;;     (let ((tab-stop-list '(2 4 6))
-;;           (deactivate-mark nil))
-;;       (indent-rigidly-right-to-tab-stop beg end)))
-;;   (defun kle/yaml-indent-shift-left (beg end)
-;;     (interactive "r")
-;;     (let ((tab-stop-list '(2 4 6))
-;;           (deactivate-mark nil))
-;;       (indent-rigidly-left-to-tab-stop beg end)))
-;;   :hook
-;;   (yaml-mode . highlight-indent-guides-mode)
-;;   :bind
-;;   (:map yaml-mode-map
-;;         ("M-<right>" . kle/yaml-indent-shift-right)
-;;         ("M-<left>" . kle/yaml-indent-shift-left))
-;;   :config
-;;   (buffer-face-set 'default))
+(use-package yaml-mode
+  :ensure t
+  :init
+  (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
+  (defun kle/yaml-indent-shift-right (beg end)
+    (interactive "r")
+    (let ((tab-stop-list '(2 4 6))
+          (deactivate-mark nil))
+      (indent-rigidly-right-to-tab-stop beg end)))
+  (defun kle/yaml-indent-shift-left (beg end)
+    (interactive "r")
+    (let ((tab-stop-list '(2 4 6))
+          (deactivate-mark nil))
+      (indent-rigidly-left-to-tab-stop beg end)))
+  :hook
+  (yaml-mode . highlight-indent-guides-mode)
+  :bind
+  (:map yaml-mode-map
+        ("M-<right>" . kle/yaml-indent-shift-right)
+        ("M-<left>" . kle/yaml-indent-shift-left))
+  :config
+  (buffer-face-set 'default))
 
-;; (use-package dockerfile-mode
-;;   :ensure t
-;;   :defer t)
+(use-package dockerfile-mode
+  :ensure t)
 
-;; (use-package textile-mode
-;;   :ensure t
-;;   :mode "\\.textile\\'")
+(use-package textile-mode
+  :ensure t
+  :mode "\\.textile\\'")
 
-;; (use-package csv-mode
-;;   :ensure t
-;;   :defer t
-;;   :init
-;;   ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-;;   ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
-;;   (defun enable-csv-mode-for-small-files ()
-;;     "Enable csv-mode for TSV/CSV files if they are not too large."
-;;     (when (and buffer-file-name
-;;                (or (string-match-p "\\.csv\\'" buffer-file-name)
-;;                    (string-match-p "\\.tsv\\'" buffer-file-name))
-;;                (or (not large-file-warning-threshold)
-;;                    (< (buffer-size) large-file-warning-threshold)))
-;;       (csv-mode)))
-;;   (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
-;;   (defun kle/smartrep-csv-setup ()
-;;     (smartrep-define-key
-;;         csv-mode-map "C-c" '(("l" . csv-forward-field)
-;;                              ("h" . csv-backward-field))))
-;;   :hook
-;;   (csv-mode . csv-align-mode)
-;;   (tsv-mode . csv-align-mode)
-;;   (csv-mode . (lambda () (toggle-truncate-lines t)))
-;;   (tsv-mode . (lambda () (toggle-truncate-lines t)))
-;;   (csv-mode . kle/smartrep-csv-setup)
-;;   :bind
-;;   (:map csv-mode-map
-;;         ("C-c l" . csv-forward-field)
-;;         ("C-c h" . csv-backward-field))
-;;   :custom
-;;   (csv-align-style 'auto)
-;;   (csv-align-max-width 200))
+(use-package csv-mode
+  :ensure t
+  :init
+  ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+  (defun enable-csv-mode-for-small-files ()
+    "Enable csv-mode for TSV/CSV files if they are not too large."
+    (when (and buffer-file-name
+               (or (string-match-p "\\.csv\\'" buffer-file-name)
+                   (string-match-p "\\.tsv\\'" buffer-file-name))
+               (or (not large-file-warning-threshold)
+                   (< (buffer-size) large-file-warning-threshold)))
+      (csv-mode)))
+  (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
+  (defun kle/smartrep-csv-setup ()
+    (smartrep-define-key
+        csv-mode-map "C-c" '(("l" . csv-forward-field)
+                             ("h" . csv-backward-field))))
+  :hook
+  (csv-mode . csv-align-mode)
+  (tsv-mode . csv-align-mode)
+  (csv-mode . (lambda () (toggle-truncate-lines t)))
+  (tsv-mode . (lambda () (toggle-truncate-lines t)))
+  (csv-mode . kle/smartrep-csv-setup)
+  :bind
+  (:map csv-mode-map
+        ("C-c l" . csv-forward-field)
+        ("C-c h" . csv-backward-field))
+  :custom
+  (csv-align-style 'auto)
+  (csv-align-max-width 200))
 
-;; (use-package yaml-pro
-;;   :ensure t
-;;   :hook (yaml-mode . yaml-pro-mode))
+(use-package yaml-pro
+  :ensure t
+  :hook (yaml-mode . yaml-pro-mode))
 
-;; (use-package open-junk-file
-;;   :ensure t
-;;   :custom
-;;   (open-junk-file-format "~/.junk/%Y/%m/%d-%H%M%S.")
-;;   :bind
-;;   (("C-l j" . open-junk-file))
-;;   )
+(use-package open-junk-file
+  :ensure t
+  :custom
+  (open-junk-file-format "~/.junk/%Y/%m/%d-%H%M%S.")
+  :bind
+  (("C-l j" . open-junk-file))
+  )
 
-;; (use-package diminish
-;;   :ensure t
-;;   :config
-;;   (diminish 'highlight-symbol-mode "HighSym")
-;;   (diminish 'smartparens-mode "SmPar")
-;;   (diminish 'hs-minor-mode "HideShow")
-;;   (diminish 'yas-minor-mode "YAS")
-;;   (diminish 'which-key-mode "WhKey")
-;;   (diminish 'undo-tree-mode "UndoTree")
-;;   (diminish 'super-save-mode "SSave"))
+(use-package diminish
+  :ensure t
+  :config
+  (diminish 'highlight-symbol-mode "HighSym")
+  (diminish 'smartparens-mode "SmPar")
+  (diminish 'hs-minor-mode "HideShow")
+  (diminish 'yas-minor-mode "YAS")
+  (diminish 'which-key-mode "WhKey")
+  (diminish 'undo-tree-mode "UndoTree")
+  (diminish 'super-save-mode "SSave"))
 
 (use-package dashboard
   :ensure t
@@ -1817,281 +1814,284 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
     (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)))
 
-;; (use-package ligature
-;;   :ensure t
-;;   :defer 1
-;;   :hook
-;;   (prog-mode . ligature-mode)
-;;   :config
-;;   (ligature-set-ligatures 'prog-mode
-;;                           '("->" "<-" "=>" "=>>" ">=>" "=>=" "=<<" "=<=" "<=<" "<=>"
-;;                             ">>" ">>>" "<<" "<<<" "<>" "<|>" "==" "===" ".=" ":="
-;;                             "#=" "!=" "!==" "=!=" "=:=" "::" ":::" ":<:" ":>:"
-;;                             "||" "|>" "||>" "|||>" "<|" "<||" "<|||"
-;;                             ;; "**" "***"
-;;                             "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
-;;                             "$$" "%%" "|]" "[|")))
+(use-package ligature
+  :ensure t
+  :defer 1
+  :hook
+  (prog-mode . ligature-mode)
+  :config
+  (ligature-set-ligatures 'prog-mode
+                          '("->" "<-" "=>" "=>>" ">=>" "=>=" "=<<" "=<=" "<=<" "<=>"
+                            ">>" ">>>" "<<" "<<<" "<>" "<|>" "==" "===" ".=" ":="
+                            "#=" "!=" "!==" "=!=" "=:=" "::" ":::" ":<:" ":>:"
+                            "||" "|>" "||>" "|||>" "<|" "<||" "<|||"
+                            ;; "**" "***"
+                            "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
+                            "$$" "%%" "|]" "[|")))
 
-;; (use-package aidermacs
-;;   :ensure t
-;;   :pin melpa
-;;   :custom
-;;   (aidermacs-default-chat-mode 'ask)
-;;   (aidermacs-exit-kills-buffer t)
-;;   :bind (("C-c a" . aidermacs-transient-menu)))
+(use-package aidermacs
+  :ensure t
+  :pin melpa
+  :custom
+  (aidermacs-default-chat-mode 'ask)
+  (aidermacs-exit-kills-buffer t)
+  :bind (("C-c a" . aidermacs-transient-menu)))
 
-;; (use-package gptel
-;;   :ensure t
-;;   :pin melpa
-;;   :custom
-;;   (gptel-api-key (getenv "OPENAI_API_KEY"))
-;;   (gptel-model 'gpt-5-mini))
+(use-package gptel
+  :ensure t
+  :pin melpa
+  :custom
+  (gptel-api-key (getenv "OPENAI_API_KEY"))
+  (gptel-model 'gpt-5-mini))
 
-;; (use-package gptel-magit
-;;   :ensure t
-;;   :hook (magit-mode . gptel-magit-install)
-;;   :config
-;;   (setopt gptel-magit-commit-prompt
-;;           "You are an expert software engineer and meticulous code reviewer.
-;; Your task is to generate a single Git commit message that **strictly follows the Conventional Commits v1.0.0 Specification**.
+(use-package gptel-magit
+  :ensure t
+  :hook (magit-mode . gptel-magit-install)
+  :config
+  (setopt gptel-magit-commit-prompt
+          "You are an expert software engineer and meticulous code reviewer.
+Your task is to generate a single Git commit message that **strictly follows the Conventional Commits v1.0.0 Specification**.
 
-;; ### PRIMARY GOAL
+### PRIMARY GOAL
 
-;; Produce one short, complete commit message for the staged changes.
+Produce one short, complete commit message for the staged changes.
 
-;; ---
+---
 
-;; ### SPEC FOR YOUR REFERENCE
+### SPEC FOR YOUR REFERENCE
 
-;; Conventional Commits 1.0.0
-;; ==========================
+Conventional Commits 1.0.0
+==========================
 
-;; Summary
-;; =======
+Summary
+=======
 
-;; The Conventional Commits specification is a lightweight convention on top of commit messages.
-;; It provides an easy set of rules for creating an explicit commit history; which makes it
-;; easier to write automated tools on top of. This convention dovetails with [SemVer](http://semver.org/),
-;; by describing the features, fixes, and breaking changes made in commit messages.
+The Conventional Commits specification is a lightweight convention on top of commit messages.
+It provides an easy set of rules for creating an explicit commit history; which makes it
+easier to write automated tools on top of. This convention dovetails with [SemVer](http://semver.org/),
+by describing the features, fixes, and breaking changes made in commit messages.
 
-;; Structure
-;; =========
+Structure
+=========
 
-;; The commit message should be structured as follows:
-;; ```
-;; <type>[optional scope]: <description>
+The commit message should be structured as follows:
+```
+<type>[optional scope]: <description>
 
-;; [optional body]
+[optional body]
 
-;; [optional footer(s)]
-;; ```
+[optional footer(s)]
+```
 
-;; Core Elements
-;; ============
+Core Elements
+============
 
-;; The commit contains the following structural elements, to communicate intent to the consumers of your library:
+The commit contains the following structural elements, to communicate intent to the consumers of your library:
 
-;; 1. **fix:** a commit of the _type_`fix` patches a bug in your codebase (this correlates with [`PATCH`](http://semver.org/#summary) in Semantic Versioning).
-;; 2. **feat:** a commit of the _type_`feat` introduces a new feature to the codebase (this correlates with [`MINOR`](http://semver.org/#summary) in Semantic Versioning).
-;; 3. **BREAKING CHANGE:** a commit that has a footer `BREAKING CHANGE:`, or appends a `!` after the type/scope, introduces a breaking API change (correlating with [`MAJOR`](http://semver.org/#summary) in Semantic Versioning). A BREAKING CHANGE can be part of commits of any _type_.
-;; 4. _types_ other than `fix:` and `feat:` are allowed, for example [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional) (based on the [Angular convention](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines)) recommends `build:`, `chore:`, `ci:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, and others.
-;; 5. _footers_ other than `BREAKING CHANGE: <description>` may be provided and follow a convention similar to [git trailer format](https://git-scm.com/docs/git-interpret-trailers).
+1. **fix:** a commit of the _type_`fix` patches a bug in your codebase (this correlates with [`PATCH`](http://semver.org/#summary) in Semantic Versioning).
+2. **feat:** a commit of the _type_`feat` introduces a new feature to the codebase (this correlates with [`MINOR`](http://semver.org/#summary) in Semantic Versioning).
+3. **BREAKING CHANGE:** a commit that has a footer `BREAKING CHANGE:`, or appends a `!` after the type/scope, introduces a breaking API change (correlating with [`MAJOR`](http://semver.org/#summary) in Semantic Versioning). A BREAKING CHANGE can be part of commits of any _type_.
+4. _types_ other than `fix:` and `feat:` are allowed, for example [@commitlint/config-conventional](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional) (based on the [Angular convention](https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines)) recommends `build:`, `chore:`, `ci:`, `docs:`, `style:`, `refactor:`, `perf:`, `test:`, and others.
+5. _footers_ other than `BREAKING CHANGE: <description>` may be provided and follow a convention similar to [git trailer format](https://git-scm.com/docs/git-interpret-trailers).
 
-;; Additional types are not mandated by the Conventional Commits specification, and have no implicit effect in Semantic Versioning (unless they include a BREAKING CHANGE). A scope may be provided to a commit's type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add ability to parse arrays`.
+Additional types are not mandated by the Conventional Commits specification, and have no implicit effect in Semantic Versioning (unless they include a BREAKING CHANGE). A scope may be provided to a commit's type, to provide additional contextual information and is contained within parenthesis, e.g., `feat(parser): add ability to parse arrays`.
 
-;; Type Definitions
-;; ==============
+Type Definitions
+==============
 
-;; Each commit type has a specific meaning and purpose:
+Each commit type has a specific meaning and purpose:
 
-;; - **fix**: A commit that patches a bug in your codebase
-;; - **feat**: A commit that introduces a new feature to the codebase
-;; - **build**: Changes that affect the build system or external dependencies
-;; - **chore**: Changes to the build process or auxiliary tools and libraries
-;; - **ci**: Changes to CI configuration files and scripts
-;; - **docs**: Documentation only changes
-;; - **perf**: A code change that improves performance
-;; - **refactor**: A code change that neither fixes a bug nor adds a feature
-;; - **style**: Changes that do not affect the meaning of the code
-;; - **test**: Adding missing tests or correcting existing tests
+- **fix**: A commit that patches a bug in your codebase
+- **feat**: A commit that introduces a new feature to the codebase
+- **build**: Changes that affect the build system or external dependencies
+- **chore**: Changes to the build process or auxiliary tools and libraries
+- **ci**: Changes to CI configuration files and scripts
+- **docs**: Documentation only changes
+- **perf**: A code change that improves performance
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **style**: Changes that do not affect the meaning of the code
+- **test**: Adding missing tests or correcting existing tests
 
-;; Note: Types other than \"fix:\" and \"feat:\" are allowed and have no implicit effect in
-;; semantic versioning (unless they include a BREAKING CHANGE).
+Note: Types other than \"fix:\" and \"feat:\" are allowed and have no implicit effect in
+semantic versioning (unless they include a BREAKING CHANGE).
 
-;; Detailed Rules
-;; =============
+Detailed Rules
+=============
 
-;; The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"MAY\", and \"OPTIONAL\" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
+The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"MAY\", and \"OPTIONAL\" in this document are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).
 
-;; 1. Commits MUST be prefixed with a type, which consists of a noun, `feat`, `fix`, etc., followed by the OPTIONAL scope, OPTIONAL `!`, and REQUIRED terminal colon and space.
-;; 2. The type `feat` MUST be used when a commit adds a new feature to your application or library.
-;; 3. The type `fix` MUST be used when a commit represents a bug fix for your application.
-;; 4. A scope MAY be provided after a type. A scope MUST consist of a noun describing a section of the codebase surrounded by parenthesis, e.g., `fix(parser):`
-;; 5. A description MUST immediately follow the colon and space after the type/scope prefix. The description is a short summary of the code changes, e.g., _fix: array parsing issue when multiple spaces were contained in string_.
-;; 6. A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
-;; 7. A commit body is free-form and MAY consist of any number of newline separated paragraphs.
-;; 8. One or more footers MAY be provided one blank line after the body. Each footer MUST consist of a word token, followed by either a `:<space>` or `<space>#` separator, followed by a string value (this is inspired by the [git trailer convention](https://git-scm.com/docs/git-interpret-trailers)).
-;; 9. A footer's token MUST use `-` in place of whitespace characters, e.g., `Acked-by` (this helps differentiate the footer section from a multi-paragraph body). An exception is made for `BREAKING CHANGE`, which MAY also be used as a token.
-;; 10. A footer's value MAY contain spaces and newlines, and parsing MUST terminate when the next valid footer token/separator pair is observed.
-;; 11. Breaking changes MUST be indicated in the type/scope prefix of a commit, or as an entry in the footer.
-;; 12. If included as a footer, a breaking change MUST consist of the uppercase text BREAKING CHANGE, followed by a colon, space, and description, e.g., _BREAKING CHANGE: environment variables now take precedence over config files_.
-;; 13. If included in the type/scope prefix, breaking changes MUST be indicated by a `!` immediately before the `:`. If `!` is used, `BREAKING CHANGE:` MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
-;; 14. Types other than `feat` and `fix` MAY be used in your commit messages, e.g., _docs: update ref docs._
-;; 15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of BREAKING CHANGE which MUST be uppercase.
-;; 16. BREAKING-CHANGE MUST be synonymous with BREAKING CHANGE, when used as a token in a footer.
+1. Commits MUST be prefixed with a type, which consists of a noun, `feat`, `fix`, etc., followed by the OPTIONAL scope, OPTIONAL `!`, and REQUIRED terminal colon and space.
+2. The type `feat` MUST be used when a commit adds a new feature to your application or library.
+3. The type `fix` MUST be used when a commit represents a bug fix for your application.
+4. A scope MAY be provided after a type. A scope MUST consist of a noun describing a section of the codebase surrounded by parenthesis, e.g., `fix(parser):`
+5. A description MUST immediately follow the colon and space after the type/scope prefix. The description is a short summary of the code changes, e.g., _fix: array parsing issue when multiple spaces were contained in string_.
+6. A longer commit body MAY be provided after the short description, providing additional contextual information about the code changes. The body MUST begin one blank line after the description.
+7. A commit body is free-form and MAY consist of any number of newline separated paragraphs.
+8. One or more footers MAY be provided one blank line after the body. Each footer MUST consist of a word token, followed by either a `:<space>` or `<space>#` separator, followed by a string value (this is inspired by the [git trailer convention](https://git-scm.com/docs/git-interpret-trailers)).
+9. A footer's token MUST use `-` in place of whitespace characters, e.g., `Acked-by` (this helps differentiate the footer section from a multi-paragraph body). An exception is made for `BREAKING CHANGE`, which MAY also be used as a token.
+10. A footer's value MAY contain spaces and newlines, and parsing MUST terminate when the next valid footer token/separator pair is observed.
+11. Breaking changes MUST be indicated in the type/scope prefix of a commit, or as an entry in the footer.
+12. If included as a footer, a breaking change MUST consist of the uppercase text BREAKING CHANGE, followed by a colon, space, and description, e.g., _BREAKING CHANGE: environment variables now take precedence over config files_.
+13. If included in the type/scope prefix, breaking changes MUST be indicated by a `!` immediately before the `:`. If `!` is used, `BREAKING CHANGE:` MAY be omitted from the footer section, and the commit description SHALL be used to describe the breaking change.
+14. Types other than `feat` and `fix` MAY be used in your commit messages, e.g., _docs: update ref docs._
+15. The units of information that make up Conventional Commits MUST NOT be treated as case sensitive by implementors, with the exception of BREAKING CHANGE which MUST be uppercase.
+16. BREAKING-CHANGE MUST be synonymous with BREAKING CHANGE, when used as a token in a footer.
 
-;; ### Examples
+### Examples
 
-;; #### Commit message with description and breaking change footer
-;; ```
-;; feat: allow provided config object to extend other configs
+#### Commit message with description and breaking change footer
+```
+feat: allow provided config object to extend other configs
 
-;; BREAKING CHANGE: `extends` key in config file is now used for extending other config files
-;; ```
+BREAKING CHANGE: `extends` key in config file is now used for extending other config files
+```
 
-;; #### Commit message with `!` to draw attention to breaking change
-;; ```
-;; feat!: send an email to the customer when a product is shipped
-;; ```
+#### Commit message with `!` to draw attention to breaking change
+```
+feat!: send an email to the customer when a product is shipped
+```
 
-;; #### Commit message with scope and `!` to draw attention to breaking change
-;; ```
-;; feat(api)!: send an email to the customer when a product is shipped
-;; ```
+#### Commit message with scope and `!` to draw attention to breaking change
+```
+feat(api)!: send an email to the customer when a product is shipped
+```
 
-;; #### Commit message with both `!` and BREAKING CHANGE footer
-;; ```
-;; chore!: drop support for Node 6
+#### Commit message with both `!` and BREAKING CHANGE footer
+```
+chore!: drop support for Node 6
 
-;; BREAKING CHANGE: use JavaScript features not available in Node 6.
-;; ```
+BREAKING CHANGE: use JavaScript features not available in Node 6.
+```
 
-;; #### Commit message with no body
-;; ```
-;; docs: correct spelling of CHANGELOG
-;; ```
+#### Commit message with no body
+```
+docs: correct spelling of CHANGELOG
+```
 
-;; #### Commit message with scope
-;; ```
-;; feat(lang): add Polish language
-;; ```
+#### Commit message with scope
+```
+feat(lang): add Polish language
+```
 
-;; #### Commit message with multi-paragraph body and multiple footers
-;; ```
-;; fix: prevent racing of requests
+#### Commit message with multi-paragraph body and multiple footers
+```
+fix: prevent racing of requests
 
-;; Introduce a request id and a reference to latest request. Dismiss
-;; incoming responses other than from latest request.
+Introduce a request id and a reference to latest request. Dismiss
+incoming responses other than from latest request.
 
-;; Remove timeouts which were used to mitigate the racing issue but are
-;; obsolete now.
+Remove timeouts which were used to mitigate the racing issue but are
+obsolete now.
 
-;; Reviewed-by: Z
-;; Refs: #123
-;; ```
+Reviewed-by: Z
+Refs: #123
+```
 
-;; ### OUTPUT FORMAT
-;; - Return **only** the commit message text—no code fences, no commentary, no extra markup or explanations.
-;; - The summary (first) line **must** be imperative, present tense, ≤72 characters, and **must not** end with a period.
-;; - Wrap all body lines at a maximum of 72 characters.
-;; - If a body is included, format it as a clean, concise bullet list, each line starting with - .
+### OUTPUT FORMAT
+- Return **only** the commit message text—no code fences, no commentary, no extra markup or explanations.
+- The summary (first) line **must** be imperative, present tense, ≤72 characters, and **must not** end with a period.
+- Wrap all body lines at a maximum of 72 characters.
+- If a body is included, format it as a clean, concise bullet list, each line starting with - .
 
-;; ### OUTPUT LANGUAGE
-;; -- Use Japanese for the commit message.
-;; -- Type keywords like feat or fix should not be translated into Japanese. Use as is.
+### OUTPUT LANGUAGE
+-- Use Japanese for the commit message.
+-- Type keywords like feat or fix should not be translated into Japanese. Use as is.
 
-;; ---
+---
 
-;; ")
-;;   (setopt gptel-magit-diff-explain-prompt
-;;           (concat gptel-magit-diff-explain-prompt
-;;                   " Use Japanase for the answer."))
-;;   (defun my-gptel-magit--format-commit-message (message)
-;;     message)
-;;   (advice-add 'gptel-magit--format-commit-message :override
-;;               #'my-gptel-magit--format-commit-message)
-;;   (setq gptel-magit-model 'gpt-4.1-mini))
+")
+  (setopt gptel-magit-diff-explain-prompt
+          (concat gptel-magit-diff-explain-prompt
+                  " Use Japanase for the answer."))
+  (defun my-gptel-magit--format-commit-message (message)
+    message)
+  (advice-add 'gptel-magit--format-commit-message :override
+              #'my-gptel-magit--format-commit-message)
+  (setq gptel-magit-model 'gpt-4.1-mini))
 
-;; (use-package minuet
-;;   :ensure t
-;;   :custom
-;;   (minuet-provider 'openai)
-;;   (minuet-request-timeout 10)
-;;   (minuet-n-completions 1)
-;;   :bind (:map minuet-active-mode-map
-;;               ("<tab>" . 'minuet-accept-suggestion)
-;;               ("TAB" . 'minuet-accept-suggestion)
-;;               ("C-<left>" . 'minuet-previous-suggestion)
-;;               ("C-<right>" . 'minuet-next-suggestion))
-;;   :hook (python-ts-mode . minuet-auto-suggestion-mode))
+(use-package minuet
+  :ensure t
+  :custom
+  (minuet-provider 'openai)
+  (minuet-request-timeout 10)
+  (minuet-n-completions 1)
+  :bind (:map minuet-active-mode-map
+              ("<tab>" . 'minuet-accept-suggestion)
+              ("TAB" . 'minuet-accept-suggestion)
+              ("C-<left>" . 'minuet-previous-suggestion)
+              ("C-<right>" . 'minuet-next-suggestion))
+  :hook (python-ts-mode . minuet-auto-suggestion-mode))
 
-;; (use-package emojify
-;;   :ensure t
-;;   :hook (after-init . global-emojify-mode))
+(use-package emojify
+  :ensure t
+  :hook
+  (text-mode . global-emojify-mode)
+  (prog-mode . global-emojify-mode))
 
-;; ;;; Linux specific setup
-;; (when (eq system-type 'gnu/linux)
-;;   (use-package vterm
-;;     :ensure t
-;;     :custom
-;;     (vterm-max-scrollback 100000)
-;;     :init
-;;     (push '("*vterm*" :position bottom :width 15)
-;;           popwin:special-display-config))
-;;   (use-package vterm-toggle
-;;     :ensure t
-;;     :bind
-;;     (("<f10>" . vterm-toggle))
-;;     (:map vterm-mode-map
-;;           ("<f10>" . vterm-toggle)))
-;;   ;; (use-package exec-path-from-shell
-;;   ;;   :ensure t
-;;   ;;   :custom
-;;   ;;   (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
-;;   ;;   :config
-;;   ;;   (exec-path-from-shell-initialize))
+;;; Linux specific setup
+(when (eq system-type 'gnu/linux)
+  (use-package vterm
+    :ensure t
+    :custom
+    (vterm-max-scrollback 100000)
+    ;; :init
+    ;; (push '("*vterm*" :position bottom :width 15)
+    ;;       popwin:special-display-config)
+    )
+  (use-package vterm-toggle
+    :ensure t
+    :bind
+    (("<f10>" . vterm-toggle))
+    (:map vterm-mode-map
+          ("<f10>" . vterm-toggle)))
+  ;; (use-package exec-path-from-shell
+  ;;   :ensure t
+  ;;   :custom
+  ;;   (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
+  ;;   :config
+  ;;   (exec-path-from-shell-initialize))
 
-;;                                         ;(use-package pdf-tools
-;;                                         ;  :ensure t
-;;                                         ;  :defer t
-;;                                         ;  :init
-;;                                         ;  (pdf-loader-install))
-;;   ;; font
-;;   ;; default ASCII font
-;;   ;; (defun calculate-font-size-for-frame (frame)
-;;   ;;   "Calculate the font size dynamically based on the frame's display resolution."
-;;   ;;   (let* ((attrs (frame-monitor-attributes frame))
-;;   ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
-;;   ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
-;;   ;;          (dpi (if (and mm-width pixel-width)
-;;   ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
-;;   ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
-;;   ;;                 96))                                  ; Default to 96 DPI if unavailable
-;;   ;;          (font-size (cond
-;;   ;;                      ((> dpi 200) 180)  ; High DPI
-;;   ;;                      ((> dpi 150) 140)  ; Medium DPI
-;;   ;;                      (t 120))))        ; Low DPI
-;;   ;;     font-size))
-;;   (use-package treesit-auto
-;;     :ensure t
-;;     :commands
-;;     (global-treesit-auto-mode)
-;;     :custom
-;;     (treesit-auto-install 'prompt)
-;;     :init
-;;     (global-treesit-auto-mode 1)
-;;     :config
-;;     (treesit-auto-add-to-auto-mode-alist 'all))
+                                        ;(use-package pdf-tools
+                                        ;  :ensure t
+                                        ;  :defer t
+                                        ;  :init
+                                        ;  (pdf-loader-install))
+  ;; font
+  ;; default ASCII font
+  ;; (defun calculate-font-size-for-frame (frame)
+  ;;   "Calculate the font size dynamically based on the frame's display resolution."
+  ;;   (let* ((attrs (frame-monitor-attributes frame))
+  ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
+  ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
+  ;;          (dpi (if (and mm-width pixel-width)
+  ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
+  ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
+  ;;                 96))                                  ; Default to 96 DPI if unavailable
+  ;;          (font-size (cond
+  ;;                      ((> dpi 200) 180)  ; High DPI
+  ;;                      ((> dpi 150) 140)  ; Medium DPI
+  ;;                      (t 120))))        ; Low DPI
+  ;;     font-size))
+  (use-package treesit-auto
+    :ensure t
+    :commands
+    (global-treesit-auto-mode)
+    :hook
+    (prog-mode . global-treesit-auto-mode)
+    :custom
+    (treesit-auto-install 'prompt)
+    :config
+    (treesit-auto-add-to-auto-mode-alist 'all))
 
-;;   (use-package treesit-fold
-;;     :init
-;;     (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
-;;            (treesit-fold-file (concat elpa-lisp-dir "/treesit-fold/treesit-fold.el")))
-;;       (unless (file-exists-p treesit-fold-file)
-;;         (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
-;;     :bind
-;;     ("C-l o" . treesit-fold-toggle))
-;;   (use-package autodisass-java-bytecode
-;;     :ensure t
-;;     :defer t)
-;;   )
+  (use-package treesit-fold
+    :init
+    (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
+           (treesit-fold-file (concat elpa-lisp-dir "/treesit-fold/treesit-fold.el")))
+      (unless (file-exists-p treesit-fold-file)
+        (package-vc-install "https://github.com/emacs-tree-sitter/treesit-fold")))
+    :bind
+    ("C-l o" . treesit-fold-toggle))
+
+  (use-package autodisass-java-bytecode
+    :ensure t)
+  )
