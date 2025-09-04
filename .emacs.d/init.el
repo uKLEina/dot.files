@@ -460,6 +460,10 @@ Otherwise, join lines with no space."
 ;; デフォルト色付け
 (use-package generic-x)
 
+(use-package java-ts-mode
+  :mode
+  (("\\.java\\'" . java-ts-mode)))
+
 (when (eq system-type 'gnu/linux)
   ;;; Fix copy/paste in Wayland
   ;; credit: yorickvP on Github
@@ -1227,6 +1231,16 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;     :notification-handlers (lsp-ht ((concat lsp-pyright-langserver-command "/beginProgress") 'lsp-pyright--begin-progress-callback)
 ;;                                    ((concat lsp-pyright-langserver-command "/reportProgress") 'lsp-pyright--report-progress-callback)
 ;;                                    ((concat lsp-pyright-langserver-command "/endProgress") 'lsp-pyright--end-progress-callback)))))
+
+(use-package lsp-java
+  :ensure t
+  :hook (java-ts-mode . lsp-deferred)
+  :custom
+  (lsp-java-java-path "/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
+  :config
+  (setq lsp-java-configuration-runtimes
+        `[(:name "JavaSE-1.8" :path "/usr/lib/jvm/java-1.8.0-amazon-corretto" :default t)
+          (:name "JavaSE-21"  :path "/usr/lib/jvm/java-21-openjdk-amd64")]))
 
 (use-package lsp-ui
   :ensure t
