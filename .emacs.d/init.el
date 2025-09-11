@@ -234,6 +234,39 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 ;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
 (setq use-default-font-for-symbols nil)
 
+(defvar my/font-family "ProtoGen")
+(defvar my/font-height 140
+  "要求するデフォルトのフォント高さ（:height の単位）。")
+(defvar my/font-step 10
+  "フォント高さを増減する単位（:height の単位）。")
+(defvar my/font-min-height 10
+  "許容する最小フォント高さ。必要なければ調整または nil に。")
+(defvar my/font-max-height 1000
+  "許容する最大フォント高さ。必要なければ調整または nil に。")
+
+(defun my/change-font-height (delta &optional n)
+  (let* ((n (or n 1))
+         (new (+ my/font-height (* delta n)))
+         (new (if my/font-min-height (max my/font-min-height new) new))
+         (new (if my/font-max-height (min my/font-max-height new) new)))
+    (setq my/font-height new)                  ;; 希望値を更新
+    (set-face-attribute 'default nil
+                        :family my/font-family
+                        :height new)
+    (message "Requested font height: %d"new)))
+
+(defun my/increase-font-height (n)
+  (interactive "p")
+  (my/change-font-height my/font-step n))
+
+(defun my/decrease-font-height (n)
+  (interactive "p")
+  (my/change-font-height (- my/font-step) n))
+
+;; キー割り当て
+(global-set-key (kbd "<f5>") 'my/decrease-font-height)
+(global-set-key (kbd "<f6>") 'my/increase-font-height)
+
 ;; (set-face-attribute 'default nil
 ;;                     :family "Ricty Discord"
 ;;                     :height 140)
