@@ -454,6 +454,7 @@ Otherwise, join lines with no space."
   (org-latex-default-class "bxjsarticle"))
 
 (use-package tramp
+  :demand t
   :custom
   (tramp-default-method "ssh"))
 
