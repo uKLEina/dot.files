@@ -1894,7 +1894,22 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5-mini))
+  (gptel-model 'gpt-5-mini)
+  ;; :init
+  ;; ;; Mark gptel-related file-local variables as safe.
+  ;; (put 'gptel-model 'safe-local-variable
+  ;;      (lambda (v) (or (symbolp v) (stringp v))))
+  ;; (put 'gptel--backend-name 'safe-local-variable #'stringp)
+  ;; (put 'gptel--bounds 'safe-local-variable #'listp)
+
+  ;; (defcustom gptel-save-directory "~/gptel/"
+  ;;   "Directory where gptel chat buffers are saved by `gptel-save-as-md'."
+  ;;   :type 'directory
+  ;;   :group 'gptel)
+  ;; (bind-key "C-l c o" #'gptel-open-saved-chat)
+  ;; :config
+  ;; (bind-key "C-x C-s" #'gptel-save-buffer-dwim gptel-mode-map)
+  )
 
 (use-package gptel-magit
   :ensure t

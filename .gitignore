@@ -52,6 +52,9 @@ xelatex
 !/.emacs.d/inits/*.el
 !/.emacs.d/snippets/
 !/.emacs.d/snippets/*
+!/.emacs.d/elisp/
+/.emacs.d/elisp/*
+!/.emacs.d/elisp/gptel-save-chat.el
 !/.skk.d/
 /.skk.d/*
 !/.skk.d/init.el
