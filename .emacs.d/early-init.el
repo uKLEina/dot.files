@@ -1,3 +1,4 @@
+(defvar my/startup-file-name-handler-alist file-name-handler-alist)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.8
       load-prefer-newer nil
@@ -21,7 +22,6 @@
 
 ;; 起動後の復元処理を一元化
 (defvar my/startup-gc-cons-threshold (* 32 1024 1024))  ; 32MB
-(defvar my/startup-file-name-handler-alist file-name-handler-alist)
 
 (add-hook 'emacs-startup-hook
           (lambda ()
