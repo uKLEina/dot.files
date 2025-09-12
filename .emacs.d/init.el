@@ -2074,7 +2074,9 @@ Refs: #123
   :ensure t
   :hook
   (text-mode . global-emojify-mode)
-  (prog-mode . global-emojify-mode))
+  (prog-mode . global-emojify-mode)
+  :custom
+  (emojify-emoji-styles '(unicode github)))
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
