@@ -616,14 +616,18 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
     (evil-define-key 'normal global-map (kbd "L") 'tab-next)
     (evil-define-key 'normal global-map (kbd "H") 'tab-previous))
-  (with-eval-after-load 'doom-themes
-    (set-face-attribute 'tab-bar-tab nil
-                        :background (doom-color 'dark-blue)
-                        :foreground (doom-color 'bg)
-                        :weight 'bold)
-    (set-face-attribute 'tab-bar-tab-inactive nil
-                        :background (doom-color 'bg)
-                        :foreground (doom-color 'base6))))
+  (defun my/setup-tab-bar-faces ()
+    (let ((tab-bg (or (doom-color 'dark-blue) 'unspecified))
+          (fg     (or (doom-color 'bg)        'unspecified))
+          (inactive-fg (or (doom-color 'base6) 'unspecified)))
+      (set-face-attribute 'tab-bar-tab nil
+                          :background tab-bg
+                          :foreground fg
+                          :weight 'bold)
+      (set-face-attribute 'tab-bar-tab-inactive nil
+                          :background fg
+                          :foreground inactive-fg)))
+  (advice-add 'load-theme :after (lambda (&rest _) (my/setup-tab-bar-faces))))
 
 (use-package doom-themes
   :ensure t
