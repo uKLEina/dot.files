@@ -1728,30 +1728,30 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
 
 (use-package auctex
- :ensure t
- :mode (("\\.tex\\'" . TeX-tex-mode)
-        ("\\.latex\\'" . TeX-tex-mode))
- :custom
- (TeX-auto-save t)
- (TeX-parse-self t)
- ;; use tectonic as tex engine
- (TeX-engine-alist '((tectonic                          ; engine symbol
-                      "Tectonic"                        ; engine name
-                      "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
-                      "tectonic -X watch"               ; shell command for compiling LaTeX documents
-                      nil                               ; shell command for compiling ConTeXt documents
-                      )))
- (TeX-engine 'tectonic)
- (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
- (TeX-check-TeX nil)
- :config
- (use-package tex
-   :config
-   (let ((tex-list (assoc "TeX" TeX-command-list))
-         (latex-list (assoc "LaTeX" TeX-command-list)))
-     (setf (cadr tex-list) "%(tex)"
-           (cadr latex-list) "%l")))
- )
+  :ensure t
+  :mode (("\\.tex\\'" . TeX-tex-mode)
+         ("\\.latex\\'" . TeX-tex-mode))
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  ;; use tectonic as tex engine
+  (TeX-engine-alist '((tectonic                          ; engine symbol
+                       "Tectonic"                        ; engine name
+                       "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
+                       "tectonic -X watch"               ; shell command for compiling LaTeX documents
+                       nil                               ; shell command for compiling ConTeXt documents
+                       )))
+  (TeX-engine 'tectonic)
+  (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
+  (TeX-check-TeX nil)
+  :config
+  (use-package tex
+    :config
+    (let ((tex-list (assoc "TeX" TeX-command-list))
+          (latex-list (assoc "LaTeX" TeX-command-list)))
+      (setf (cadr tex-list) "%(tex)"
+            (cadr latex-list) "%l")))
+  )
 ;;   :config
 ;;   (TeX-source-correlate-mode +1)
 ;;   (use-package pdf-sync)
