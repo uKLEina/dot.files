@@ -553,11 +553,11 @@ Otherwise, join lines with no space."
   ;;   :config
   ;;   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
 
-;;   (use-package flyspell
-;;     :config
-;;     (unbind-key "C-M-i" flyspell-mode-map)
-;;     (unbind-key "C-;" flyspell-mode-map)
-;;     (unbind-key "C-," flyspell-mode-map))
+  ;;   (use-package flyspell
+  ;;     :config
+  ;;     (unbind-key "C-M-i" flyspell-mode-map)
+  ;;     (unbind-key "C-;" flyspell-mode-map)
+  ;;     (unbind-key "C-," flyspell-mode-map))
 
   (defun file-open-file-manager ()
     "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
@@ -615,7 +615,12 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (evil-define-key 'normal global-map (kbd "T") 'tab-new)
     (evil-define-key 'normal global-map (kbd "C-S-t") 'tab-close)
     (evil-define-key 'normal global-map (kbd "L") 'tab-next)
-    (evil-define-key 'normal global-map (kbd "H") 'tab-previous))
+    (evil-define-key 'normal global-map (kbd "H") 'tab-previous)
+    (evil-define-key 'emacs dired-mode-map (kbd "T") 'tab-new)
+    (evil-define-key 'emacs dired-mode-map (kbd "C-S-t") 'tab-close)
+    (evil-define-key 'emacs dired-mode-map (kbd "L") 'tab-next)
+    (evil-define-key 'emacs dired-mode-map (kbd "H") 'tab-previous)
+    )
   (defun my/setup-tab-bar-faces ()
     (let ((tab-bg (or (doom-color 'dark-blue) 'unspecified))
           (fg     (or (doom-color 'bg)        'unspecified))
@@ -827,40 +832,40 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
 
 (use-package evil
-    :ensure t
-    :demand t
-    :custom
-    (evil-echo-state nil)
-    (evil-undo-system 'undo-tree)
-    :init
-    (defun evil-swap-key (map key1 key2)
-      "Swap KEY1 and KEY2 in MAP."
-      (let ((def1 (lookup-key map key1))
-            (def2 (lookup-key map key2)))
-        (define-key map key1 def2)
-        (define-key map key2 def1)))
-    :config
-    (evil-mode 1)
-    (defun kle/evil-scroll-line-down-1 ()
-      (interactive)
-      (evil-scroll-line-down 1)
-      (forward-line 1))
-    (defun kle/evil-scroll-line-up-1 ()
-      (interactive)
-      (evil-scroll-line-up 1)
-      (forward-line -1))
-    (bind-keys :map evil-normal-state-map
-               ("M-." . xref-find-definitions)
-               ("J" . kle/evil-scroll-line-down-1)
-               ("K" . kle/evil-scroll-line-up-1)
-               ("C-e" . end-of-line)
-               ("C-t" . other-window-or-split)
-               :map evil-insert-state-map
-               ("C-t" . other-window-or-split)
-               ("C-e" . end-of-line))
-    (evil-swap-key evil-motion-state-map "j" "gj")
-    (evil-swap-key evil-motion-state-map "k" "gk")
-    (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
+  :ensure t
+  :demand t
+  :custom
+  (evil-echo-state nil)
+  (evil-undo-system 'undo-tree)
+  :init
+  (defun evil-swap-key (map key1 key2)
+    "Swap KEY1 and KEY2 in MAP."
+    (let ((def1 (lookup-key map key1))
+          (def2 (lookup-key map key2)))
+      (define-key map key1 def2)
+      (define-key map key2 def1)))
+  :config
+  (evil-mode 1)
+  (defun kle/evil-scroll-line-down-1 ()
+    (interactive)
+    (evil-scroll-line-down 1)
+    (forward-line 1))
+  (defun kle/evil-scroll-line-up-1 ()
+    (interactive)
+    (evil-scroll-line-up 1)
+    (forward-line -1))
+  (bind-keys :map evil-normal-state-map
+             ("M-." . xref-find-definitions)
+             ("J" . kle/evil-scroll-line-down-1)
+             ("K" . kle/evil-scroll-line-up-1)
+             ("C-e" . end-of-line)
+             ("C-t" . other-window-or-split)
+             :map evil-insert-state-map
+             ("C-t" . other-window-or-split)
+             ("C-e" . end-of-line))
+  (evil-swap-key evil-motion-state-map "j" "gj")
+  (evil-swap-key evil-motion-state-map "k" "gk")
+  (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
 ;; (use-package evil-mode-line
 ;;   :init
