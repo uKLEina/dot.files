@@ -1887,6 +1887,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (aidermacs-default-chat-mode 'ask)
   (aidermacs-exit-kills-buffer t)
+  (aidermacs-backend 'comint)
   :bind (("C-c a" . aidermacs-transient-menu)))
 
 (use-package gptel
