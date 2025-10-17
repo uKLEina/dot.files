@@ -1306,7 +1306,140 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-ui-doc-max-height 30)
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  ;; sidelineの日本語対応
+  ;; 幅2の文字を考慮しておらず表示が崩れるので、関連している関数を全部書き直す
+  (defun lsp-ui-sideline--make-display-string (info symbol current)
+    "Make final string to display in buffer.
+     INFO is the information to display.
+     SYMBOL is the symbol associated with the info.
+     CURRENT is non-nil when the point is on the symbol."
+    (let* ((face (if current 'lsp-ui-sideline-current-symbol 'lsp-ui-sideline-symbol))
+           (str (if lsp-ui-sideline-show-symbol
+                    (concat info " " (propertize (concat " " symbol " ") 'face face))
+                  info))
+           (ch-len (length str))         ;; 文字数はプロパティ付与のために保持
+           (vis-len (string-width str))  ;; 表示幅は string-width
+           (margin (lsp-ui-sideline--margin-width)))
+      (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil str)
+      (concat
+       (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align vis-len margin))))
+       (propertize str 'display (lsp-ui-sideline--compute-height)))))
+
+  ;; push-info: final-string の長さ（表示幅）を string-width で計算する
+  (defun lsp-ui-sideline--push-info (win-width symbol bounds info bol eol)
+    (let* ((markdown-hr-display-char nil)
+           (info (or (alist-get info lsp-ui-sideline--cached-infos)
+                     (-some--> (lsp:hover-contents info)
+                       (lsp-ui-sideline--extract-info it)
+                       (lsp-ui-sideline--format-info it win-width)
+                       (progn (push (cons info it) lsp-ui-sideline--cached-infos) it))))
+           (current (and (>= (point) (car bounds)) (<= (point) (cdr bounds)))))
+      (when (and info
+                 (> (string-width info) 0)
+                 (lsp-ui-sideline--check-duplicate symbol info))
+        (let* ((visible (if lsp-ui-sideline-show-symbol
+                            (concat info " " (concat " " symbol " "))
+                          info))
+               (vis-w (string-width visible))
+               (final-string (lsp-ui-sideline--make-display-string info symbol current))
+               (pos-ov (lsp-ui-sideline--find-line vis-w bol eol))
+               (ov (when pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+          (when pos-ov
+            (overlay-put ov 'info info)
+            (overlay-put ov 'symbol symbol)
+            (overlay-put ov 'bounds bounds)
+            (overlay-put ov 'current current)
+            (overlay-put ov 'after-string final-string)
+            (overlay-put ov 'before-string " ")
+            (overlay-put ov 'window (get-buffer-window))
+            (overlay-put ov 'kind 'info)
+            (overlay-put ov 'position (car pos-ov))
+            (push ov lsp-ui-sideline--ovs))))))
+
+  ;; diagnostics: msg の幅を string-width で使う
+  (defun lsp-ui-sideline--diagnostics (buffer bol eol)
+    "Show diagnostics belonging to the current line."
+    (when (and (bound-and-true-p flycheck-mode)
+               (bound-and-true-p lsp-ui-sideline-mode)
+               lsp-ui-sideline-show-diagnostics
+               (eq (current-buffer) buffer))
+      (lsp-ui-sideline--delete-kind 'diagnostics)
+      (dolist (e (flycheck-overlay-errors-in bol (1+ eol)))
+        (let* ((lines (--> (flycheck-error-format-message-and-id e)
+                           (split-string it "\n")
+                           (lsp-ui-sideline--split-long-lines it)))
+               (display-lines (butlast lines (- (length lines) lsp-ui-sideline-diagnostic-max-lines)))
+               (offset 1))
+          (dolist (line (nreverse display-lines))
+            (let* ((msg (string-trim (replace-regexp-in-string "[\t ]+" " " line)))
+                   (msg (replace-regexp-in-string " " " " msg))
+                   (ch-len (length msg))
+                   (w-len (string-width msg))
+                   (level (flycheck-error-level e))
+                   (face (if (eq level 'info) 'success level))
+                   (margin (lsp-ui-sideline--margin-width))
+                   (msg (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil msg)
+                               (add-face-text-property 0 ch-len face nil msg)
+                               msg))
+                   (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align w-len margin))))
+                                   (propertize msg 'display (lsp-ui-sideline--compute-height))))
+                   (pos-ov (lsp-ui-sideline--find-line w-len bol eol t offset))
+                   (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+              (when pos-ov
+                (setq offset (1+ (car (cdr pos-ov))))
+                (overlay-put ov 'after-string string)
+                (overlay-put ov 'kind 'diagnostics)
+                (overlay-put ov 'before-string " ")
+                (overlay-put ov 'position (car pos-ov))
+                (push ov lsp-ui-sideline--ovs))))))))
+
+  ;; code-actions: タイトル幅を string-width で計算、画像は幅1とみなす
+  (defun lsp-ui-sideline--code-actions (actions bol eol)
+    "Show code ACTIONS."
+    (let ((inhibit-modification-hooks t))
+      (when lsp-ui-sideline-actions-kind-regex
+        (setq actions (seq-filter (-lambda ((&CodeAction :kind?))
+                                    (or (not kind?)
+                                        (s-match lsp-ui-sideline-actions-kind-regex kind?)))
+                                  actions)))
+      (setq lsp-ui-sideline--code-actions actions)
+      (lsp-ui-sideline--delete-kind 'actions)
+      (seq-doseq (action actions)
+        (-let* ((title (->> (lsp:code-action-title action)
+                            (replace-regexp-in-string "[\n\t ]+" " ")
+                            (replace-regexp-in-string " " " ")
+                            (concat (unless lsp-ui-sideline-actions-icon
+                                      lsp-ui-sideline-code-actions-prefix))))
+                (image (lsp-ui-sideline--code-actions-image action))
+                (margin (lsp-ui-sideline--margin-width))
+                (keymap (let ((map (make-sparse-keymap)))
+                          (define-key map [down-mouse-1] (lambda () (interactive)
+                                                           (save-excursion
+                                                             (lsp-execute-code-action action))))
+                          map))
+                (ch-len (length title))
+                (w-len (string-width title))
+                (img-w (if image 1 0))
+                (title (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil title)
+                              (add-face-text-property 0 ch-len 'lsp-ui-sideline-code-action nil title)
+                              (add-text-properties 0 ch-len `(keymap ,keymap mouse-face highlight) title)
+                              title))
+                (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align (+ w-len img-w) margin))))
+                                image
+                                (propertize title 'display (lsp-ui-sideline--compute-height))))
+                (pos-ov (lsp-ui-sideline--find-line (+ 1 w-len img-w) bol eol t))
+                (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+          (when pos-ov
+            (overlay-put ov 'after-string string)
+            (overlay-put ov 'before-string " ")
+            (overlay-put ov 'kind 'actions)
+            (overlay-put ov 'position (car pos-ov))
+            (push ov lsp-ui-sideline--ovs)))))
+    )
+  )
+
+
 
 (use-package dap-mode
   :ensure t
