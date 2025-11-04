@@ -1934,37 +1934,37 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :mode "\\.textile\\'")
 
-(use-package csv-mode
-  :ensure t
-  :init
-  ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-  ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
-  (defun enable-csv-mode-for-small-files ()
-    "Enable csv-mode for TSV/CSV files if they are not too large."
-    (when (and buffer-file-name
-               (or (string-match-p "\\.csv\\'" buffer-file-name)
-                   (string-match-p "\\.tsv\\'" buffer-file-name))
-               (or (not large-file-warning-threshold)
-                   (< (buffer-size) large-file-warning-threshold)))
-      (csv-mode)))
-  (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
-  (defun kle/smartrep-csv-setup ()
-    (smartrep-define-key
-        csv-mode-map "C-c" '(("l" . csv-forward-field)
-                             ("h" . csv-backward-field))))
-  :hook
-  (csv-mode . csv-align-mode)
-  (tsv-mode . csv-align-mode)
-  (csv-mode . (lambda () (toggle-truncate-lines t)))
-  (tsv-mode . (lambda () (toggle-truncate-lines t)))
-  (csv-mode . kle/smartrep-csv-setup)
-  :bind
-  (:map csv-mode-map
-        ("C-c l" . csv-forward-field)
-        ("C-c h" . csv-backward-field))
-  :custom
-  (csv-align-style 'auto)
-  (csv-align-max-width 200))
+;; (use-package csv-mode
+;;   :ensure t
+;;   :init
+;;   ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+;;   ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
+;;   (defun enable-csv-mode-for-small-files ()
+;;     "Enable csv-mode for TSV/CSV files if they are not too large."
+;;     (when (and buffer-file-name
+;;                (or (string-match-p "\\.csv\\'" buffer-file-name)
+;;                    (string-match-p "\\.tsv\\'" buffer-file-name))
+;;                (or (not large-file-warning-threshold)
+;;                    (< (buffer-size) large-file-warning-threshold)))
+;;       (csv-mode)))
+;;   (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
+;;   (defun kle/smartrep-csv-setup ()
+;;     (smartrep-define-key
+;;         csv-mode-map "C-c" '(("l" . csv-forward-field)
+;;                              ("h" . csv-backward-field))))
+;;   :hook
+;;   (csv-mode . csv-align-mode)
+;;   (tsv-mode . csv-align-mode)
+;;   (csv-mode . (lambda () (toggle-truncate-lines t)))
+;;   (tsv-mode . (lambda () (toggle-truncate-lines t)))
+;;   (csv-mode . kle/smartrep-csv-setup)
+;;   :bind
+;;   (:map csv-mode-map
+;;         ("C-c l" . csv-forward-field)
+;;         ("C-c h" . csv-backward-field))
+;;   :custom
+;;   (csv-align-style 'auto)
+;;   (csv-align-max-width 200))
 
 (use-package yaml-pro
   :ensure t
