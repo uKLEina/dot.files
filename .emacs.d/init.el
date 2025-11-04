@@ -888,6 +888,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;; ;; (require 'evil-mode-line)
 
 (use-package migemo
+  :demand t
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
