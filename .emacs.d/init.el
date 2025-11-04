@@ -2051,6 +2051,19 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;; (bind-key "C-x C-s" #'gptel-save-buffer-dwim gptel-mode-map)
   )
 
+(use-package gptel-bedrock
+  :after gptel
+  :config
+  (add-to-list 'gptel-bedrock--model-ids
+             '(claude-sonnet-4-5-20250929 . "anthropic.claude-sonnet-4-5-20250929-v1:0"))
+  (gptel-make-bedrock "AWS"
+    :stream t
+    :region "ap-northeast-1"
+    :models '(claude-sonnet-4-5-20250929)
+    :model-region 'apac
+    ;; :aws-profile 'sinops-corporate
+    :aws-bearer-token (getenv "AWS_BEARER_TOKEN_BEDROCK")))
+
 (use-package gptel-magit
   :ensure t
   :hook (magit-mode . gptel-magit-install)
