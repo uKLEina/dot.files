@@ -47,6 +47,7 @@ xelatex
 !/.emacs.d/init.el
 !/.emacs.d/early-init.el
 !/.emacs.d/init_wsl.el
+!/.emacs.d/build-treesit-grammar.sh
 !/.emacs.d/inits/
 /.emacs.d/inits/*
 !/.emacs.d/inits/*.el
