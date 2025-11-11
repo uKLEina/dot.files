@@ -6,7 +6,7 @@
 (setopt initial-major-mode 'fundamental-mode)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
-(global-unset-key (kbd "C-\\"))
+;; (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "C-l"))
 (bind-keys ("C-l C-l" . recenter-top-bottom)
            ("C-l C-x" . server-edit)
@@ -15,9 +15,11 @@
 
 (defun my/setup-basic-config ()
   "基本設定のセットアップ"
-  (set-language-environment "Japanese")
+  (set-language-environment "utf-8")
+  (set-default-coding-systems 'utf-8-unix)
   (prefer-coding-system 'utf-8)
   (set-default 'buffer-file-coding-system 'utf-8)
+  (setopt default-input-method "japanese")
   (setq read-process-output-max (* 3 1024 1024))
   (setq message-log-max 100000)
   (setq enable-recursive-minibuffers t)
@@ -744,7 +746,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
     ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
     ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
-    '(bar modals matches remote-host buffer-info buffer-position csv-index)
+    '(input-method bar modals matches remote-host buffer-info buffer-position csv-index)
     '(projectile-project-name vcs check battery datetime)
     )
 
@@ -1210,6 +1212,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;;     (let ((flymake-fn 'flymake-eldoc-function))
   ;;       (setq eldoc-documentation-functions
   ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
+  (add-to-list 'tramp-remote-path "/workspace/.venv/bin")
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or
@@ -1238,8 +1241,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
         orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
-
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  :hook
+  (lsp-mode . (lambda () (when (file-remote-p default-directory)
+                           (setq-local lsp-enable-file-watchers nil))))
+  )
+;; (setq lsp-pyright-langserver-command "/workspace/.venv/bin/basedpyright")
 (use-package lsp-pyright
   :ensure t
   :hook
@@ -1254,7 +1261,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
   (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
   (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
-  (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
+  (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
+  )
+
 
 ;; (with-eval-after-load 'lsp-pyright
 ;;   (lsp-register-client
@@ -2055,7 +2064,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :after gptel
   :config
   (add-to-list 'gptel-bedrock--model-ids
-             '(claude-sonnet-4-5-20250929 . "anthropic.claude-sonnet-4-5-20250929-v1:0"))
+               '(claude-sonnet-4-5-20250929 . "jp.anthropic.claude-sonnet-4-5-20250929-v1:0"))
   (gptel-make-bedrock "AWS"
     :stream t
     :region "ap-northeast-1"
@@ -2240,7 +2249,101 @@ Refs: #123
               ("TAB" . 'minuet-accept-suggestion)
               ("C-<left>" . 'minuet-previous-suggestion)
               ("C-<right>" . 'minuet-next-suggestion))
-  :hook (python-ts-mode . minuet-auto-suggestion-mode))
+  ;; :hook (python-ts-mode . minuet-auto-suggestion-mode)
+  )
+
+(use-package claude-code-ide
+  :ensure t
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-@" . claude-code-ide-menu)
+  ;; :custom (claude-code-ide-terminal-backend 'eat)
+  :config
+  (defvar claude-code-ide-prompt-buffer-close-after-send t)
+  (defvar claude-code-ide-prompt-focus-claude-after-send t)
+
+  (defvar claude-code-ide-prompt-mode-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "C-c C-s") #'claude-code-ide-prompt-send-and-close)
+      (define-key map (kbd "C-c C-c") #'claude-code-ide-prompt-send)
+      (define-key map (kbd "C-c C-k") (lambda () (interactive) (kill-buffer (current-buffer))))
+      map)
+    "Keymap for claude-code-ide-prompt-mode.")
+
+  (define-minor-mode claude-code-ide-prompt-mode
+    "Minor mode for editing Claude prompts."
+    :init-value nil
+    :lighter " Claude-Prompt"
+    :keymap claude-code-ide-prompt-mode-map)
+  ;;   (define-derived-mode claude-code-ide-prompt-mode text-mode "Claude-Prompt"
+  ;;     "Claude Code のプロンプト編集用モード。
+;; C-c C-s: 送信してバッファを残す
+;; C-c C-c: 送信してバッファを閉じる
+;; C-c C-k: バッファを閉じる（送信しない）"
+;;     (setq-local header-line-format "C-c C-s: 送信, C-c C-c: 送信+閉じる, C-c C-k: 閉じる"))
+
+  (defun claude-code-ide--current-project-root ()
+    (if-let ((proj (ignore-errors (project-current))))
+        (expand-file-name (project-root proj))
+      (expand-file-name default-directory)))
+
+  (defun claude-code-ide-open-prompt-buffer ()
+    "現在プロジェクト用のプロンプト編集バッファを開く。"
+    (interactive)
+    (let* ((root (claude-code-ide--current-project-root))
+           (proj (file-name-nondirectory (directory-file-name root)))
+           (buf (get-buffer-create (format "*Claude Prompt: %s*" proj))))
+      (with-current-buffer buf
+        ;; 送信先の判定に使うので default-directory をプロジェクトに合わせる
+        (setq default-directory root)
+        ;; markdown-mode があれば使う（任意）
+        (when (require 'markdown-mode nil t)
+          (markdown-mode))
+        (claude-code-ide-prompt-mode 1)
+        (setq-local header-line-format "C-c C-c: 送信, C-c C-s: 送信+閉じる, C-c C-k: 閉じる")
+        ;; (unless (> (buffer-size) 0)
+        ;;   (insert ""))
+        )
+      (pop-to-buffer buf)))
+
+  (defun claude-code-ide--prompt-collect ()
+    "送信するテキストを取得（リージョンがあればリージョン、なければバッファ全体）。"
+    (if (use-region-p)
+        (buffer-substring-no-properties (region-beginning) (region-end))
+      (buffer-substring-no-properties (point-min) (point-max))))
+
+  (defun claude-code-ide-prompt-send ()
+    "編集バッファの内容を送信（バッファは残す）。"
+    (interactive)
+    (let ((text (claude-code-ide--prompt-collect)))
+      (condition-case err
+          (progn
+            (claude-code-ide-send-prompt text)
+            (when claude-code-ide-prompt-focus-claude-after-send
+              (claude-code-ide-switch-to-buffer))
+            (message "Claudeにプロンプトを送信しました"))
+        (error
+         (message "送信失敗: %s" (error-message-string err))))))
+
+  (defun claude-code-ide-prompt-send-and-close ()
+    "編集バッファの内容を送信して（成功時）バッファを閉じる。"
+    (interactive)
+    (let ((buf (current-buffer)))
+      (call-interactively #'claude-code-ide-prompt-send)
+      (when (and claude-code-ide-prompt-buffer-close-after-send
+                 (buffer-live-p buf))
+        (kill-buffer buf))))
+
+  ;; キーに割り当て
+  (define-prefix-command 'claude-code-ide-prefix)
+  (global-set-key (kbd "C-c c") 'claude-code-ide-prefix)
+  (global-set-key (kbd "C-c c p") #'claude-code-ide-open-prompt-buffer)
+
+  ;; Transientメニューに項目を追加（任意）
+  (with-eval-after-load 'claude-code-ide-transient
+    (when (fboundp 'transient-append-suffix)
+      (transient-append-suffix 'claude-code-ide-menu "p"
+        '("P" "Open prompt editor" claude-code-ide-open-prompt-buffer))))
+  )
 
 (use-package emojify
   :ensure t
@@ -2266,6 +2369,22 @@ Refs: #123
     (("<f10>" . vterm-toggle))
     (:map vterm-mode-map
           ("<f10>" . vterm-toggle)))
+  (use-package eat
+    :ensure t
+    ;; :init
+    ;; (add-hook 'eat-mode-hook
+    ;;       (lambda ()
+    ;;         (add-hook 'pre-command-hook
+    ;;                   (lambda ()
+    ;;                     (when (and (boundp 'eat-terminal) eat-terminal
+    ;;                                (boundp 'eat--line-mode) eat--line-mode
+    ;;                                (< (point) (eat-term-end eat-terminal))
+    ;;                                (let ((s (symbol-name this-command)))
+    ;;                                  (or (string-prefix-p "skk-" s)
+    ;;                                      (eq this-command 'self-insert-command))))
+    ;;                       (goto-char (point-max))))
+    ;;                   nil t)))
+    )
   ;; (use-package exec-path-from-shell
   ;;   :ensure t
   ;;   :custom
