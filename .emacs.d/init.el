@@ -111,6 +111,7 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
               (my-all-other-windows-are-utility-p utility-buffers))
       (split-window-horizontally)))
   (other-window 1))
+(bind-keys ("C-t" . other-window-or-split))
 
 ;;; ウィンドウ選択を変えた時に光らせて分かりやすくする
 ;; 直前のウィンドウを覚えておく変数
@@ -2361,10 +2362,12 @@ Refs: #123
     :ensure t
     :custom
     (vterm-max-scrollback 100000)
-    ;; :init
-    ;; (push '("*vterm*" :position bottom :width 15)
-    ;;       popwin:special-display-config)
-    )
+    :config
+    ;; 例外キーに追加
+    (add-to-list 'vterm-keymap-exceptions "C-t")
+    ;; 既に作られているキーマップに反映
+    (when (boundp 'vterm-mode-map)
+      (vterm--exclude-keys vterm-mode-map vterm-keymap-exceptions)))
   (use-package vterm-toggle
     :ensure t
     :bind
