@@ -443,6 +443,8 @@ Otherwise, join lines with no space."
 ;;   "Major mode for editing Path of Exile filter file.")
 
 (use-package json-ts-mode
+  :mode
+  (("\\.json\\'" . json-ts-mode))
   :custom (json-ts-mode-indent-offset 4))
 
 (use-package org
