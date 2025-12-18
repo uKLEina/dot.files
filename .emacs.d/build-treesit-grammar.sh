@@ -59,7 +59,10 @@ if [ ! -f src/parser.c ]; then
 fi
 
 # run generate (idempotent)
-if command -v tree-sitter >/dev/null 2>&1; then
+if [ -f package.json ] && command -v npx >/dev/null 2>&1; then
+  echo "Running: npx tree-sitter generate"
+  npx tree-sitter generate
+elif command -v tree-sitter >/dev/null 2>&1; then
   echo "Running: tree-sitter generate"
   tree-sitter generate
 else
