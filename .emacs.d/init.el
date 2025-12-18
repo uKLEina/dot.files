@@ -1915,6 +1915,13 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package markdown-mode
   :ensure t
   :mode (("\\.md\\'" . gfm-mode))
+  :init
+  (defun my/disable-ispell-capf ()
+    "completion-at-point-functions から ispell を除外する。"
+    (setq-local completion-at-point-functions
+                (remove #'ispell-completion-at-point
+                        completion-at-point-functions)))
+  :hook (gfm-mode . my/disable-ispell-capf)
   :custom
   (markdown-command "multimarkdown")
   (markdown-italic-underscore t)
@@ -2112,8 +2119,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5-mini)
-  ;; :init
+  (gptel-model 'gpt-5.1)
   ;; ;; Mark gptel-related file-local variables as safe.
   ;; (put 'gptel-model 'safe-local-variable
   ;;      (lambda (v) (or (symbolp v) (stringp v))))
