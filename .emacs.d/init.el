@@ -626,10 +626,55 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     (evil-define-key 'emacs dired-mode-map (kbd "L") 'tab-next)
     (evil-define-key 'emacs dired-mode-map (kbd "H") 'tab-previous)
     )
+  (defun my/tab-bar-tab-name-format-with-icon (name tab i)
+    "タブ名の前にnerd-iconsのアイコンを付与する。
+この関数は`tab-bar-tab-name-format-functions`のフック関数として使用される。"
+    (let* ((current-p (eq (car tab) 'current-tab))
+           (buffer (if current-p
+                       (current-buffer)
+                     ;; 非カレントタブの場合はwindow-stateから最初のバッファを取得
+                     (let* ((ws (alist-get 'ws tab))
+                            (buffers (when ws (window-state-buffers ws)))
+                            (buffer-name (car buffers)))
+                       (when buffer-name
+                         (get-buffer buffer-name)))))
+           ;; アクティブタブは黒系、非アクティブタブは白系の色を使用
+           (icon-color (if current-p
+                           (doom-color 'bg)
+                         (doom-color 'base6)))
+           (icon-face (when icon-color
+                        (list :foreground icon-color)))
+           (icon (when buffer
+                   (cond
+                    ;; ファイルがある場合は拡張子でアイコンを決定
+                    ((buffer-file-name buffer)
+                     (if (fboundp 'nerd-icons-icon-for-file)
+                         (nerd-icons-icon-for-file (buffer-file-name buffer) :face icon-face)
+                       ""))
+                    ;; dired-modeの場合
+                    ((with-current-buffer buffer (derived-mode-p 'dired-mode))
+                     (if (fboundp 'nerd-icons-octicon)
+                         (nerd-icons-octicon "nf-oct-file_directory" :face icon-face)
+                       ""))
+                    ;; その他のバッファ
+                    (t
+                     (if (fboundp 'nerd-icons-icon-for-buffer)
+                         (nerd-icons-icon-for-buffer :face icon-face)
+                       ""))))))
+      ;; アイコンがあれば名前の前に追加
+      (if (and icon (not (string-empty-p icon)))
+          (concat " " icon " " name " ")
+        (concat " " name " "))))
+
+  ;; tab-bar-tab-name-format-functionsの先頭にアイコン表示関数を追加
+  (setq tab-bar-tab-name-format-functions
+        (cons 'my/tab-bar-tab-name-format-with-icon
+              tab-bar-tab-name-format-functions))
+
   (defun my/setup-tab-bar-faces ()
-    (let ((tab-bg (or (doom-color 'dark-blue) 'unspecified))
-          (fg     (or (doom-color 'bg)        'unspecified))
-          (inactive-fg (or (doom-color 'base6) 'unspecified)))
+    (let ((tab-bg (doom-color 'dark-blue))
+          (fg     (doom-color 'bg))
+          (inactive-fg (doom-color 'base6)))
       (set-face-attribute 'tab-bar-tab nil
                           :background tab-bg
                           :foreground fg
@@ -973,6 +1018,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (interactive)
     (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
 
+(use-package consult-jq
+  :ensure t
+  :vc (:url "https://github.com/bigbuger/consult-jq" :rev :newest))
+
 (use-package embark-consult
   :ensure t)
 
@@ -1069,6 +1118,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package flycheck
   :ensure t
   :pin melpa
+  :custom
+  (flyecheck-disabled-checkers 'python-ruff)
   ;; :init
   ;; (push '(flycheck-error-list-mode :position right :width 0.2 :noselect t :stick t)
   ;;       popwin:special-display-config)
@@ -1204,8 +1255,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   ;; (lsp-disabled-clients '(lsp-ruff))
   ;; (lsp-log-io t)
-  (lsp-diagnostics-provider :flycheck)
+  (lsp-diagnostics-provider :auto)
   (lsp-completion-provider :none)
+  ;; (lsp-log-io t)
   ;; (lsp-auto-register-remote-clients nil)
   :init
   ;; (defun my-reorder-eldoc-functions ()
@@ -1248,6 +1300,16 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :hook
   (lsp-mode . (lambda () (when (file-remote-p default-directory)
                            (setq-local lsp-enable-file-watchers nil))))
+  :config
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].aws-sam\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].cache\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].claude\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].devcontainer\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].ruffcache\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].serena\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]data\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]db_schemas\\'")
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]rds_migration\\'")
   )
 ;; (setq lsp-pyright-langserver-command "/workspace/.venv/bin/basedpyright")
 (use-package lsp-pyright
@@ -1266,6 +1328,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
   (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
   )
+
+(use-package lsp-ruff
+  :custom
+  (lsp-ruff-log-level "debug"))
 
 
 ;; (with-eval-after-load 'lsp-pyright
@@ -1823,7 +1889,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package yasnippet-snippets
   :ensure t
   :pin melpa
-  :after (yasnippet))
+  :after yasnippet)
 
 (use-package web-mode
   :ensure t
@@ -2259,8 +2325,10 @@ Refs: #123
   :ensure t
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
   :bind ("C-c C-@" . claude-code-ide-menu)
-  ;; :custom (claude-code-ide-terminal-backend 'eat)
+  :custom
+  (claude-code-ide-diagnostics-backend 'flycheck)
   :config
+  ;; dedicated buffer for editing prompt
   (defvar claude-code-ide-prompt-buffer-close-after-send t)
   (defvar claude-code-ide-prompt-focus-claude-after-send t)
 
@@ -2277,12 +2345,6 @@ Refs: #123
     :init-value nil
     :lighter " Claude-Prompt"
     :keymap claude-code-ide-prompt-mode-map)
-  ;;   (define-derived-mode claude-code-ide-prompt-mode text-mode "Claude-Prompt"
-  ;;     "Claude Code のプロンプト編集用モード。
-;; C-c C-s: 送信してバッファを残す
-;; C-c C-c: 送信してバッファを閉じる
-;; C-c C-k: バッファを閉じる（送信しない）"
-;;     (setq-local header-line-format "C-c C-s: 送信, C-c C-c: 送信+閉じる, C-c C-k: 閉じる"))
 
   (defun claude-code-ide--current-project-root ()
     (if-let ((proj (ignore-errors (project-current))))
@@ -2302,10 +2364,7 @@ Refs: #123
         (when (require 'markdown-mode nil t)
           (markdown-mode))
         (claude-code-ide-prompt-mode 1)
-        (setq-local header-line-format "C-c C-c: 送信, C-c C-s: 送信+閉じる, C-c C-k: 閉じる")
-        ;; (unless (> (buffer-size) 0)
-        ;;   (insert ""))
-        )
+        (setq-local header-line-format "C-c C-c: 送信, C-c C-s: 送信+閉じる, C-c C-k: 閉じる"))
       (pop-to-buffer buf)))
 
   (defun claude-code-ide--prompt-collect ()
@@ -2336,17 +2395,19 @@ Refs: #123
                  (buffer-live-p buf))
         (kill-buffer buf))))
 
-  ;; キーに割り当て
-  (define-prefix-command 'claude-code-ide-prefix)
-  (global-set-key (kbd "C-c c") 'claude-code-ide-prefix)
-  (global-set-key (kbd "C-c c p") #'claude-code-ide-open-prompt-buffer)
+  ;; ;; キーに割り当て
+  ;; (define-prefix-command 'claude-code-ide-prefix)
+  ;; (global-set-key (kbd "C-c c") 'claude-code-ide-prefix)
+  ;; (global-set-key (kbd "C-c c p") #'claude-code-ide-open-prompt-buffer)
 
   ;; Transientメニューに項目を追加（任意）
   (with-eval-after-load 'claude-code-ide-transient
     (when (fboundp 'transient-append-suffix)
       (transient-append-suffix 'claude-code-ide-menu "p"
         '("P" "Open prompt editor" claude-code-ide-open-prompt-buffer))))
-  )
+
+  ;; enable Emacs specific tools
+  (claude-code-ide-emacs-tools-setup))
 
 (use-package emojify
   :ensure t
