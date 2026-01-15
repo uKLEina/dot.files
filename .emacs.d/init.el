@@ -503,8 +503,12 @@ Otherwise, join lines with no space."
   :mode
   (("\\.java\\'" . java-ts-mode)))
 
+(use-package treesit
+  :custom
+  (treesit-font-lock-level 4))
+
 (when (eq system-type 'gnu/linux)
-  ;;; Fix copy/paste in Wayland
+;;; Fix copy/paste in Wayland
   ;; credit: yorickvP on Github
   (if (bound-and-true-p pgtk-initialized)
       (progn
@@ -2488,7 +2492,6 @@ Refs: #123
   ;;   (treesit-auto-install 'nil)
   ;;   :config
   ;;   (treesit-auto-add-to-auto-mode-alist 'all))
-
   (use-package treesit-fold
     :init
     (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
