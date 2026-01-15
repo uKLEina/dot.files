@@ -2105,15 +2105,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                             "<*" "<*>" "*>" "<+" "<+>" "+>" "<$" "<$>" "$>"
                             "$$" "%%" "|]" "[|")))
 
-(use-package aidermacs
-  :ensure t
-  :pin melpa
-  :custom
-  (aidermacs-default-chat-mode 'ask)
-  (aidermacs-exit-kills-buffer t)
-  (aidermacs-backend 'comint)
-  :bind (("C-c a" . aidermacs-transient-menu)))
-
 (use-package gptel
   :ensure t
   :pin melpa
@@ -2485,16 +2476,18 @@ Refs: #123
   ;;                      ((> dpi 150) 140)  ; Medium DPI
   ;;                      (t 120))))        ; Low DPI
   ;;     font-size))
-  (use-package treesit-auto
-    :ensure t
-    :commands
-    (global-treesit-auto-mode)
-    :hook
-    (prog-mode . global-treesit-auto-mode)
-    :custom
-    (treesit-auto-install 'prompt)
-    :config
-    (treesit-auto-add-to-auto-mode-alist 'all))
+  ;; (use-package treesit-auto
+  ;;   :ensure t
+  ;;   :init
+  ;;   (add-to-list 'treesit-extra-load-path "~/.emacs.d/tree-sitter/")
+  ;;   :commands
+  ;;   (global-treesit-auto-mode)
+  ;;   :hook
+  ;;   (prog-mode . global-treesit-auto-mode)
+  ;;   :custom
+  ;;   (treesit-auto-install 'nil)
+  ;;   :config
+  ;;   (treesit-auto-add-to-auto-mode-alist 'all))
 
   (use-package treesit-fold
     :init
