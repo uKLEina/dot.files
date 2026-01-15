@@ -1,153 +1,154 @@
-#!/usr/bin/env bash
-set -euo pipefail
-# build-treesit-grammar.sh
-# Usage: ./build-treesit-grammar.sh [-s SRC_DIR] [-l LANG] [-e EMACS_BIN] [-o OUT_DIR] [-k]
-# -s SRC_DIR: tree-sitter language repo root (default: current dir)
-# -l LANG: language symbol/name used in output filename (default: 'language')
-# -e EMACS_BIN: path to emacs binary to detect tree-sitter runtime (default: which emacs)
-# -o OUT_DIR: install dir for resulting .so (default: ~/.local/lib/tree-sitter)
-# -k: keep intermediate object files (do not delete parser.o/scanner.o)
+#!/bin/bash
+set -e
+
+# tree-sitter言語文法をビルドして~/.emacs.d/tree-sitter/にインストールするスクリプト
 #
-# This script:
-#  - runs `tree-sitter generate` in SRC_DIR
-#  - compiles src/parser.c and src/scanner.c (if exists) with pkg-config flags
-#  - links shared lib and forces a DT_NEEDED on Emacs's libtree-sitter
-#  - installs the .so into OUT_DIR
-# 使い方（例）
-# 1. スクリプトを保存（例: build-treesit-grammar.sh）
-# 2. 実行権を付ける: chmod +x build-treesit-grammar.sh
-# 3. tree-sitter-python リポジトリのルートで実行:
-#    ./build-treesit-grammar.sh -l python
-#    あるいは Emacs 実行ファイルを指定する場合:
-#    ./build-treesit-grammar.sh -l python -e /usr/local/bin/emacs
+# 使い方:
+#   ./build-treesit-grammar.sh <tree-sitter-repo-dir> <language-name> [abi-version] [grammar-subdir]
+#
+# 例:
+#   ./build-treesit-grammar.sh /path/to/tree-sitter-python python
+#   ./build-treesit-grammar.sh /path/to/tree-sitter-python python 14
+#   ./build-treesit-grammar.sh . python 14
+#   ./build-treesit-grammar.sh /path/to/tree-sitter-markdown markdown 14 tree-sitter-markdown
 
-LANG="language"
-SRC_DIR="."
-EMACS_BIN="$(command -v emacs || true)"
-OUT_DIR="${HOME}/.local/lib/tree-sitter"
-KEEP=0
-
-show_help() {
-  sed -n '1,120p' <<<"$0" >/dev/stderr
-}
-
-while getopts "s:l:e:o:kh" opt; do
-  case "$opt" in
-    s) SRC_DIR="$OPTARG" ;;
-    l) LANG="$OPTARG" ;;
-    e) EMACS_BIN="$OPTARG" ;;
-    o) OUT_DIR="$OPTARG" ;;
-    k) KEEP=1 ;;
-    h) show_help; exit 0 ;;
-    *) show_help; exit 1 ;;
-  esac
-done
-
-cd "$SRC_DIR"
-
-# Checks
-command -v gcc >/dev/null 2>&1 || { echo "gcc not found"; exit 1; }
-command -v pkg-config >/dev/null 2>&1 || { echo "pkg-config not found"; exit 1; }
-
-if ! command -v tree-sitter >/dev/null 2>&1; then
-  echo "Warning: tree-sitter CLI not found in PATH. If repository needs generation, run 'tree-sitter generate' manually or install tree-sitter CLI."
+# 引数チェック
+if [ $# -lt 2 ]; then
+    echo "エラー: 引数が不足しています"
+    echo ""
+    echo "使い方: $0 <tree-sitter-repo-dir> <language-name> [abi-version] [grammar-subdir]"
+    echo ""
+    echo "例:"
+    echo "  $0 /path/to/tree-sitter-python python"
+    echo "  $0 /path/to/tree-sitter-python python 14"
+    echo "  $0 . python 14"
+    echo "  $0 /path/to/tree-sitter-markdown markdown 14 tree-sitter-markdown"
+    exit 1
 fi
 
-if [ ! -f src/parser.c ]; then
-  echo "Error: src/parser.c not found in $PWD/src"
-  exit 1
+REPO_DIR="$1"
+LANGUAGE="$2"
+ABI_VERSION="${3:-14}"  # デフォルトはABIバージョン14
+GRAMMAR_SUBDIR="${4:-}"  # オプション: grammar.jsがあるサブディレクトリ
+INSTALL_DIR="$HOME/.emacs.d/tree-sitter"
+
+# ディレクトリの存在確認
+if [ ! -d "$REPO_DIR" ]; then
+    echo "エラー: ディレクトリが見つかりません: $REPO_DIR"
+    exit 1
 fi
 
-# run generate (idempotent)
-if [ -f package.json ] && command -v npx >/dev/null 2>&1; then
-  echo "Running: npx tree-sitter generate"
-  npx tree-sitter generate
-elif command -v tree-sitter >/dev/null 2>&1; then
-  echo "Running: tree-sitter generate"
-  tree-sitter generate
+# grammar.jsの場所を決定
+if [ -n "$GRAMMAR_SUBDIR" ]; then
+    # サブディレクトリが指定されている場合
+    GRAMMAR_DIR="$REPO_DIR/$GRAMMAR_SUBDIR"
+    if [ ! -d "$GRAMMAR_DIR" ]; then
+        echo "エラー: サブディレクトリが見つかりません: $GRAMMAR_DIR"
+        exit 1
+    fi
 else
-  echo "Skipping 'tree-sitter generate' (CLI not found)."
+    # サブディレクトリが指定されていない場合は、リポジトリルートを使用
+    GRAMMAR_DIR="$REPO_DIR"
 fi
 
-# Setup compile flags
-PKG_CFLAGS="$(pkg-config --cflags tree-sitter 2>/dev/null || true)"
-PKG_LIBS="$(pkg-config --libs tree-sitter 2>/dev/null || true)"
-
-echo "pkg-config cflags: $PKG_CFLAGS"
-echo "pkg-config libs: $PKG_LIBS"
-
-# compile parser and scanner
-CFLAGS="$PKG_CFLAGS -I${SRC_DIR}/src"
-echo "Compiling parser.c..."
-gcc -O2 -fPIC $CFLAGS -c src/parser.c -o parser.o
-
-SCANNER_OBJ=""
-if [ -f src/scanner.c ]; then
-  echo "Compiling scanner.c..."
-  gcc -O2 -fPIC $CFLAGS -c src/scanner.c -o scanner.o
-  SCANNER_OBJ="scanner.o"
+# grammar.jsの存在確認
+if [ ! -f "$GRAMMAR_DIR/grammar.js" ]; then
+    echo "エラー: grammar.jsが見つかりません: $GRAMMAR_DIR/grammar.js"
+    echo "指定されたディレクトリはtree-sitterリポジトリではないようです"
+    echo ""
+    echo "モノレポ構造の場合は、第4引数でサブディレクトリを指定してください:"
+    echo "  $0 $REPO_DIR $LANGUAGE $ABI_VERSION <grammar-subdir>"
+    exit 1
 fi
 
-# Find Emacs's libtree-sitter runtime path
-EMACS_TS_LIB=""
-if [ -n "$EMACS_BIN" ] && [ -x "$EMACS_BIN" ]; then
-  EMACS_TS_LIB="$(ldd "$EMACS_BIN" 2>/dev/null | awk '/libtree-sitter/ {print $3; exit}')"
+# tree-sitter CLIの存在確認
+if ! command -v tree-sitter &> /dev/null; then
+    echo "エラー: tree-sitter CLIが見つかりません"
+    echo "インストールしてください: sudo apt install tree-sitter-cli"
+    exit 1
 fi
 
-# fallback: try ldconfig
-if [ -z "$EMACS_TS_LIB" ]; then
-  EMACS_TS_LIB="$(ldconfig -p | awk '/libtree-sitter/ {print $4; exit}')"
-fi
+# インストールディレクトリの作成
+mkdir -p "$INSTALL_DIR"
 
-# fallback: try pkg-config libs to get -L path
-if [ -z "$EMACS_TS_LIB" ] && [ -n "$PKG_LIBS" ]; then
-  # try to extract -L path from pkg-config --libs
-  EMACS_TS_DIR="$(echo "$PKG_LIBS" | sed -n 's/.*-L\([^ ]*\).*/\1/p')"
-  if [ -n "$EMACS_TS_DIR" ]; then
-    EMACS_TS_LIB="$(ls "$EMACS_TS_DIR"/libtree-sitter*.so* 2>/dev/null | head -n1 || true)"
-  fi
-fi
+echo "=========================================="
+echo "tree-sitter文法のビルドとインストール"
+echo "=========================================="
+echo "リポジトリ: $REPO_DIR"
+echo "文法ディレクトリ: $GRAMMAR_DIR"
+echo "言語: $LANGUAGE"
+echo "ABIバージョン: $ABI_VERSION"
+echo "インストール先: $INSTALL_DIR"
+echo "=========================================="
+echo ""
 
-if [ -z "$EMACS_TS_LIB" ]; then
-  echo "Warning: Could not determine Emacs's libtree-sitter runtime path automatically."
-  echo "You can pass Emacs path with -e /path/to/emacs or ensure libtree-sitter is installed on system."
-  # continue, but link may not include libtree-sitter DT_NEEDED
-fi
+# 文法ディレクトリに移動
+cd "$GRAMMAR_DIR"
 
-EMACS_TS_DIR=""
-if [ -n "$EMACS_TS_LIB" ]; then
-  EMACS_TS_DIR="$(dirname "$EMACS_TS_LIB")"
-  echo "Detected Emacs tree-sitter lib: $EMACS_TS_LIB (dir: $EMACS_TS_DIR)"
-fi
+# パーサーの生成
+echo "[1/4] パーサーを生成中 (tree-sitter generate --abi $ABI_VERSION)..."
+tree-sitter generate --abi "$ABI_VERSION"
 
-SO_NAME="libtree-sitter-${LANG}.so"
-echo "Linking shared library: $SO_NAME"
-
-# Link: if EMACS_TS_DIR known, force DT_NEEDED on that lib; otherwise link normally using pkg-config libs.
-if [ -n "$EMACS_TS_DIR" ]; then
-  # ensure using no-as-needed around -ltree-sitter so DT_NEEDED is recorded
-  gcc -shared -o "$SO_NAME" parser.o $SCANNER_OBJ \
-    -Wl,--no-as-needed -L"$EMACS_TS_DIR" -ltree-sitter -Wl,--as-needed \
-    -Wl,-rpath,"$EMACS_TS_DIR"
+# ABIバージョンの確認
+if [ -f "src/parser.c" ]; then
+    GENERATED_ABI=$(grep "#define LANGUAGE_VERSION" src/parser.c | awk '{print $3}')
+    echo "✓ 生成されたABIバージョン: $GENERATED_ABI"
+    if [ "$GENERATED_ABI" != "$ABI_VERSION" ]; then
+        echo "警告: 指定されたABIバージョン($ABI_VERSION)と生成されたバージョン($GENERATED_ABI)が一致しません"
+    fi
 else
-  gcc -shared -o "$SO_NAME" parser.o $SCANNER_OBJ $PKG_LIBS
+    echo "警告: src/parser.cが見つかりません"
 fi
+echo ""
 
-echo "Resulting dependencies (ldd):"
-ldd "$SO_NAME" || true
+# クリーンビルド
+echo "[2/4] クリーンビルド中 (make clean && make)..."
+make clean > /dev/null 2>&1 || true
+make
 
-echo "Check for ABI marker (yNNV):"
-strings "$SO_NAME" | grep -E 'y[0-9]+V' -m1 || true
-
-# install
-mkdir -p "$OUT_DIR"
-mv -f "$SO_NAME" "$OUT_DIR/"
-
-if [ "$KEEP" -eq 0 ]; then
-  rm -f parser.o scanner.o || true
+# 生成されたsoファイルを確認
+SO_FILE="libtree-sitter-${LANGUAGE}.so"
+if [ ! -f "$SO_FILE" ]; then
+    echo "エラー: $SO_FILE が生成されませんでした"
+    exit 1
 fi
+echo "✓ ビルド完了: $SO_FILE"
+echo ""
 
-echo "Installed $SO_NAME -> $OUT_DIR/"
-echo "Add the following to your Emacs config (or evaluate in Emacs):"
-echo "  (add-to-list 'treesit-extra-load-path \"${OUT_DIR}\")"
-echo "Then restart Emacs (from a terminal to inherit PATH) or run (treesit-reload-language 'LANGUAGE) in Emacs."
+# インストール
+echo "[3/4] インストール中..."
+/bin/cp -f "$SO_FILE" "$INSTALL_DIR/"
+echo "✓ インストール完了: $INSTALL_DIR/$SO_FILE"
+echo ""
+
+# Emacsでの確認
+echo "[4/4] Emacsでの確認..."
+if command -v emacs &> /dev/null; then
+    EMACS_ABI=$(emacs --batch --eval "(progn (require 'treesit) (princ (treesit-library-abi-version nil)))" 2>/dev/null)
+    echo "✓ Emacsが期待するABIバージョン: $EMACS_ABI"
+
+    # 言語のロードテスト
+    if emacs --batch --eval "(progn (require 'treesit) (treesit-language-available-p '$LANGUAGE t))" 2>/dev/null; then
+        LANG_ABI=$(emacs --batch --eval "(progn (require 'treesit) (treesit-language-available-p '$LANGUAGE t) (princ (treesit-library-abi-version '$LANGUAGE)))" 2>/dev/null)
+        echo "✓ ${LANGUAGE}ライブラリのABIバージョン: $LANG_ABI"
+
+        if [ "$EMACS_ABI" = "$LANG_ABI" ]; then
+            echo "✓ ABIバージョンが一致しています！"
+        else
+            echo "⚠ 警告: ABIバージョンが一致しません (Emacs: $EMACS_ABI, Library: $LANG_ABI)"
+        fi
+    else
+        echo "⚠ 警告: ライブラリのロードに失敗しました"
+    fi
+else
+    echo "⚠ Emacsが見つからないため、確認をスキップします"
+fi
+echo ""
+
+echo "=========================================="
+echo "✓ すべての処理が完了しました！"
+echo "=========================================="
+echo ""
+echo "Emacsで以下のコマンドを実行して${LANGUAGE}-ts-modeが使えることを確認してください:"
+echo "  M-x ${LANGUAGE}-ts-mode"
+echo ""
