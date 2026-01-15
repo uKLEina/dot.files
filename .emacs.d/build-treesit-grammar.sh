@@ -3,6 +3,10 @@ set -e
 
 # tree-sitter言語文法をビルドして~/.emacs.d/tree-sitter/にインストールするスクリプト
 #
+# 事前準備
+# libtree-sitter-devをDebian公式のaptリポジトリからインストールしておく
+# tree-sitter-cliはcargoで最新版をインストールしておく
+#
 # 使い方:
 #   ./build-treesit-grammar.sh <tree-sitter-repo-dir> <language-name> [abi-version] [grammar-subdir]
 #
