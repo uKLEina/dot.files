@@ -2456,6 +2456,12 @@ Refs: #123
   ;; enable Emacs specific tools
   (claude-code-ide-emacs-tools-setup))
 
+(use-package agent-shell
+  :ensure t
+  :custom
+  (agent-shell-anthropic-make-authentication :login t)
+  (agent-shell-session-strategy 'prompt))
+
 (use-package emojify
   :ensure t
   :hook
