@@ -527,6 +527,9 @@ Otherwise, join lines with no space."
   :custom
   (treesit-font-lock-level 4))
 
+(use-package js
+  :mode (("\\.js\\'" . js-ts-mode)))
+
 (when (eq system-type 'gnu/linux)
 ;;; Fix copy/paste in Wayland
   ;; credit: yorickvP on Github
@@ -1939,9 +1942,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package web-mode
   :ensure t
-  :mode (("\\.html?\\'" . web-mode)
+  :mode (;; ("\\.html?\\'" . web-mode)
          ("\\.vue\\'" . web-mode)
-         ("\\.js\\'" . web-mode)))
+         ;; ("\\.js\\'" . web-mode)
+         ))
 
 (use-package typescript-mode
   :ensure t)
