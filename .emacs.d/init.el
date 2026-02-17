@@ -1089,8 +1089,30 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package cape
   :ensure t
-  :bind (("C-:" . cape-dabbrev))
-  )
+  :bind (("C-:" . my-cape-dabbrev-completion))
+  :custom
+  (cape-dabbrev-buffer-function #'my-cape-project-buffers)
+  (project-vc-extra-root-markers '(".project"))
+  :config
+  (defun my-cape-dabbrev-completion ()
+    "必要な補完関数のみで補完する"
+    (interactive)
+    (let ((completion-at-point-functions '(cape-keyword cape-file cape-dabbrev)))
+      (completion-at-point)))
+
+  (defun my-cape-project-buffers ()
+    "現在のバッファがプロジェクト内なら同じプロジェクトの全バッファ、
+  そうでなければ同じメジャーモードのバッファを返す"
+    (if-let ((proj (project-current)))
+        ;; プロジェクト内: project.elの標準関数を使う
+        (project-buffers proj)
+      ;; プロジェクト外: 同じメジャーモードのバッファ
+      (cape-same-mode-buffers))))
+
+;; cape-keywordを有効化（autoloadのため）
+(use-package cape-keyword
+  :ensure nil
+  :after cape)
 
 (use-package kind-icon
   :ensure t
