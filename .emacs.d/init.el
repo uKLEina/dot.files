@@ -8,8 +8,14 @@
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 ;; (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "C-l"))
+(defun my/server-edit-save-and-done ()
+  "Save buffer and finish editing for emacsclient without confirmation."
+  (interactive)
+  (save-buffer)
+  (server-edit))
+
 (bind-keys ("C-l C-l" . recenter-top-bottom)
-           ("C-l C-x" . server-edit)
+           ("C-l C-x" . my/server-edit-save-and-done)
            ("C-l C-<tab>" . tab-to-tab-stop)
            ("C-M-y" . duplicate-dwim))
 
@@ -338,7 +344,21 @@ Otherwise, join lines with no space."
     (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
   (defun iconify-emacs-when-server-is-done ()
     (unless server-clients (iconify-frame)))
+  (defun my/server-visit-setup-keybindings ()
+    "Setup C-c C-c to save and finish in emacsclient buffers."
+    (local-set-key (kbd "C-c C-c") #'my/server-edit-save-and-done))
+  ;; Claude Code起動時のみEvil insert + SKK有効化
+  (defvar my/claude-code-pending nil
+    "Non-nil when next emacsclient session is from Claude Code.")
+  (defun my/claude-code-server-setup ()
+    "Enter Evil insert state and enable SKK for Claude Code sessions."
+    (when my/claude-code-pending
+      (setq my/claude-code-pending nil)
+      (evil-insert-state)
+      (skk-mode 1)))
   (add-hook 'server-switch-hook #'raise-frame)
+  (add-hook 'server-switch-hook #'my/claude-code-server-setup)
+  (add-hook 'server-visit-hook #'my/server-visit-setup-keybindings)
   (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done)
   :hook (emacs-startup . server-start))
 
