@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;; watcher を張っているディレクトリ一覧を見る;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setopt custom-file (locate-user-emacs-file "custom.el"))
@@ -1350,15 +1350,15 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-mode . (lambda () (when (file-remote-p default-directory)
                            (setq-local lsp-enable-file-watchers nil))))
   :config
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].aws-sam\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].cache\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].claude\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].devcontainer\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].ruffcache\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\].serena\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]data\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]db_schemas\\'")
-  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]rds_migration\\'")
+  (dolist (re '("[/\\\\]\\.aws-sam\\'"
+                "[/\\\\]\\.cache\\'"
+                "[/\\\\]\\.claude\\'"
+                "[/\\\\]\\.devcontainer\\'"
+                "[/\\\\]\\.ruff_cache\\'"
+                "[/\\\\]\\.serena\\'"
+                "[/\\\\][^/\\\\]+\\.dist-info\\'"
+                "[/\\\\][^/\\\\]+\\.egg-info\\'"))
+    (add-to-list 'lsp-file-watch-ignored-directories re))
   )
 ;; (setq lsp-pyright-langserver-command "/workspace/.venv/bin/basedpyright")
 (use-package lsp-pyright
