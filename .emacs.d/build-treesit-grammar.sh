@@ -128,6 +128,7 @@ find_grammars() {
         -not -path "*/node_modules/*" \
         -not -path "*/test/*" \
         -not -path "*/examples/*" \
+        -not -path "*/templates/*" \
         | while read -r f; do dirname "$f"; done \
         | sort
 }
