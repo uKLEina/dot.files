@@ -8,151 +8,169 @@ set -e
 # tree-sitter-cliはcargoで最新版をインストールしておく
 #
 # 使い方:
-#   ./build-treesit-grammar.sh <tree-sitter-repo-dir> <language-name> [abi-version] [grammar-subdir]
+#   build-treesit-grammar.sh <dir>
 #
-# 例:
-#   ./build-treesit-grammar.sh /path/to/tree-sitter-python python
-#   ./build-treesit-grammar.sh /path/to/tree-sitter-python python 14
-#   ./build-treesit-grammar.sh . python 14
-#   ./build-treesit-grammar.sh /path/to/tree-sitter-markdown markdown 14 tree-sitter-markdown
+# 単一リポジトリ:
+#   build-treesit-grammar.sh /path/to/tree-sitter-python
+#
+# 複数リポジトリを一括:
+#   build-treesit-grammar.sh /path/to/tree-sitter/
+#   → 配下のgrammar.jsを全て探索してビルド
+#
+# モノレポ（typescript等）も自動検出:
+#   build-treesit-grammar.sh /path/to/tree-sitter-typescript
+#   → typescript/, tsx/ 両方ビルド
 
-# 引数チェック
-if [ $# -lt 2 ]; then
-    echo "エラー: 引数が不足しています"
-    echo ""
-    echo "使い方: $0 <tree-sitter-repo-dir> <language-name> [abi-version] [grammar-subdir]"
+if [ $# -lt 1 ]; then
+    echo "使い方: $0 <dir>"
     echo ""
     echo "例:"
-    echo "  $0 /path/to/tree-sitter-python python"
-    echo "  $0 /path/to/tree-sitter-python python 14"
-    echo "  $0 . python 14"
-    echo "  $0 /path/to/tree-sitter-markdown markdown 14 tree-sitter-markdown"
+    echo "  $0 /path/to/tree-sitter-python          # 単一言語"
+    echo "  $0 /path/to/tree-sitter/                 # 配下を一括ビルド"
     exit 1
 fi
 
-REPO_DIR="$1"
-LANGUAGE="$2"
-ABI_VERSION="${3:-14}"  # デフォルトはABIバージョン14
-GRAMMAR_SUBDIR="${4:-}"  # オプション: grammar.jsがあるサブディレクトリ
+TARGET_DIR="$1"
 INSTALL_DIR="$HOME/.emacs.d/tree-sitter"
 
-# ディレクトリの存在確認
-if [ ! -d "$REPO_DIR" ]; then
-    echo "エラー: ディレクトリが見つかりません: $REPO_DIR"
-    exit 1
-fi
-
-# grammar.jsの場所を決定
-if [ -n "$GRAMMAR_SUBDIR" ]; then
-    # サブディレクトリが指定されている場合
-    GRAMMAR_DIR="$REPO_DIR/$GRAMMAR_SUBDIR"
-    if [ ! -d "$GRAMMAR_DIR" ]; then
-        echo "エラー: サブディレクトリが見つかりません: $GRAMMAR_DIR"
-        exit 1
-    fi
-else
-    # サブディレクトリが指定されていない場合は、リポジトリルートを使用
-    GRAMMAR_DIR="$REPO_DIR"
-fi
-
-# grammar.jsの存在確認
-if [ ! -f "$GRAMMAR_DIR/grammar.js" ]; then
-    echo "エラー: grammar.jsが見つかりません: $GRAMMAR_DIR/grammar.js"
-    echo "指定されたディレクトリはtree-sitterリポジトリではないようです"
-    echo ""
-    echo "モノレポ構造の場合は、第4引数でサブディレクトリを指定してください:"
-    echo "  $0 $REPO_DIR $LANGUAGE $ABI_VERSION <grammar-subdir>"
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "エラー: ディレクトリが見つかりません: $TARGET_DIR"
     exit 1
 fi
 
 # tree-sitter CLIの存在確認
 if ! command -v tree-sitter &> /dev/null; then
     echo "エラー: tree-sitter CLIが見つかりません"
-    echo "インストールしてください: sudo apt install tree-sitter-cli"
+    echo "インストールしてください: cargo install tree-sitter-cli"
     exit 1
 fi
 
-# インストールディレクトリの作成
+# EmacsからABIバージョンを取得
+if ! command -v emacs &> /dev/null; then
+    echo "エラー: Emacsが見つかりません（ABIバージョンの自動取得に必要です）"
+    exit 1
+fi
+ABI_VERSION=$(emacs --batch --eval "(progn (require 'treesit) (princ (treesit-library-abi-version nil)))" 2>/dev/null)
+if [ -z "$ABI_VERSION" ]; then
+    echo "エラー: EmacsからABIバージョンを取得できませんでした"
+    exit 1
+fi
+
 mkdir -p "$INSTALL_DIR"
 
-echo "=========================================="
-echo "tree-sitter文法のビルドとインストール"
-echo "=========================================="
-echo "リポジトリ: $REPO_DIR"
-echo "文法ディレクトリ: $GRAMMAR_DIR"
-echo "言語: $LANGUAGE"
-echo "ABIバージョン: $ABI_VERSION"
-echo "インストール先: $INSTALL_DIR"
-echo "=========================================="
-echo ""
+# 言語名をgrammar.jsのあるディレクトリから推測
+detect_language() {
+    local grammar_dir="$1"
+    local dir_name
+    dir_name=$(basename "$grammar_dir")
 
-# 文法ディレクトリに移動
-cd "$GRAMMAR_DIR"
-
-# パーサーの生成
-echo "[1/4] パーサーを生成中 (tree-sitter generate --abi $ABI_VERSION)..."
-tree-sitter generate --abi "$ABI_VERSION"
-
-# ABIバージョンの確認
-if [ -f "src/parser.c" ]; then
-    GENERATED_ABI=$(grep "#define LANGUAGE_VERSION" src/parser.c | awk '{print $3}')
-    echo "✓ 生成されたABIバージョン: $GENERATED_ABI"
-    if [ "$GENERATED_ABI" != "$ABI_VERSION" ]; then
-        echo "警告: 指定されたABIバージョン($ABI_VERSION)と生成されたバージョン($GENERATED_ABI)が一致しません"
+    # ディレクトリ名がtree-sitter-xxxならxxxを使う
+    if [[ "$dir_name" == tree-sitter-* ]]; then
+        echo "${dir_name#tree-sitter-}"
+    else
+        # モノレポのサブディレクトリ（typescript, tsx等）はそのまま使う
+        echo "$dir_name"
     fi
+}
+
+# 単一の文法をビルド・インストール
+build_one() {
+    local grammar_dir="$1"
+    local language
+    language=$(detect_language "$grammar_dir")
+
+    echo "--- $language ($grammar_dir)"
+
+    # npm依存関係のインストール（package.jsonがある場合）
+    # モノレポの場合、親ディレクトリのpackage.jsonも確認
+    local repo_root
+    repo_root=$(cd "$grammar_dir" && git rev-parse --show-toplevel 2>/dev/null || echo "$grammar_dir")
+    if [ -f "$repo_root/package.json" ] && [ -d "$repo_root/node_modules" ] 2>/dev/null; then
+        : # 既にインストール済み
+    elif [ -f "$repo_root/package.json" ]; then
+        echo "  npm install..."
+        (cd "$repo_root" && npm install --ignore-scripts > /dev/null 2>&1) || true
+    fi
+
+    # パーサー生成
+    (cd "$grammar_dir" && tree-sitter generate --abi "$ABI_VERSION") || { echo "  失敗: generate"; return 1; }
+
+    # ソースファイル収集
+    local src_files=("$grammar_dir/src/parser.c")
+    [ -f "$grammar_dir/src/scanner.c" ] && src_files+=("$grammar_dir/src/scanner.c")
+    [ -f "$grammar_dir/src/scanner.cc" ] && src_files+=("$grammar_dir/src/scanner.cc")
+
+    # コンパイル
+    local so_file="$grammar_dir/libtree-sitter-${language}.so"
+    if [ -f "$grammar_dir/src/scanner.cc" ]; then
+        g++ -shared -fPIC -fno-exceptions -I "$grammar_dir/src" -o "$so_file" "${src_files[@]}" -std=c++14
+    else
+        cc -shared -fPIC -I "$grammar_dir/src" -o "$so_file" "${src_files[@]}" -std=c11
+    fi || { echo "  失敗: compile"; return 1; }
+
+    # インストール
+    /bin/cp -f "$so_file" "$INSTALL_DIR/"
+
+    # ロードテスト
+    if emacs --batch --eval "(progn (require 'treesit) (unless (treesit-language-available-p '$language) (kill-emacs 1)))" 2>/dev/null; then
+        echo "  OK"
+    else
+        echo "  警告: Emacsでのロードに失敗しました"
+        return 1
+    fi
+}
+
+# grammar.jsを探索してビルド対象を収集
+# node_modules, test, examples等は除外
+find_grammars() {
+    local dir="$1"
+    find "$dir" -name grammar.js \
+        -not -path "*/node_modules/*" \
+        -not -path "*/test/*" \
+        -not -path "*/examples/*" \
+        | while read -r f; do dirname "$f"; done \
+        | sort
+}
+
+GRAMMAR_DIRS=()
+if [ -f "$TARGET_DIR/grammar.js" ]; then
+    # 直下にgrammar.jsがある → 単一ビルド
+    GRAMMAR_DIRS=("$(cd "$TARGET_DIR" && pwd)")
 else
-    echo "警告: src/parser.cが見つかりません"
+    # 配下を探索
+    while IFS= read -r d; do
+        GRAMMAR_DIRS+=("$d")
+    done < <(find_grammars "$(cd "$TARGET_DIR" && pwd)")
 fi
-echo ""
 
-# クリーンビルド
-echo "[2/4] クリーンビルド中 (make clean && make)..."
-make clean > /dev/null 2>&1 || true
-make
-
-# 生成されたsoファイルを確認
-SO_FILE="libtree-sitter-${LANGUAGE}.so"
-if [ ! -f "$SO_FILE" ]; then
-    echo "エラー: $SO_FILE が生成されませんでした"
+if [ ${#GRAMMAR_DIRS[@]} -eq 0 ]; then
+    echo "エラー: grammar.jsが見つかりません: $TARGET_DIR"
     exit 1
 fi
-echo "✓ ビルド完了: $SO_FILE"
+
+echo "=========================================="
+echo "tree-sitter文法のビルド (ABI $ABI_VERSION)"
+echo "対象: ${#GRAMMAR_DIRS[@]} 言語"
+echo "=========================================="
 echo ""
 
-# インストール
-echo "[3/4] インストール中..."
-/bin/cp -f "$SO_FILE" "$INSTALL_DIR/"
-echo "✓ インストール完了: $INSTALL_DIR/$SO_FILE"
-echo ""
+SUCCESS=0
+FAILED=0
+FAILED_NAMES=()
 
-# Emacsでの確認
-echo "[4/4] Emacsでの確認..."
-if command -v emacs &> /dev/null; then
-    EMACS_ABI=$(emacs --batch --eval "(progn (require 'treesit) (princ (treesit-library-abi-version nil)))" 2>/dev/null)
-    echo "✓ Emacsが期待するABIバージョン: $EMACS_ABI"
-
-    # 言語のロードテスト
-    if emacs --batch --eval "(progn (require 'treesit) (treesit-language-available-p '$LANGUAGE t))" 2>/dev/null; then
-        LANG_ABI=$(emacs --batch --eval "(progn (require 'treesit) (treesit-language-available-p '$LANGUAGE t) (princ (treesit-library-abi-version '$LANGUAGE)))" 2>/dev/null)
-        echo "✓ ${LANGUAGE}ライブラリのABIバージョン: $LANG_ABI"
-
-        if [ "$EMACS_ABI" = "$LANG_ABI" ]; then
-            echo "✓ ABIバージョンが一致しています！"
-        else
-            echo "⚠ 警告: ABIバージョンが一致しません (Emacs: $EMACS_ABI, Library: $LANG_ABI)"
-        fi
+for grammar_dir in "${GRAMMAR_DIRS[@]}"; do
+    if build_one "$grammar_dir"; then
+        SUCCESS=$((SUCCESS + 1))
     else
-        echo "⚠ 警告: ライブラリのロードに失敗しました"
+        FAILED=$((FAILED + 1))
+        FAILED_NAMES+=("$(detect_language "$grammar_dir")")
     fi
-else
-    echo "⚠ Emacsが見つからないため、確認をスキップします"
-fi
-echo ""
+done
 
-echo "=========================================="
-echo "✓ すべての処理が完了しました！"
-echo "=========================================="
 echo ""
-echo "Emacsで以下のコマンドを実行して${LANGUAGE}-ts-modeが使えることを確認してください:"
-echo "  M-x ${LANGUAGE}-ts-mode"
-echo ""
+echo "=========================================="
+echo "結果: ${SUCCESS}/${#GRAMMAR_DIRS[@]} 成功"
+if [ $FAILED -gt 0 ]; then
+    echo "失敗: ${FAILED_NAMES[*]}"
+fi
+echo "=========================================="
