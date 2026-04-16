@@ -189,10 +189,14 @@ zstyle ':vcs_info:*' actionformats '[%b|%a]'
 # シェル起動時に一度 update_rprompt を呼び出しておく
 update_rprompt
 
-# zsh autosuggestion
+# zsh plugins
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.zsh/zsh-completions/zsh-completions.plugin.zsh
+source ~/.zsh/zsh-bd/bd.plugin.zsh
+fpath=(~/.zsh/cd-gitroot(N-/) $fpath)
+source ~/.zsh/cd-gitroot/cd-gitroot.plugin.zsh
+alias cdgr=cd-gitroot
 
 # config for emacs-vterm
 vterm_printf() {

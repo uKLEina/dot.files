@@ -7,3 +7,9 @@
 [submodule ".zsh/zsh-completions"]
 	path = .zsh/zsh-completions
 	url = https://github.com/zsh-users/zsh-completions.git
+[submodule ".zsh/cd-gitroot"]
+	path = .zsh/cd-gitroot
+	url = https://github.com/mollifier/cd-gitroot.git
+[submodule ".zsh/zsh-bd"]
+	path = .zsh/zsh-bd
+	url = https://github.com/Tarrasch/zsh-bd.git
