@@ -5,7 +5,7 @@
       file-name-handler-alist nil
       site-run-file nil)  ; site-start.elの読み込みを無効
 (setopt ;; package-enable-at-startup nil
-        package-quickstart t
+        ;; package-quickstart t
         package-native-compile t)
 
 ;; native-compileの最適化
