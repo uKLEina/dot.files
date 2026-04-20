@@ -2160,7 +2160,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5.1)
+  (gptel-model 'gpt-5.4)
   ;; ;; Mark gptel-related file-local variables as safe.
   ;; (put 'gptel-model 'safe-local-variable
   ;;      (lambda (v) (or (symbolp v) (stringp v))))
@@ -2352,7 +2352,7 @@ Refs: #123
     message)
   (advice-add 'gptel-magit--format-commit-message :override
               #'my-gptel-magit--format-commit-message)
-  (setq gptel-magit-model 'gpt-4.1-mini))
+  (setq gptel-magit-model 'gpt-5.4-nano))
 
 (use-package minuet
   :ensure t
