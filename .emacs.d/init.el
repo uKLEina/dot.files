@@ -517,7 +517,8 @@ Otherwise, join lines with no space."
   (tramp-default-method "ssh"))
 
 ;; デフォルト色付け
-(use-package generic-x)
+(use-package generic-x
+  :demand t)
 
 (use-package java-ts-mode
   :mode
