@@ -1784,9 +1784,16 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
-(use-package compat
-  :ensure t
-  :pin gnu)
+;; Emacs 30 同梱の compat スタブが (compat 30 2 9999) として組み込み登録され、
+;; use-package の :ensure t は (package-installed-p 'compat) でこのスタブを掴むため、
+;; transient 0.13 が要求する compat 31 が入らない。さらに package-compute-transaction
+;; の並び直しロジックと噛み合って transient のインストール時に compat がトランザクション
+;; から脱落し、static-when 未定義でロードが落ちる。
+;; package-install-upgrade-built-in を一時的に t にして組み込みより新しい compat を強制取得する。
+(when (and (fboundp 'package--active-built-in-p)
+           (package--active-built-in-p 'compat))
+  (let ((package-install-upgrade-built-in t))
+    (package-install 'compat)))
 
 (use-package magit
   :ensure t
