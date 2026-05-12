@@ -342,20 +342,49 @@ Otherwise, join lines with no space."
       (call-process "wmctrl" nil nil nil "-i" "-R"
                     (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
     (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
+  (defvar my/claude-code-frame nil
+    "Dedicated GUI frame for Claude Code-originated emacsclient sessions.
+Lazily created on the first edit and reused via make-frame-invisible /
+make-frame-visible so we never destroy/recreate the GTK widget — that
+avoids the new-frame focus-in use-after-free crash on WSLg.")
+  (defvar my/claude-code-session-active nil
+    "Non-nil while a Claude Code-originated emacsclient session is active.")
+  (defvar my/claude-code-pending nil
+    "Non-nil when next emacsclient session is from Claude Code.")
+  (defun my/claude-code-show-frame ()
+    "Bring the dedicated Claude Code frame forward, creating it if needed.
+On pgtk/Wayland an unmap+remap roundtrip is used to bypass Mutter's
+focus-stealing prevention so the frame actually comes to the front."
+    (if (and my/claude-code-frame (frame-live-p my/claude-code-frame))
+        (progn
+          (make-frame-invisible my/claude-code-frame)
+          (make-frame-visible my/claude-code-frame))
+      (setq my/claude-code-frame
+            (make-frame '((name . "claude-code"))))))
+  (defun my/claude-code-server-setup ()
+    "Move Claude Code session into the dedicated frame; enable Evil + SKK."
+    (when my/claude-code-pending
+      (setq my/claude-code-pending nil
+            my/claude-code-session-active t)
+      (let ((buf (current-buffer)))
+        (my/claude-code-show-frame)
+        ;; Keep the main frame's working buffer intact
+        (switch-to-prev-buffer)
+        (select-frame-set-input-focus my/claude-code-frame)
+        (switch-to-buffer buf))
+      (evil-insert-state)
+      (skk-mode 1)))
   (defun iconify-emacs-when-server-is-done ()
-    (unless server-clients (iconify-frame)))
+    (cond
+     (server-clients)
+     (my/claude-code-session-active
+      (setq my/claude-code-session-active nil)
+      (when (and my/claude-code-frame (frame-live-p my/claude-code-frame))
+        (make-frame-invisible my/claude-code-frame)))
+     (t (iconify-frame))))
   (defun my/server-visit-setup-keybindings ()
     "Setup C-c C-c to save and finish in emacsclient buffers."
     (local-set-key (kbd "C-c C-c") #'my/server-edit-save-and-done))
-  ;; Claude Code起動時のみEvil insert + SKK有効化
-  (defvar my/claude-code-pending nil
-    "Non-nil when next emacsclient session is from Claude Code.")
-  (defun my/claude-code-server-setup ()
-    "Enter Evil insert state and enable SKK for Claude Code sessions."
-    (when my/claude-code-pending
-      (setq my/claude-code-pending nil)
-      (evil-insert-state)
-      (skk-mode 1)))
   (add-hook 'server-switch-hook #'raise-frame)
   (add-hook 'server-switch-hook #'my/claude-code-server-setup)
   (add-hook 'server-visit-hook #'my/server-visit-setup-keybindings)
