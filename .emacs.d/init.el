@@ -1017,14 +1017,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (bind-key "C-s" 'kle/isearch-forward-migemo)
   (bind-key "C-r" 'kle/isearch-backward-migemo))
 
-(use-package ripgrep
-  :ensure t
-  :custom
-  (ripgrep-executable (seq-find #'file-exists-p
-                                '("/usr/bin/rg"
-                                  (expand-file-name "~/bin/rg"))))
-  (ripgrep-arguments '("-S")))
-
 (use-package vertico
   :ensure t
   :init
@@ -2048,14 +2040,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (rust-format-on-save t))
 
-(use-package racer
-  :ensure t
-  :hook
-  ((rust-mode . racer-mode)
-   (racer-mode . eldoc-mode))
-  :config
-  (evil-define-key 'normal rust-mode-map (kbd "M-.") 'racer-find-definition))
-
 (use-package auctex
   :ensure t
   :mode (("\\.tex\\'" . TeX-tex-mode)
@@ -2231,19 +2215,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;; (bind-key "C-x C-s" #'gptel-save-buffer-dwim gptel-mode-map)
   )
 
-(use-package gptel-bedrock
-  :after gptel
-  :config
-  (add-to-list 'gptel-bedrock--model-ids
-               '(claude-sonnet-4-5-20250929 . "jp.anthropic.claude-sonnet-4-5-20250929-v1:0"))
-  (gptel-make-bedrock "AWS"
-    :stream t
-    :region "ap-northeast-1"
-    :models '(claude-sonnet-4-5-20250929)
-    :model-region 'apac
-    ;; :aws-profile 'sinops-corporate
-    :aws-bearer-token (getenv "AWS_BEARER_TOKEN_BEDROCK")))
-
 (use-package gptel-magit
   :ensure t
   :hook (magit-mode . gptel-magit-install)
@@ -2348,108 +2319,6 @@ test: ユーザー登録APIの境界値テストを追加
               #'my-gptel-magit--format-commit-message)
   (setq gptel-magit-model 'gpt-5.4-nano))
 
-(use-package minuet
-  :ensure t
-  :custom
-  (minuet-provider 'openai)
-  (minuet-request-timeout 10)
-  (minuet-n-completions 1)
-  :bind (:map minuet-active-mode-map
-              ("<tab>" . 'minuet-accept-suggestion)
-              ("TAB" . 'minuet-accept-suggestion)
-              ("C-<left>" . 'minuet-previous-suggestion)
-              ("C-<right>" . 'minuet-next-suggestion))
-  ;; :hook (python-ts-mode . minuet-auto-suggestion-mode)
-  )
-
-(use-package claude-code-ide
-  :ensure t
-  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
-  :bind ("C-c C-@" . claude-code-ide-menu)
-  :custom
-  (claude-code-ide-diagnostics-backend 'flycheck)
-  :config
-  ;; dedicated buffer for editing prompt
-  (defvar claude-code-ide-prompt-buffer-close-after-send t)
-  (defvar claude-code-ide-prompt-focus-claude-after-send t)
-
-  (defvar claude-code-ide-prompt-mode-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "C-c C-s") #'claude-code-ide-prompt-send-and-close)
-      (define-key map (kbd "C-c C-c") #'claude-code-ide-prompt-send)
-      (define-key map (kbd "C-c C-k") (lambda () (interactive) (kill-buffer (current-buffer))))
-      map)
-    "Keymap for claude-code-ide-prompt-mode.")
-
-  (define-minor-mode claude-code-ide-prompt-mode
-    "Minor mode for editing Claude prompts."
-    :init-value nil
-    :lighter " Claude-Prompt"
-    :keymap claude-code-ide-prompt-mode-map)
-
-  (defun claude-code-ide--current-project-root ()
-    (if-let ((proj (ignore-errors (project-current))))
-        (expand-file-name (project-root proj))
-      (expand-file-name default-directory)))
-
-  (defun claude-code-ide-open-prompt-buffer ()
-    "現在プロジェクト用のプロンプト編集バッファを開く。"
-    (interactive)
-    (let* ((root (claude-code-ide--current-project-root))
-           (proj (file-name-nondirectory (directory-file-name root)))
-           (buf (get-buffer-create (format "*Claude Prompt: %s*" proj))))
-      (with-current-buffer buf
-        ;; 送信先の判定に使うので default-directory をプロジェクトに合わせる
-        (setq default-directory root)
-        ;; markdown-mode があれば使う（任意）
-        (when (require 'markdown-mode nil t)
-          (markdown-mode))
-        (claude-code-ide-prompt-mode 1)
-        (setq-local header-line-format "C-c C-c: 送信, C-c C-s: 送信+閉じる, C-c C-k: 閉じる"))
-      (pop-to-buffer buf)))
-
-  (defun claude-code-ide--prompt-collect ()
-    "送信するテキストを取得（リージョンがあればリージョン、なければバッファ全体）。"
-    (if (use-region-p)
-        (buffer-substring-no-properties (region-beginning) (region-end))
-      (buffer-substring-no-properties (point-min) (point-max))))
-
-  (defun claude-code-ide-prompt-send ()
-    "編集バッファの内容を送信（バッファは残す）。"
-    (interactive)
-    (let ((text (claude-code-ide--prompt-collect)))
-      (condition-case err
-          (progn
-            (claude-code-ide-send-prompt text)
-            (when claude-code-ide-prompt-focus-claude-after-send
-              (claude-code-ide-switch-to-buffer))
-            (message "Claudeにプロンプトを送信しました"))
-        (error
-         (message "送信失敗: %s" (error-message-string err))))))
-
-  (defun claude-code-ide-prompt-send-and-close ()
-    "編集バッファの内容を送信して（成功時）バッファを閉じる。"
-    (interactive)
-    (let ((buf (current-buffer)))
-      (call-interactively #'claude-code-ide-prompt-send)
-      (when (and claude-code-ide-prompt-buffer-close-after-send
-                 (buffer-live-p buf))
-        (kill-buffer buf))))
-
-  ;; ;; キーに割り当て
-  ;; (define-prefix-command 'claude-code-ide-prefix)
-  ;; (global-set-key (kbd "C-c c") 'claude-code-ide-prefix)
-  ;; (global-set-key (kbd "C-c c p") #'claude-code-ide-open-prompt-buffer)
-
-  ;; Transientメニューに項目を追加（任意）
-  (with-eval-after-load 'claude-code-ide-transient
-    (when (fboundp 'transient-append-suffix)
-      (transient-append-suffix 'claude-code-ide-menu "p"
-        '("P" "Open prompt editor" claude-code-ide-open-prompt-buffer))))
-
-  ;; enable Emacs specific tools
-  (claude-code-ide-emacs-tools-setup))
-
 (use-package agent-shell
   :ensure t
   :custom
@@ -2466,78 +2335,6 @@ test: ユーザー登録APIの境界値テストを追加
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
-  (use-package vterm
-    :ensure t
-    :custom
-    (vterm-max-scrollback 100000)
-    :config
-    ;; 例外キーに追加
-    (add-to-list 'vterm-keymap-exceptions "C-t")
-    ;; 既に作られているキーマップに反映
-    (when (boundp 'vterm-mode-map)
-      (vterm--exclude-keys vterm-mode-map vterm-keymap-exceptions)))
-  (use-package vterm-toggle
-    :ensure t
-    :bind
-    (("<f10>" . vterm-toggle))
-    (:map vterm-mode-map
-          ("<f10>" . vterm-toggle)))
-  (use-package eat
-    :ensure t
-    ;; :init
-    ;; (add-hook 'eat-mode-hook
-    ;;       (lambda ()
-    ;;         (add-hook 'pre-command-hook
-    ;;                   (lambda ()
-    ;;                     (when (and (boundp 'eat-terminal) eat-terminal
-    ;;                                (boundp 'eat--line-mode) eat--line-mode
-    ;;                                (< (point) (eat-term-end eat-terminal))
-    ;;                                (let ((s (symbol-name this-command)))
-    ;;                                  (or (string-prefix-p "skk-" s)
-    ;;                                      (eq this-command 'self-insert-command))))
-    ;;                       (goto-char (point-max))))
-    ;;                   nil t)))
-    )
-  ;; (use-package exec-path-from-shell
-  ;;   :ensure t
-  ;;   :custom
-  ;;   (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
-  ;;   :config
-  ;;   (exec-path-from-shell-initialize))
-
-                                        ;(use-package pdf-tools
-                                        ;  :ensure t
-                                        ;  :defer t
-                                        ;  :init
-                                        ;  (pdf-loader-install))
-  ;; font
-  ;; default ASCII font
-  ;; (defun calculate-font-size-for-frame (frame)
-  ;;   "Calculate the font size dynamically based on the frame's display resolution."
-  ;;   (let* ((attrs (frame-monitor-attributes frame))
-  ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
-  ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
-  ;;          (dpi (if (and mm-width pixel-width)
-  ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
-  ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
-  ;;                 96))                                  ; Default to 96 DPI if unavailable
-  ;;          (font-size (cond
-  ;;                      ((> dpi 200) 180)  ; High DPI
-  ;;                      ((> dpi 150) 140)  ; Medium DPI
-  ;;                      (t 120))))        ; Low DPI
-  ;;     font-size))
-  ;; (use-package treesit-auto
-  ;;   :ensure t
-  ;;   :init
-  ;;   (add-to-list 'treesit-extra-load-path "~/.emacs.d/tree-sitter/")
-  ;;   :commands
-  ;;   (global-treesit-auto-mode)
-  ;;   :hook
-  ;;   (prog-mode . global-treesit-auto-mode)
-  ;;   :custom
-  ;;   (treesit-auto-install 'nil)
-  ;;   :config
-  ;;   (treesit-auto-add-to-auto-mode-alist 'all))
   (use-package treesit-fold
     :init
     (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
