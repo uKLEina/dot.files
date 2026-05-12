@@ -1784,14 +1784,29 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
-;; Emacs 30 同梱の compat スタブが (compat 30 2 9999) として組み込み登録され、
-;; use-package の :ensure t は (package-installed-p 'compat) でこのスタブを掴むため、
-;; transient 0.13 が要求する compat 31 が入らない。さらに package-compute-transaction
-;; の並び直しロジックと噛み合って transient のインストール時に compat がトランザクション
-;; から脱落し、static-when 未定義でロードが落ちる。
-;; package-install-upgrade-built-in を一時的に t にして組み込みより新しい compat を強制取得する。
+;; Emacs 30 同梱の compat スタブが (compat 30 2 9999) として組み込み登録されており、
+;; transient 0.13 等が要求する compat 31 を素直に入れさせてくれない。
+;; (a) use-package :ensure t はバージョン指定なしの package-installed-p でスタブを掴む。
+;; (b) package-install は package-install-upgrade-built-in が nil だとスタブを上書き不可。
+;; (c) package-compute-transaction の並び直しロジックが compat 30 と compat 31 の混在で
+;;     compat をトランザクションから silently drop する (#5568)。
+;; (d) install 後の package--reload-previously-loaded が compat.el を再ロードするが、
+;;     その時点で elpa の compat ディレクトリがまだ load-path に無く、compat.el 内の
+;;     (require 'compat-31) が落ちる (compat-autoloads.el は後でロードされる)。
+;; → magit 関連を触る前に compat 31 を明示的かつ強制的に install する。
 (when (and (fboundp 'package--active-built-in-p)
            (package--active-built-in-p 'compat))
+  (unless package-archive-contents
+    (package-read-all-archive-contents))
+  (let* ((desc (cadr (assq 'compat package-archive-contents)))
+         (compat-dir (and desc
+                          (expand-file-name
+                           (format "compat-%s"
+                                   (package-version-join
+                                    (package-desc-version desc)))
+                           package-user-dir))))
+    (when compat-dir
+      (add-to-list 'load-path compat-dir)))
   (let ((package-install-upgrade-built-in t))
     (package-install 'compat)))
 
