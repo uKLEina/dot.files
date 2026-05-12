@@ -1049,8 +1049,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package embark
   :ensure t
   :bind
-  (("C-S-i" . embark-act)
-   ("M-i" . embark-dwim)))
+  (("<backtab>" . embark-act)))
 
 (use-package consult
   :ensure t
