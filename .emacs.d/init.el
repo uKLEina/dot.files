@@ -1784,6 +1784,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
   (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
 
+(use-package compat
+  :ensure t
+  :pin gnu)
+
 (use-package magit
   :ensure t
   :pin melpa-stable
