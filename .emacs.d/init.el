@@ -2321,10 +2321,20 @@ test: ユーザー登録APIの境界値テストを追加
 
 (use-package agent-shell
   :ensure t
+  :bind (:map agent-shell-diff-mode-map
+         ("C-c C-c" . agent-shell-diff-accept-all)
+         ("C-c C-k" . agent-shell-diff-reject-all))
   :custom
   (agent-shell-anthropic-make-authentication :login t)
   (agent-shell-session-strategy 'prompt)
   (agent-shell-context-sources nil)
+  (agent-shell-cwd-function
+      (lambda ()
+        (let ((default-directory (file-truename default-directory)))
+          (or (when (fboundp 'project-root)
+                (when-let ((proj (project-current)))
+                  (project-root proj)))
+              default-directory))))
   :init
   (defun my-agent-shell-open-previous-transcript (event)
     "セッション再開時に、前回のトランスクリプトをサイドウィンドウで開く。"
