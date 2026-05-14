@@ -2338,8 +2338,6 @@ test: ユーザー登録APIの境界値テストを追加
                                       (mapcar #'expand-file-name sorted)))
                          (nth 1 sorted)
                        (car sorted))))
-      (message "DEBUG agent-shell transcript: dir=%s files=%d current=%s previous=%s"
-               dir (length files) agent-shell--transcript-file previous)
       (when (and previous (file-exists-p previous))
         (display-buffer (find-file-noselect previous)
                         '(display-buffer-in-side-window
@@ -2405,8 +2403,6 @@ test: ユーザー登録APIの境界値テストを追加
                 (and (equal kind "execute")
                      (my-agent-shell--safe-command-p
                       (map-elt (map-elt tc :raw-input) 'command))))))
-      (message "agent-shell auto-approve: kind=%s title=%s approved=%s"
-               kind title (if should-approve "yes" "no"))
       (when should-approve
         (when-let ((choice (seq-find
                             (lambda (opt)
@@ -2414,6 +2410,7 @@ test: ユーザー登録APIの境界値テストを追加
                             (map-elt permission :options))))
           (funcall (map-elt permission :respond)
                    (map-elt choice :option-id))
+          (message "✓ 自動許可: %s" (or title kind))
           t))))
 
   (setq agent-shell-permission-responder-function
