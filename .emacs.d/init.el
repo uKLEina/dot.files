@@ -656,7 +656,12 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   (emacs-startup . auto-compile-on-save-mode)
   :custom
   (auto-compile-display-buffer nil)
-  (auto-compile-mode-line-counter t))
+  (auto-compile-mode-line-counter t)
+  :config
+  (advice-add 'auto-compile-byte-compile :around
+              (lambda (orig-fn &rest args)
+                (unless (equal (file-name-nondirectory (buffer-file-name)) "init.el")
+                  (apply orig-fn args)))))
 
 (use-package super-save
   :ensure t
