@@ -2047,14 +2047,18 @@ test: ユーザー登録APIの境界値テストを追加
   (use-package eat
     :ensure t
     :init
-    (defun toggle-eat ()
-      "Toggle eat terminal in bottom window."
-      (interactive)
-      (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'eat-mode))
-                              (buffer-list)))
-               (win (get-buffer-window buf)))
-          (delete-window win)
-        (eat-other-window)))
+    (setq explicit-shell-file-name "tmux"
+          explicit-tmux-args '("new-session" "-A" "-s" "main"))
+    (defun toggle-eat (arg)
+      "Toggle eat terminal in bottom window.  With prefix ARG, open fullscreen."
+      (interactive "P")
+      (if arg
+          (eat)
+        (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'eat-mode))
+                                (buffer-list)))
+                 (win (get-buffer-window buf)))
+            (delete-window win)
+          (eat-other-window))))
     (bind-key "<f10>" #'toggle-eat)
     (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3))
     :config
