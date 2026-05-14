@@ -2,11 +2,9 @@
 ;; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setopt custom-file (locate-user-emacs-file "custom.el"))
-;; (setopt package-install-upgrade-built-in t)
 (setopt initial-major-mode 'fundamental-mode)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
-;; (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "C-l"))
 (defun my/server-edit-save-and-done ()
   "Save buffer and finish editing for emacsclient without confirmation."
@@ -66,8 +64,6 @@
   (global-auto-revert-mode 1))
 (run-with-idle-timer 0.5 nil #'my/setup-modes)
 
-;; (setopt pixel-scroll-precision-large-scroll-height 40)
-
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
 (defun my-minibuffer-delete-parent-directory ()
@@ -93,7 +89,6 @@
      ("\t" 0 f-ub-steelblue prepend)
      ("[ ]+$" 0 f-bg-gray append))))
 (advice-add 'font-lock-mode :before #'visible-spaces)
-;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; ウィンドウのスマート分割
 ;; ヘルパー関数: 他のウィンドウがすべて指定されたユーティリティバッファか確認する
@@ -204,12 +199,6 @@ frame if FRAME is nil, and to 1 if AMT is nil."
 
 (global-set-key (kbd "C-x C-+") 'kle/zoom-frame)
 (global-set-key (kbd "C-x C--") 'kle/zoom-frame-out)
-
-;; (defun kle/ensure-package-vc-install (url)
-;;   "package-vc-install if not yet installed."
-;;   (let ((elpa-lisp-dir "~/.emacs.d/elpa"))
-;;     (unless (file-directory-p (concat elpa-lisp-dir "/" (car (last (split-string url "/"))) "/"))
-;;       (package-vc-install url))))
 
 (setopt debug-on-error t)
 
@@ -420,18 +409,6 @@ focus-stealing prevention so the frame actually comes to the front."
   :config
   (which-key-setup-side-window-right))
 
-;; (use-package smerge-mode
-;;   :config
-;;   (smartrep-define-key
-;;       smerge-mode-map "C-c ^"
-;;     '(("n" . smerge-next)
-;;       ("p" . smerge-prev)
-;;       ("l" . smerge-keep-lower)
-;;       ("u" . smerge-keep-upper)
-;;       ("b" . smerge-keep-base)
-;;       ("a" . smerge-keep-all)
-;;       ("E" . smerge-ediff))))
-
 (use-package winner
   :init
   (winner-mode 1)
@@ -447,11 +424,6 @@ focus-stealing prevention so the frame actually comes to the front."
   (("C-q" . winner-dwim)
    ("C-l C-q" . quoted-insert)))
 
-;; (use-package hideif
-;;   :init
-;;   (add-hook 'c++-mode-hook 'hide-ifdef-mode)
-;;   (add-hook 'c-mode-hook 'hide-ifdef-mode))
-
 (use-package cperl-mode
   :mode (("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
   :init
@@ -460,37 +432,6 @@ focus-stealing prevention so the frame actually comes to the front."
   (add-to-list 'interpreter-mode-alist '("perl" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("perl5" . cperl-mode))
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
-
-;; (define-generic-mode 'poe-filter-mode
-;;   ;; Comments
-;;   '("#")
-;;   ;; Blocks
-;;   '("Show" "Hide")
-;;   '(
-;;     ;; Conditions
-;;     ("\\(ItemLevel\\|DropLevel\\|Quality\\|Rarity\\|Class\\|BaseType\\|Sockets\\|LinkedSockets\\|SocketGroup\\|Height\\|Width\\|HasExplicitMod\\|StackSize\\|GemLevel\\|Identified\\|Corrupted\\|ElderItem\\|ShaperItem\\|ElderMap\\|ShapedMap\\|MapTier\\)" . 'font-lock-variable-name-face)
-;;     ;; Actions
-;;     ("\\(SetBorderColor\\|SetTextColor\\|SetBackgroundColor\\|SetFontSize\\|PlayAlertSound\\|PlayAlertSoundPositional\\|DisableDropSound\\|CustomAlertSound\\|MinimapIcon\\|PlayEffect\\)" . 'font-lock-variable-name-face)
-;;     ;; Attributes
-;;     ("\\(True\\|False\\)" . 'font-lock-constant-face)
-;;     ;; Rarity
-;;     ("\\(Unique\\|Rare\\|Magic\\|Normal\\)" . 'font-lock-constant-face)
-;;     ;; Color
-;;     ("\\(Red\\|Green\\|Blue\\|Brown\\|White\\|Yellow\\)" . 'font-lock-constant-face)
-;;     ;; Shape
-;;     ("\\(Circle\\|Diamond\\|Hexagon\\|Square\\|Star\\|Triangle\\)" . font-lock-constant-face)
-;;     ;; Beam
-;;     ("\\(Temp\\)" . font-lock-constant-face)
-;;     ;; Base Type
-;;     ("\\(Jewel\\|Amulets\\|Belt\\|Ring\\|Wands\\|Daggers\\|One Hand\\|Shields\\|Thrusting\\|Sceptre\\|Claws\\|Currency\\|Gems\\|Flask\\|Maps\\|Piece\\)" . font-lock-constant-face)
-;;     ;; Item Size
-;;     ("\\(Small\\|Medium\\|Large\\)" . font-lock-constant-face)
-;;     ;; Flask Tier
-;;     ("\\(Greater\\|Grand\\|Giant\\|Colossal\\|Sacred\\|Hallowed\\|Sanctified\\|Divine\\|Eternal\\)" . font-lock-constant-face)
-;;     )
-;;   '(".filter\\'")
-;;   nil
-;;   "Major mode for editing Path of Exile filter file.")
 
 (use-package json-ts-mode
   :mode
@@ -580,46 +521,6 @@ focus-stealing prevention so the frame actually comes to the front."
             (shell-command-to-string "wl-paste -n | tr -d \r")))
         (setq interprogram-cut-function 'wl-copy)
         (setq interprogram-paste-function 'wl-paste)))
-  ;; (use-package exec-path-from-shell
-  ;;   :ensure t
-  ;;   :custom
-  ;;   (exec-path-from-shell-variables '("PATH" "MANPATH" "LSP_USE_PLISTS"))
-  ;;   :config
-  ;;   (exec-path-from-shell-initialize))
-
-  ;; (use-package pdf-tools
-  ;;  :ensure t
-  ;;  :init
-  ;;  (pdf-loader-install))
-  ;; font
-  ;; default ASCII font
-  ;; (defun calculate-font-size-for-frame (frame)
-  ;;   "Calculate the font size dynamically based on the frame's display resolution."
-  ;;   (let* ((attrs (frame-monitor-attributes frame))
-  ;;          (mm-width (alist-get 'mm-width attrs))       ; Display width in mm
-  ;;          (pixel-width (alist-get 'geometry attrs))    ; Display geometry
-  ;;          (dpi (if (and mm-width pixel-width)
-  ;;                   (/ (float (nth 2 pixel-width))       ; Geometry width in pixels
-  ;;                      (/ (float mm-width) 25.4))       ; Convert mm to inches
-  ;;                 96))                                  ; Default to 96 DPI if unavailable
-  ;;          (font-size (cond
-  ;;                      ((> dpi 200) 180)  ; High DPI
-  ;;                      ((> dpi 150) 140)  ; Medium DPI
-  ;;                      (t 120))))        ; Low DPI
-  ;;     font-size))
-  ;; (use-package ispell
-  ;;   :custom
-  ;;   (ispell-program-name "hunspell")
-  ;;   (ispell-dictionary "/usr/share/hunspell/en_US.dic")
-  ;;   ;; (ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
-  ;;   :config
-  ;;   (add-to-list 'ispell-skip-region-alist '("[^\000-\377]+")))
-
-  ;;   (use-package flyspell
-  ;;     :config
-  ;;     (unbind-key "C-M-i" flyspell-mode-map)
-  ;;     (unbind-key "C-;" flyspell-mode-map)
-  ;;     (unbind-key "C-," flyspell-mode-map))
 
   (defun file-open-file-manager ()
     "Open the directory of the current buffer's file or dired buffer in the appropriate file manager.
@@ -646,11 +547,8 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; External packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (package-initialize)
-
 (use-package auto-compile
   :ensure t
-  ;; :pin melpa-stable
   :hook
   (emacs-startup . auto-compile-on-load-mode)
   (emacs-startup . auto-compile-on-save-mode)
@@ -794,15 +692,6 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
                             'mode-line-inactive))
       ""))
 
-  ;; (doom-modeline-def-segment linum-colnum
-  ;;   "Display current linum/colnum"
-  ;;   (propertize (format " Ln %s, Col %s"
-  ;;                       (format-mode-line "%l")
-  ;;                       (format-mode-line "%c"))
-  ;;               'face (if (doom-modeline--active)
-  ;;                         '(:foreground "#8cd0d3" :weight bold)
-  ;;                       'mode-line-inactive)))
-
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
     (let* ((system-time-locale "C")
@@ -846,19 +735,9 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
       ""))
 
   ;; ;; you can use featurep to check if library is loaded or not
-  ;; (with-eval-after-load 'evil
-  ;;   (doom-modeline-def-segment evil-state-seg
-  ;;     "Display current Evil State."
-  ;;     (propertize (format " <%s>" (upcase (substring (symbol-name evil-state) 0 1)))
-  ;;                 'face '(:weight bold)))
-  ;;   )
   (doom-modeline-def-modeline 'simple
-    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum pdf-pages)
-    ;; '(bar evil-state-seg matches remote-host buffer-info-simple linum-colnum)
-    ;; '(bar modals matches remote-host buffer-info-simple buffer-position)
     '(input-method bar modals matches remote-host buffer-info buffer-position csv-index)
-    '(projectile-project-name vcs check battery datetime)
-    )
+    '(projectile-project-name vcs check battery datetime))
 
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple my-buffer-size)
@@ -895,10 +774,6 @@ closing delimiter in normal or visual state."
     (apply orig-fn args))
   (advice-add 'paredit-backward :around #'my/paredit-backward-advice)
   (advice-add 'paredit-forward :around #'my/paredit-forward-visual-advice))
-
-;; (use-package enhanced-evil-paredit
-;;   :ensure t
-;;   :after (paredit))
 
 (use-package posframe
   :ensure t)
@@ -978,26 +853,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-swap-key evil-motion-state-map "j" "gj")
   (evil-swap-key evil-motion-state-map "k" "gk")
   (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
-
-;; (use-package evil-mode-line
-;;   :init
-;;   (let* ((site-lisp-dir "~/.emacs.d/elisp")
-;;          (mode-line-color-file (concat site-lisp-dir "/mode-line-color.el"))
-;;          (evil-mode-line-file (concat site-lisp-dir "/evil-mode-line.el")))
-;;     (unless (and (file-exists-p mode-line-color-file) (file-exists-p evil-mode-line-file))
-;;       (use-package url)
-;;       (unless (file-directory-p site-lisp-dir)
-;;         (mkdir site-lisp-dir))
-;;       (url-copy-file "https://raw.githubusercontent.com/tarao/evil-plugins/master/evil-mode-line.el" evil-mode-line-file)
-;;       (url-copy-file "https://raw.githubusercontent.com/tarao/elisp/master/mode-line-color.el" mode-line-color-file))
-;;     (add-to-list 'load-path site-lisp-dir))
-;;   :config
-;;   (with-eval-after-load 'doom-themes
-;;     (setopt evil-mode-line-color `((normal . ,(doom-color 'bg-alt))
-;;                                    (insert . ,(doom-darken (doom-color 'green) 0.5))
-;;                                    (visual . ,(doom-color 'dark-blue))
-;;                                    (emacs . ,(doom-color 'magenta))))))
-;; ;; (require 'evil-mode-line)
 
 (use-package migemo
   :demand t
@@ -1191,36 +1046,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (flyecheck-disabled-checkers 'python-ruff)
   )
 
-
-;; (use-package flymake
-;;   :ensure t
-;;   :pin gnu
-;;   :after (popwin)
-;;   :commands (flymake-show-buffer-diagnostics flymake-goto-next-error flymake-goto-prev-error)
-;;   :bind (("C-c ! l" . flymake-show-buffer-diagnostics)
-;;          ("C-c ! n" . flymake-goto-next-error)
-;;          ("C-c ! p" . flymake-goto-prev-error))
-;;   :config
-;;   (smartrep-define-key
-;;       flymake-mode-map "C-c !"
-;;     '(("n" . flymake-goto-next-error)
-;;       ("p" . flymake-goto-prev-error)))
-;;   (push '(flymake-diagnostics-buffer-mode :position bottom :width 5 :noselect t)
-;;         popwin:special-display-config))
-
-;; ;; (use-package flymake-ruff
-;; ;;   :ensure t
-;; ;;   ;; :init
-;; ;;   ;; (defun kle/flymake-ruff-load-python-ts-mode ()
-;; ;;   ;;   "check major mode before load flymake-ruff"
-;; ;;   ;;   (when (eq major-mode 'python-ts-mode)
-;; ;;   ;;     (flymake-ruff-load)))
-;; ;;   :hook
-;; ;;   ;; (eglot-managed-mode . kle/flymake-ruff-load-python-ts-mode)
-;; ;;   (python-mode . flymake-ruff-load)
-;; ;;   (python-ts-mode . flymake-ruff-load)
-;; ;;   )
-
 (use-package highlight-indent-guides
   :ensure t
   :hook
@@ -1229,33 +1054,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (highlight-indent-guides-method 'column))
 
-;; (use-package pangu-spacing
-;;   :ensure t
-;;   :custom
-;;   (pangu-spacing-real-insert-separtor t)
-;;   :config
-;;   ;; chinse-two-byte→japanese に置き換えて日本語で使う
-;;   (setq pangu-spacing-chinese-before-english-regexp
-;;         (rx (group-n 1 (category japanese))
-;;             (group-n 2 (in "a-zA-Z0-9"))))
-;;   (setq pangu-spacing-chinese-after-english-regexp
-;;         (rx (group-n 1 (in "a-zA-Z0-9"))
-;;             (group-n 2 (category japanese)))))
-
 (use-package docker
   :ensure t)
 
 (use-package python
   :custom
   (eldoc-echo-area-use-multiline-p nil)
-  ;; :init
-  ;; (defun set-basedpyright-options ()
-  ;;   (setq-default eglot-workspace-configuration
-  ;;                 '(:basedpyright.analysis
-  ;;                   ( :inlayHints ( :variableTypes nil
-  ;;                                   :callArgumentNames nil
-  ;;                                   :functionReturnTypes nil
-  ;;                                   :genericTypes nil)))))
   :init
   (defun my/python-init-setup ()
     (setq tab-width python-indent-offset)
@@ -1265,8 +1069,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (python-mode . my/python-init-setup)
   :mode
   (("\\.py\\'" . python-ts-mode))
-  ;; (python-ts-mode . set-basedpyright-options)
-  ;; (python-mode . set-basedpyright-options)
   :config
   (smartrep-define-key
       python-mode-map "C-c"
@@ -1283,48 +1085,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
     (revert-buffer t t t)))
 
-;; (use-package eglot
-;;   :ensure t
-;;   :pin gnu
-;;   :config
-;;   (unless (require 'eglot-booster nil t)
-;;     (package-vc-install "https://github.com/jdtsmith/eglot-booster"))
-;;   (use-package eglot-booster
-;;     :config (eglot-booster-mode +1))
-;;   ;; (assq-delete-all '(python-mode python-ts-mode) eglot-server-programs)
-;;   ;; (add-to-list 'eglot-server-programs
-;;   ;;              '((python-mode python-ts-mode)
-;;   ;;                "basedpyright-langserver" "--stdio"))
-;;   ;; (add-to-list 'eglot-server-programs
-;;   ;;              '((python-mode python-ts-mode)
-;;   ;;                . ,(eglot-alternatives
-;;   ;;                    '(("basedpyright-langserver" "--stdio")
-;;   ;;                      "ruff-lsp"
-;;   ;;                      "pylsp"
-;;   ;;                      ("pyright-langserver" "--stdio")
-;;   ;;                      "judi-language-server"
-;;   ;;                      "pyls"))))
-;;   (defun my-reorder-eldoc-functions ()
-;;     "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
-;;     (when (and (boundp 'eldoc-documentation-functions)
-;;                (listp eldoc-documentation-functions))
-;;       (let ((flymake-fn 'flymake-eldoc-function))
-;;         (setq eldoc-documentation-functions
-;;               (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
-;;   (add-hook 'eglot-managed-mode-hook #'my-reorder-eldoc-functions)
-;;   (setq-default eglot-workspace-configuration
-;;                 '(:yaml (:customTags ["!Sub scalar" "!Sub sequence" "!GetAtt scalar" "!Ref scalar"]))))
-
 (use-package lsp-mode
   :ensure t
   ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
   :custom
-  ;; (lsp-disabled-clients '(lsp-ruff))
-  ;; (lsp-log-io t)
   (lsp-diagnostics-provider :auto)
   (lsp-completion-provider :none)
-  ;; (lsp-log-io t)
-  ;; (lsp-auto-register-remote-clients nil)
   :init
   ;; (defun my-reorder-eldoc-functions ()
   ;;   "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
@@ -1375,9 +1141,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                 "[/\\\\]\\.serena\\'"
                 "[/\\\\][^/\\\\]+\\.dist-info\\'"
                 "[/\\\\][^/\\\\]+\\.egg-info\\'"))
-    (add-to-list 'lsp-file-watch-ignored-directories re))
-  )
-;; (setq lsp-pyright-langserver-command "/workspace/.venv/bin/basedpyright")
+    (add-to-list 'lsp-file-watch-ignored-directories re)))
+
 (use-package lsp-pyright
   :ensure t
   :hook
@@ -1392,33 +1157,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
   (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
   (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
-  (lsp-pyright-basedpyright-inlay-hints-generic-types nil)
-  )
+  (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
 
 (use-package lsp-ruff
   :custom
   (lsp-ruff-log-level "debug"))
-
-
-;; (with-eval-after-load 'lsp-pyright
-;;   (lsp-register-client
-;;    (make-lsp-client
-;;     :new-connection
-;;     (lsp-stdio-connection
-;;      (lambda ()
-;;        '("basedpyright-langserver" "--stdio")))
-;;     :major-modes '(python-mode python-ts-mode)
-;;     :server-id 'pyright-remote
-;;     :multi-root lsp-pyright-multi-root
-;;     :remote? t
-;;     :priority 1
-;;     :initialized-fn (lambda (workspace)
-;;                       (with-lsp-workspace workspace
-;;                                           (lsp--set-configuration
-;;                                            (make-hash-table :test 'equal))))
-;;     :notification-handlers (lsp-ht ((concat lsp-pyright-langserver-command "/beginProgress") 'lsp-pyright--begin-progress-callback)
-;;                                    ((concat lsp-pyright-langserver-command "/reportProgress") 'lsp-pyright--report-progress-callback)
-;;                                    ((concat lsp-pyright-langserver-command "/endProgress") 'lsp-pyright--end-progress-callback)))))
 
 (use-package lsp-java
   :ensure t
@@ -1594,39 +1337,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (dap-auto-configure-mode 1)
   (setq dap-python-debugger 'debugpy))
 
-;; (use-package eglot-java
-;;   :ensure t
-;;   :init
-;;   (defun kle/eglot-java--install-lsp-server ()
-;;     "Install specific version of the Eclipse JDT LSP server."
-;;     (interactive)
-;;     (let* ((destination-dir              (concat user-emacs-directory "share/eclipse.jdt.ls"))
-;;            (dest-dir                     (expand-file-name destination-dir))
-;;            (download-metadata            (eglot-java--parse-jdtls-download-metadata
-;;                                           (eglot-java--read-json-from-url eglot-java-eclipse-jdt-ls-dl-metadata-url)))
-;;            (download-url                 "https://download.eclipse.org/jdtls/milestones/0.57.0/jdt-language-server-0.57.0-202006172108.tar.gz")
-;;            (download-version             "0.57.0")
-;;            (dest-filename                (file-name-nondirectory download-url))
-;;            (dest-abspath                 (expand-file-name dest-filename dest-dir))
-;;            (dest-versionfile             (expand-file-name eglot-java-filename-version-jdtls dest-dir))
-;;            (large-file-warning-threshold nil))
-;;       (message "Installing Eclipse JDT LSP server, please wait...")
-;;       (eglot-java--download-file download-url dest-abspath)
-
-;;       (message "Extracting Eclipse JDT LSP archive, please wait...")
-;;       (let ((b (find-file dest-abspath)))
-;;         (switch-to-buffer b)
-;;         (goto-char (point-min))
-;;         (tar-untar-buffer)
-;;         (kill-buffer b))
-;;       (delete-file dest-abspath)
-
-;;       (eglot-java--record-version-info download-version dest-versionfile)
-
-;;       (message "Eclipse JDT LSP server installed in folder \n\"%s\"." dest-dir)))
-;;   :custom
-;;   (eglot-java-eglot-server-programs-manual-updates t))
-
 ;;; dired
 (use-package lv :ensure t)
 (use-package dired
@@ -1675,33 +1385,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package nerd-icons-dired
   :ensure t
   :hook (dired-mode . nerd-icons-dired-mode))
-
-;; (use-package direx
-;;   :ensure t
-;;   :init
-;;   (defun kle/direx-open ()
-;;     (interactive)
-;;     (or (ignore-errors
-;;           (direx-project:jump-to-project-root-other-window))
-;;         (direx:jump-to-directory-other-window)))
-;;   (defun kle/direx-dwim ()
-;;     (interactive)
-;;     (if (derived-mode-p 'direx:direx-mode)
-;;         (kill-buffer)
-;;       (kle/direx-open)))
-;;   :bind
-;;   (("<f8>" . kle/direx-dwim))
-;;   :after (popwin)
-;;   :config
-;;   (push '(direx:direx-mode :position left :width 40 :dedicated t)
-;;         popwin:special-display-config)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "j") 'direx:next-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "k") 'direx:previous-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "J") 'direx:next-sibling-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "K") 'direx:previous-sibling-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "^") 'direx:up-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "RET") 'direx:maybe-find-item)
-;;   (evil-define-key 'normal direx:direx-mode-map (kbd "TAB") 'direx:toggle-item))
 
 (use-package neotree
   :ensure t
@@ -1765,34 +1448,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (add-hook 'isearch-mode-hook #'skk-isearch-setup-maybe)
   (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
 
-;; (use-package ddskk-posframe
-;;   :ensure t
-;;   :after skk
-;;   :config
-;;   (ddskk-posframe-mode 1))
-
-;; (use-package image+
-;;   :ensure t
-;;   :after (image)
-;;   :config
-;;   (defhydra imagex-sticky-binding (global-map "C-l i")
-;;     "Manipulating Image"
-;;     ("+" imagex-sticky-zoom-in "zoom in")
-;;     ("-" imagex-sticky-zoom-out "zoom out")
-;;     ("M" imagex-sticky-maximize "maximize")
-;;     ("O" imagex-sticky-restore-original "restore original")
-;;     ("S" imagex-sticky-save-image "save file")
-;;     ("r" imagex-sticky-rotate-right "rotate right")
-;;     ("l" imagex-sticky-rotate-left "rotate left")))
-
 (use-package imenu-list
   :ensure t
   :custom
-  ;; (imenu-list-auto-resize t)
   (imenu-list-position 'left)
   (imenu-list-size 0.18)
-  ;; :hook
-  ;; (imenu-list-after-jump . imenu-list-smart-toggle)
   :bind
   ("C-;" . imenu-list-smart-toggle)
   :config
@@ -1882,12 +1542,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :bind
   (("C-M-]" . expreg-expand)
    ("C-M-:" . expreg-contract)))
-
-;; (use-package origami
-;;   :ensure t
-;;   :bind
-;;   ("C-l o" . origami-recursively-toggle-node)
-;;   )
 
 (use-package highlight-symbol
   :ensure t
@@ -2058,16 +1712,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (let ((tex-list (assoc "TeX" TeX-command-list))
           (latex-list (assoc "LaTeX" TeX-command-list)))
       (setf (cadr tex-list) "%(tex)"
-            (cadr latex-list) "%l")))
-  )
-;;   :config
-;;   (TeX-source-correlate-mode +1)
-;;   (use-package pdf-sync)
-;;   (bind-key "C-c s s" 'pdf-sync-forward-search LaTeX-mode-map)
-;;   (dolist (command '("pTeX" "pLaTeX" "pBibTeX" "jTeX" "jLaTeX" "jBibTeX" "Mendex"))
-;;     (delq (assoc command TeX-command-list) TeX-command-list))
-;;   (LaTeX-math-mode +1)
-;;   (turn-on-reftex)
+            (cadr latex-list) "%l"))))
 
 (use-package vimrc-mode
   :ensure t
@@ -2102,38 +1747,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package textile-mode
   :ensure t
   :mode "\\.textile\\'")
-
-;; (use-package csv-mode
-;;   :ensure t
-;;   :init
-;;   ;; (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
-;;   ;; (add-to-list 'auto-mode-alist '("\\.tsv\\'" . tsv-mode))
-;;   (defun enable-csv-mode-for-small-files ()
-;;     "Enable csv-mode for TSV/CSV files if they are not too large."
-;;     (when (and buffer-file-name
-;;                (or (string-match-p "\\.csv\\'" buffer-file-name)
-;;                    (string-match-p "\\.tsv\\'" buffer-file-name))
-;;                (or (not large-file-warning-threshold)
-;;                    (< (buffer-size) large-file-warning-threshold)))
-;;       (csv-mode)))
-;;   (add-hook 'find-file-hook 'enable-csv-mode-for-small-files)
-;;   (defun kle/smartrep-csv-setup ()
-;;     (smartrep-define-key
-;;         csv-mode-map "C-c" '(("l" . csv-forward-field)
-;;                              ("h" . csv-backward-field))))
-;;   :hook
-;;   (csv-mode . csv-align-mode)
-;;   (tsv-mode . csv-align-mode)
-;;   (csv-mode . (lambda () (toggle-truncate-lines t)))
-;;   (tsv-mode . (lambda () (toggle-truncate-lines t)))
-;;   (csv-mode . kle/smartrep-csv-setup)
-;;   :bind
-;;   (:map csv-mode-map
-;;         ("C-c l" . csv-forward-field)
-;;         ("C-c h" . csv-backward-field))
-;;   :custom
-;;   (csv-align-style 'auto)
-;;   (csv-align-max-width 200))
 
 (use-package yaml-pro
   :ensure t
@@ -2194,21 +1807,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5.4)
-  ;; ;; Mark gptel-related file-local variables as safe.
-  ;; (put 'gptel-model 'safe-local-variable
-  ;;      (lambda (v) (or (symbolp v) (stringp v))))
-  ;; (put 'gptel--backend-name 'safe-local-variable #'stringp)
-  ;; (put 'gptel--bounds 'safe-local-variable #'listp)
-
-  ;; (defcustom gptel-save-directory "~/gptel/"
-  ;;   "Directory where gptel chat buffers are saved by `gptel-save-as-md'."
-  ;;   :type 'directory
-  ;;   :group 'gptel)
-  ;; (bind-key "C-l c o" #'gptel-open-saved-chat)
-  ;; :config
-  ;; (bind-key "C-x C-s" #'gptel-save-buffer-dwim gptel-mode-map)
-  )
+  (gptel-model 'gpt-5.4))
 
 (use-package gptel-magit
   :ensure t
@@ -2455,5 +2054,4 @@ test: ユーザー登録APIの境界値テストを追加
     ("C-l o" . treesit-fold-toggle))
 
   (use-package autodisass-java-bytecode
-    :ensure t)
-  )
+    :ensure t))
