@@ -1495,7 +1495,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (magit-format-file-function #'magit-format-file-nerd-icons)
   :init
-  (add-to-list 'shackle-rules '(magit-status-mode :align right :size 0.4))
+  (add-to-list 'shackle-rules '(magit-status-mode :other right :size 0.4))
   :config
   (defun surpress-iconify (&rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
