@@ -2375,7 +2375,11 @@ test: ユーザー登録APIの境界値テストを追加
        (not (string-match-p "\\$(" command))
        (not (string-match-p "`" command))
        ;; リダイレクト (>, >>) を含む場合は拒否
-       (not (string-match-p "[^|]>[^&]\\|>>" command))
+       ;; ただし /dev/null 向け (>/dev/null, 2>/dev/null, 2>&1, &>/dev/null) は許可
+       (let ((stripped (replace-regexp-in-string
+                        "[0-9]*>&[0-9]+\\|&>[ \t]*/dev/null\\|[0-9]*>[ \t]*/dev/null" ""
+                        command)))
+         (not (string-match-p "[^|]>[^&]\\|>>" stripped)))
        ;; &&, ||, ;, | で分割して各コマンドをチェック
        (let ((parts (split-string command "&&\\|||\\|;\\||" t "[ \t]+")))
          (seq-every-p #'my-agent-shell--safe-single-command-p parts)))))
