@@ -2323,7 +2323,111 @@ test: ユーザー登録APIの境界値テストを追加
   :ensure t
   :custom
   (agent-shell-anthropic-make-authentication :login t)
-  (agent-shell-session-strategy 'prompt))
+  (agent-shell-session-strategy 'prompt)
+  (agent-shell-context-sources nil)
+  :init
+  (defun my-agent-shell-open-previous-transcript (event)
+    "セッション再開時に、前回のトランスクリプトをサイドウィンドウで開く。"
+    (ignore event)
+    (let* ((dir (agent-shell--dot-subdir "transcripts"))
+           (files (and (file-directory-p dir)
+                       (directory-files dir t "\\.md\\'" t)))
+           (sorted (sort files #'file-newer-than-file-p))
+           (previous (if (and agent-shell--transcript-file
+                              (member (expand-file-name agent-shell--transcript-file)
+                                      (mapcar #'expand-file-name sorted)))
+                         (nth 1 sorted)
+                       (car sorted))))
+      (message "DEBUG agent-shell transcript: dir=%s files=%d current=%s previous=%s"
+               dir (length files) agent-shell--transcript-file previous)
+      (when (and previous (file-exists-p previous))
+        (display-buffer (find-file-noselect previous)
+                        '(display-buffer-in-side-window
+                          (side . right)
+                          (window-width . 0.4))))))
+
+  (defvar my-agent-shell-auto-approve-kinds '("read" "search")
+    "無条件で自動許可するACPツールのkindリスト。")
+
+  (defvar my-agent-shell-auto-approve-title-patterns '()
+    "自動許可するツールのtitleにマッチする正規表現リスト。
+例: (\"^Glob\" \"^Grep\" \"^Read\")")
+
+  (defvar my-agent-shell-safe-commands
+    '("ls" "cat" "head" "tail" "echo" "pwd" "wc" "date" "whoami"
+      "which" "file" "stat" "find" "grep" "rg" "fd" "tree"
+      "du" "df" "free" "uname" "hostname" "touch" "mkdir"
+      "true" "false" "test" "[" "env" "printenv" "id" "sort"
+      "uniq" "tr" "cut" "sed" "awk" "xargs" "basename" "dirname"
+      "realpath" "readlink" "sha256sum" "md5sum" "wc")
+    "自動許可するコマンドのリスト。")
+
+  (defvar my-agent-shell-safe-git-subcommands
+    '("status" "log" "diff" "branch" "show" "rev-parse"
+      "remote" "tag" "stash" "ls-files" "ls-tree"
+      "describe" "shortlog" "config" "name-rev"
+      "cat-file" "for-each-ref" "symbolic-ref")
+    "自動許可するgitサブコマンドのリスト。")
+
+  (defun my-agent-shell--safe-command-p (command)
+    "COMMAND 文字列が安全か判定する。"
+    (when (stringp command)
+      (and
+       ;; サブシェル・バッククォートを含む場合は拒否
+       (not (string-match-p "\\$(" command))
+       (not (string-match-p "`" command))
+       ;; リダイレクト (>, >>) を含む場合は拒否
+       (not (string-match-p "[^|]>[^&]\\|>>" command))
+       ;; &&, ||, ;, | で分割して各コマンドをチェック
+       (let ((parts (split-string command "&&\\|||\\|;\\||" t "[ \t]+")))
+         (seq-every-p #'my-agent-shell--safe-single-command-p parts)))))
+
+  (defun my-agent-shell--safe-single-command-p (cmd)
+    "単一コマンド CMD が安全か判定する。"
+    (when-let ((tokens (split-string (string-trim cmd) "[ \t]+" t))
+               (exe (file-name-nondirectory (car tokens))))
+      (cond
+       ((equal exe "git")
+        (and (cdr tokens)
+             (member (cadr tokens) my-agent-shell-safe-git-subcommands)))
+       (t
+        (member exe my-agent-shell-safe-commands)))))
+
+  (defun my-agent-shell-permission-responder (permission)
+    "安全なツール呼び出しを自動許可する。"
+    (let* ((tc (map-elt permission :tool-call))
+           (kind (map-elt tc :kind))
+           (title (map-elt tc :title))
+           (should-approve
+            (or (member kind my-agent-shell-auto-approve-kinds)
+                (seq-some (lambda (pat) (string-match-p pat (or title "")))
+                          my-agent-shell-auto-approve-title-patterns)
+                (and (equal kind "execute")
+                     (my-agent-shell--safe-command-p
+                      (map-elt (map-elt tc :raw-input) 'command))))))
+      (message "agent-shell auto-approve: kind=%s title=%s approved=%s"
+               kind title (if should-approve "yes" "no"))
+      (when should-approve
+        (when-let ((choice (seq-find
+                            (lambda (opt)
+                              (equal (map-elt opt :kind) "allow_once"))
+                            (map-elt permission :options))))
+          (funcall (map-elt permission :respond)
+                   (map-elt choice :option-id))
+          t))))
+
+  (setq agent-shell-permission-responder-function
+        #'my-agent-shell-permission-responder)
+
+  (add-hook 'agent-shell-mode-hook
+            (lambda ()
+              (agent-shell-subscribe-to
+               :shell-buffer (current-buffer)
+               :event 'session-selected
+               :on-event
+               (lambda (event)
+                 (when (map-nested-elt event '(:data :session-id))
+                   (my-agent-shell-open-previous-transcript event)))))))
 
 (use-package emojify
   :ensure t
