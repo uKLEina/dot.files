@@ -2044,6 +2044,27 @@ test: ユーザー登録APIの境界値テストを追加
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
+  (use-package eat
+    :ensure t
+    :init
+    (defun toggle-eat ()
+      "Toggle eat terminal in bottom window."
+      (interactive)
+      (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'eat-mode))
+                              (buffer-list)))
+               (win (get-buffer-window buf)))
+          (delete-window win)
+        (eat-other-window)))
+    (bind-key "<f10>" #'toggle-eat)
+    (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3))
+    :config
+    (evil-set-initial-state 'eat-mode 'emacs)
+    (bind-key "C-t" #'other-window-or-split eat-semi-char-mode-map)
+    (advice-add 'eat-emacs-mode :after
+                (lambda (&rest _) (evil-normal-state)))
+    (advice-add 'eat-semi-char-mode :after
+                (lambda (&rest _) (evil-emacs-state))))
+
   (use-package treesit-fold
     :init
     (let* ((elpa-lisp-dir "~/.emacs.d/elpa")
