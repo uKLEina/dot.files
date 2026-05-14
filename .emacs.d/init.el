@@ -1170,20 +1170,14 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
       ("C--" . kle/zoom-frame-out)))
   )
 
-;; (use-package popwin
-;;   :ensure t
-;;   :init
-;;   (popwin-mode 1))
 (use-package shackle
   :ensure t
-  :init (setq shackle-rules nil))
+  :init
+  (shackle-mode 1))
 
 (use-package xref
-  ;; :after (popwin)
   :init
-  ;; (push '("*xref*" :position bottom :width 5)
-  ;;       popwin:special-display-config)
-  (add-to-list 'shackle-rules '("\\*xref\\*" :align 'below :size 5))
+  (add-to-list 'shackle-rules '("*xref*" :align below :size 0.3))
   (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
   :bind
   (:map xref--xref-buffer-mode-map
@@ -1195,9 +1189,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (flyecheck-disabled-checkers 'python-ruff)
-  ;; :init
-  ;; (push '(flycheck-error-list-mode :position right :width 0.2 :noselect t :stick t)
-  ;;       popwin:special-display-config)
   )
 
 
@@ -1843,16 +1834,15 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
          ("C-l m l b" . magit-log-buffer-file))
   :custom
   (magit-format-file-function #'magit-format-file-nerd-icons)
+  :init
+  (add-to-list 'shackle-rules '(magit-status-mode :align right :size 0.4))
   :config
   (defun surpress-iconify (&rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   (defun apply-iconify (&rest arg)
     (add-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
   (advice-add 'magit-run-git-with-editor :before #'surpress-iconify)
-  (advice-add 'with-editor-finish :after #'apply-iconify)
-  ;; (push '(magit-status-mode :position right :width 0.5)
-  ;;       popwin:special-display-config)
-  )
+  (advice-add 'with-editor-finish :after #'apply-iconify))
 
 (use-package rainbow-delimiters
   :ensure t
