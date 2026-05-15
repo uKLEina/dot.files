@@ -39,7 +39,9 @@ xelatex
 !/.Xdefaults
 !/.Xresources
 !/.zshenv
+!/.zprofile
 !/.gitignore_global
+!/launch-emacs.vbs
 
 ## emacs
 !/.emacs.d/
