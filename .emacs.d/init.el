@@ -781,7 +781,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package undo-tree
   :ensure t
   :init
-  (global-undo-tree-mode +1)
+  (global-undo-tree-mode 1)
   :custom
   (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
 
