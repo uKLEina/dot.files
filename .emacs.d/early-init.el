@@ -30,7 +30,10 @@
           (lambda ()
             (setq gc-cons-threshold my/startup-gc-cons-threshold
                   gc-cons-percentage 0.1
-                  file-name-handler-alist my/startup-file-name-handler-alist
+                  ;; init.el中に追加されたエントリ(tramp等)を保持しつつ復元
+                  file-name-handler-alist (delete-dups
+                                           (append file-name-handler-alist
+                                                   my/startup-file-name-handler-alist))
                   native-comp-jit-compilation t))
           t)
 

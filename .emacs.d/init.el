@@ -456,7 +456,6 @@ focus-stealing prevention so the frame actually comes to the front."
   (org-latex-default-class "bxjsarticle"))
 
 (use-package tramp
-  :demand t
   :custom
   (tramp-default-method "ssh"))
 
