@@ -1065,7 +1065,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   ;;     (let ((flymake-fn 'flymake-eldoc-function))
   ;;       (setq eldoc-documentation-functions
   ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
-  (add-to-list 'tramp-remote-path "/workspace/.venv/bin")
+  (with-eval-after-load 'tramp
+    (add-to-list 'tramp-remote-path "/workspace/.venv/bin"))
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or
