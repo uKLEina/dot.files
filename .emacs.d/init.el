@@ -828,23 +828,28 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
 (use-package migemo
-  :demand t
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
   (migemo-dictionary (seq-find #'file-exists-p
                                '("/usr/share/cmigemo/utf-8/migemo-dict"
                                  (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
-  :config
+  :init
   ;; C-u で migemo を有効にする isearch
   (defun kle/isearch-forward-migemo (arg)
     "通常は通常のisearch。C-uでmigemoが有効になる。"
     (interactive "P")
+    (unless (featurep 'migemo)
+      (require 'migemo)
+      (migemo-init))
     (let ((migemo-isearch-enable-p arg))
       (isearch-forward)))
   (defun kle/isearch-backward-migemo (arg)
     "通常は通常のisearch。C-uでmigemoが有効になる(後方検索)。"
     (interactive "P")
+    (unless (featurep 'migemo)
+      (require 'migemo)
+      (migemo-init))
     (let ((migemo-isearch-enable-p arg))
       (isearch-backward)))
   (bind-key "C-s" 'kle/isearch-forward-migemo)
