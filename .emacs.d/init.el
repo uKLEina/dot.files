@@ -1968,8 +1968,7 @@ test: ユーザー登録APIの境界値テストを追加
 (use-package emojify
   :ensure t
   :hook
-  (text-mode . global-emojify-mode)
-  (prog-mode . global-emojify-mode)
+  (after-init . global-emojify-mode)
   :custom
   (emojify-emoji-styles '(unicode github)))
 
