@@ -981,8 +981,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     :repeat t
     "<tab>" #'tab-to-tab-stop))
 
-()
-
 (use-package shackle
   :ensure t
   :init
