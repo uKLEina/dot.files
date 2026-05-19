@@ -763,14 +763,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package undo-tree
   :ensure t
-  :init
-  (global-undo-tree-mode 1)
+  :hook (after-init . global-undo-tree-mode)
   :custom
   (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
 
 (use-package evil
   :ensure t
-  :after undo-tree
   :hook (after-init . evil-mode)
   :custom
   (evil-echo-state nil)
@@ -967,7 +965,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package xref
   :init
-  (add-to-list 'shackle-rules '("*xref*" :align below :size 0.3))
+  (with-eval-after-load 'shackle
+    (add-to-list 'shackle-rules '("*xref*" :align below :size 0.3)))
   (with-eval-after-load 'evil
     (evil-set-initial-state 'xref--xref-buffer-mode 'emacs))
   :bind
@@ -1406,7 +1405,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :custom
   (magit-format-file-function #'magit-format-file-nerd-icons)
   :init
-  (add-to-list 'shackle-rules '(magit-status-mode :other right :size 0.4))
+  (with-eval-after-load 'shackle
+    (add-to-list 'shackle-rules '(magit-status-mode :other right :size 0.4)))
   :config
   (defun suppress-iconify (&rest arg)
     (remove-hook 'server-done-hook #'iconify-emacs-when-server-is-done))
@@ -1953,7 +1953,8 @@ test: ユーザー登録APIの境界値テストを追加
             (delete-window win)
           (eat-other-window))))
     (bind-key "<f10>" #'toggle-eat)
-    (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3))
+    (with-eval-after-load 'shackle
+      (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3)))
     :config
     (with-eval-after-load 'evil
       (evil-set-initial-state 'eat-mode 'emacs)
