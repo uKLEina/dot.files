@@ -1347,24 +1347,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :hook (dired-mode . nerd-icons-dired-mode))
 
-(use-package neotree
-  :ensure t
-  :init
-  (evil-set-initial-state 'neotree-mode 'emacs)
-  :bind
-  (("<f8>" . neotree-toggle))
-  (:map neotree-mode-map
-        ("j" . neotree-next-line)
-        ("k" . neotree-previous-line)
-        ("C-t" . other-window-or-split))
-  :custom
-  (neo-theme 'nerd-icons)
-  (neo-smart-open t)
-  (neo-force-change-root t)
-  (neo-autorefresh t)
-  (neo-window-fixed-size t)
-  (neo-show-hidden-files t)
-  (neo-vc-integration '(face)))
+
 
 (use-package skk
   :ensure ddskk
