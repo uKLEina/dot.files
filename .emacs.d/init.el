@@ -102,7 +102,7 @@ displays a buffer not in UTILITY-BUFFER-NAMES."
 
 (defun other-window-or-split ()
   (interactive)
-  (let ((utility-buffers '("*Ilist*" "*Flycheck errors*" " *NeoTree*")))
+  (let ((utility-buffers '("*Ilist*" "*Flycheck errors*")))
     (when (or (one-window-p)
               (my-all-other-windows-are-utility-p utility-buffers))
       (split-window-horizontally)))
