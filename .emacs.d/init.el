@@ -1535,6 +1535,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :hook
   (prog-mode . smartparens-mode)
+  (emacs-lisp-mode . (lambda () (smartparens-mode -1)))
   :config
   (sp-local-pair 'emacs-lisp-mode "`" nil :actions nil)
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil))
