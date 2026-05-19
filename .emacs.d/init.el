@@ -787,7 +787,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package evil
   :ensure t
-  :demand t
+  :after undo-tree
+  :hook (after-init . evil-mode)
   :custom
   (evil-echo-state nil)
   (evil-undo-system 'undo-tree)
@@ -799,7 +800,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
       (define-key map key1 def2)
       (define-key map key2 def1)))
   :config
-  (evil-mode 1)
   (defun kle/evil-scroll-line-down-1 ()
     (interactive)
     (evil-scroll-line-down 1)
@@ -851,8 +851,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package vertico
   :ensure t
-  :init
-  (vertico-mode))
+  :hook (after-init . vertico-mode))
 
 (use-package orderless
   :ensure t
@@ -867,8 +866,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package marginalia
   :ensure t
-  :init
-  (marginalia-mode))
+  :hook (after-init . marginalia-mode))
 
 (use-package embark
   :ensure t
@@ -989,7 +987,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package xref
   :init
   (add-to-list 'shackle-rules '("*xref*" :align below :size 0.3))
-  (evil-set-initial-state 'xref--xref-buffer-mode 'emacs)
+  (with-eval-after-load 'evil
+    (evil-set-initial-state 'xref--xref-buffer-mode 'emacs))
   :bind
   (:map xref--xref-buffer-mode-map
         ("j" . xref-next-line)
@@ -1297,7 +1296,8 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (dired-bind-jump nil)
   (dired-kill-when-opening-new-dired-buffer t)
   :init
-  (evil-set-initial-state 'dired-mode 'emacs)
+  (with-eval-after-load 'evil
+    (evil-set-initial-state 'dired-mode 'emacs))
   :config
   (bind-keys :map dired-mode-map
              ("C-t" . other-window-or-split)
@@ -1391,9 +1391,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :bind
   ("C-;" . imenu-list-smart-toggle)
   :config
-  (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
-  (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
-  (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry))
+  (with-eval-after-load 'evil
+    (evil-define-key 'normal imenu-list-major-mode-map (kbd "j") 'next-line)
+    (evil-define-key 'normal imenu-list-major-mode-map (kbd "k") 'previous-line)
+    (evil-define-key 'normal imenu-list-major-mode-map (kbd "RET") 'imenu-list-goto-entry)))
 
 ;; Emacs 30 同梱の compat スタブが (compat 30 2 9999) として組み込み登録されており、
 ;; transient 0.13 等が要求する compat 31 を素直に入れさせてくれない。
@@ -1458,12 +1459,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package backward-forward
   :ensure t
-  :init
-  (backward-forward-mode 1)
+  :hook (after-init . backward-forward-mode)
   :config
   (setq backward-forward-evil-compatibility-mode t)
-  (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
-  (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper)
+  (with-eval-after-load 'evil
+    (advice-add 'evil-goto-first-line :before #'backward-forward-push-mark-wrapper)
+    (advice-add 'evil-goto-line :before #'backward-forward-push-mark-wrapper))
   :bind
   (:map backward-forward-mode-map
         ("C-l C-a" . backward-forward-previous-location)
@@ -1982,12 +1983,13 @@ test: ユーザー登録APIの境界値テストを追加
     (bind-key "<f10>" #'toggle-eat)
     (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3))
     :config
-    (evil-set-initial-state 'eat-mode 'emacs)
-    (bind-key "C-t" #'other-window-or-split eat-semi-char-mode-map)
-    (advice-add 'eat-emacs-mode :after
-                (lambda (&rest _) (evil-normal-state)))
-    (advice-add 'eat-semi-char-mode :after
-                (lambda (&rest _) (evil-emacs-state))))
+    (with-eval-after-load 'evil
+      (evil-set-initial-state 'eat-mode 'emacs)
+      (advice-add 'eat-emacs-mode :after
+                  (lambda (&rest _) (evil-normal-state)))
+      (advice-add 'eat-semi-char-mode :after
+                  (lambda (&rest _) (evil-emacs-state))))
+    (bind-key "C-t" #'other-window-or-split eat-semi-char-mode-map))
 
   (use-package treesit-fold
     :init
