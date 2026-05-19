@@ -656,14 +656,15 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
     "Display current buffer size"
     (format-mode-line " %IB"))
 
-  (doom-modeline-def-segment projectile-project-name
-    "Display Projectile project name"
-    (if (and (boundp 'projectile-mode) projectile-mode)
-        (propertize (format " [%s]" (projectile-default-project-name (projectile-project-root)))
-                    'face (if (doom-modeline--active)
-                              '(:foreground "#8cd0d3" :weight bold)
-                            'mode-line-inactive))
-      ""))
+  (doom-modeline-def-segment project-name
+    "Display project name via project.el"
+    (let ((proj (project-current)))
+      (if proj
+          (propertize (format " [%s]" (project-name proj))
+                      'face (if (doom-modeline--active)
+                                '(:foreground "#8cd0d3" :weight bold)
+                              'mode-line-inactive))
+        "")))
 
   (doom-modeline-def-segment datetime
     "Display datetime on modeline"
@@ -710,7 +711,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
   ;; ;; you can use featurep to check if library is loaded or not
   (doom-modeline-def-modeline 'simple
     '(input-method bar modals matches remote-host buffer-info buffer-position csv-index)
-    '(projectile-project-name vcs check battery datetime))
+    '(project-name vcs check battery datetime))
 
   (doom-modeline-def-modeline 'verbose
     '(bar matches remote-host buffer-info-simple my-buffer-size)
@@ -1581,20 +1582,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :bind
   (("C-l g" . google-this)))
-
-(use-package projectile
-  :ensure t
-  :commands (projectile-project-root)
-  :bind-keymap ("C-l p" . projectile-command-map)
-  :config
-  (when (executable-find "ghq")
-    (projectile-load-known-projects)
-    (setq projectile-known-projects
-          (delete-dups
-           (append projectile-known-projects
-                   (mapcar
-                    (lambda (x) (abbreviate-file-name x))
-                    (split-string (shell-command-to-string "ghq list --full-path"))))))))
 
 (use-package yasnippet
   :ensure t
