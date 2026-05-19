@@ -174,21 +174,6 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 ;; (setopt debug-on-error t)
 
 ;;; font
-;; (defun set-font-for-frame (frame)
-;;   "Set the font size for a specific frame based on its display resolution."
-;;   (let ((font-size (calculate-font-size-for-frame frame)))
-;;     (with-selected-frame frame
-;;       (set-face-attribute 'default frame :family "HackGen" :height font-size))))
-
-;; (defun adjust-font-on-frame-events (frame)
-;;   "Adjust font size when a frame is created or moved."
-;;   (set-font-for-frame frame))
-
-;; ;; Apply font settings to existing frames and new ones
-;; (add-hook 'after-make-frame-functions #'adjust-font-on-frame-events)
-
-;; ;; For the initial frame
-;; (add-hook 'window-size-change-functions #'adjust-font-on-frame-events)
 ;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 130)
 ;; (set-face-attribute 'default nil :family "HackGen" :height 140)
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
