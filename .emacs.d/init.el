@@ -71,20 +71,19 @@
       (delete-region (point) current-pt))))
 (bind-key "M-h" 'my-minibuffer-delete-parent-directory minibuffer-local-map)
 
-;;; visible spaces
-(defface f-bg-aquamarine '((t (:background "medium aquamarine"))) nil)
-(defface f-bg-gray '((t (:background "gray"))) nil)
-(defface f-ub-steelblue '((t (:foreground "SteelBlue" :underline t))) nil)
-(defvar f-bg-aquamarine 'f-bg-aquamarine)
-(defvar f-bg-gray 'f-bg-gray)
-(defvar f-ub-steelblue 'f-ub-steelblue)
-(defun visible-spaces (&rest args)
-  (font-lock-add-keywords
-   major-mode
-   '(("　" 0 f-bg-aquamarine append)
-     ("\t" 0 f-ub-steelblue prepend)
-     ("[ ]+$" 0 f-bg-gray append))))
-(advice-add 'font-lock-mode :before #'visible-spaces)
+(use-package whitespace
+  :hook (after-init . global-whitespace-mode)
+  :custom
+  (whitespace-style '(face tab-mark trailing))
+  (whitespace-display-mappings '((tab-mark ?\t [?▸ ?\t])))
+  :custom-face
+  (whitespace-trailing ((t (:background "gray" :inherit nil))))
+  :config
+  ;; 全角スペースの可視化
+  (defface my/whitespace-full-width-space '((t (:background "medium aquamarine"))) nil)
+  (defun my/add-full-width-space-highlight ()
+    (font-lock-add-keywords nil '(("\u3000" 0 'my/whitespace-full-width-space append))))
+  (add-hook 'font-lock-mode-hook #'my/add-full-width-space-highlight))
 
 ;; ウィンドウのスマート分割
 ;; ヘルパー関数: 他のウィンドウがすべて指定されたユーティリティバッファか確認する
