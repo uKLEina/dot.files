@@ -56,7 +56,7 @@
   (show-paren-mode 1)
   (pixel-scroll-precision-mode 1)
   (global-auto-revert-mode 1))
-(run-with-idle-timer 0.5 nil #'my/setup-modes)
+(add-hook 'after-init-hook #'my/setup-modes)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
 ;;; tips; M-h works as "mark-paragraph" in a main buffer.
