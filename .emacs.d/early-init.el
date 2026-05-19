@@ -1,16 +1,19 @@
 (defvar my/startup-file-name-handler-alist file-name-handler-alist)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.8
-      load-prefer-newer nil
+      load-prefer-newer t
       file-name-handler-alist nil
       site-run-file nil)  ; site-start.elの読み込みを無効
+
+;; エンコーディング（自動検出より前に設定する必要がある）
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8-unix)
 (setopt ;; package-enable-at-startup nil
         ;; package-quickstart t
         package-native-compile t)
 
 ;; native-compileの最適化
-(setq native-comp-deferred-compilation t
-      native-comp-jit-compilation nil
+(setq native-comp-jit-compilation nil
       native-comp-async-report-warnings-errors 'silent)
 
 ;; UIの無効化（より早いタイミングで）
@@ -27,7 +30,6 @@
           (lambda ()
             (setq gc-cons-threshold my/startup-gc-cons-threshold
                   gc-cons-percentage 0.1
-                  load-prefer-newer t
                   file-name-handler-alist my/startup-file-name-handler-alist
                   native-comp-jit-compilation t))
           t)

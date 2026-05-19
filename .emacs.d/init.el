@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;; watcher を張っているディレクトリ一覧を見る;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic Settings
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setopt custom-file (locate-user-emacs-file "custom.el"))
@@ -19,10 +19,6 @@
 
 (defun my/setup-basic-config ()
   "基本設定のセットアップ"
-  (set-language-environment "utf-8")
-  (set-default-coding-systems 'utf-8-unix)
-  (prefer-coding-system 'utf-8)
-  (set-default 'buffer-file-coding-system 'utf-8)
   (setopt default-input-method "japanese")
   (setq read-process-output-max (* 3 1024 1024))
   (setq message-log-max 100000)
@@ -178,29 +174,7 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
     (kill-new project-buffer-file-path)
     (message "copied: %s" project-buffer-file-path)))
 
-;; Resize the whole frame, and not only a window
-;; Adapted from https://stackoverflow.com/a/24714383/5103881
-(defun kle/zoom-frame (&optional amt frame)
-  "Increaze FRAME font size by amount AMT. Defaults to selected
-frame if FRAME is nil, and to 1 if AMT is nil."
-  (interactive "p")
-  (let* ((frame (or frame (selected-frame)))
-         (font (face-attribute 'default :font frame))
-         (size (font-get font :size))
-         (amt (or amt 1))
-         (new-size (+ size amt)))
-    (set-frame-font (font-spec :size new-size) t `(,frame))
-    (message "Frame's font new size: %d" new-size)))
-
-(defun kle/zoom-frame-out (&optional amt frame)
-  "Call `kle/zoom-frame' with negative argument."
-  (interactive "p")
-  (kle/zoom-frame (- (or amt 1)) frame))
-
-(global-set-key (kbd "C-x C-+") 'kle/zoom-frame)
-(global-set-key (kbd "C-x C--") 'kle/zoom-frame-out)
-
-(setopt debug-on-error t)
+;; (setopt debug-on-error t)
 
 ;;; font
 ;; (defun set-font-for-frame (frame)
@@ -1007,23 +981,21 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :config
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
-(use-package smartrep
-  :ensure t
-  :commands (smartrep-define-key)
+(use-package repeat
+  :init
+  (repeat-mode 1)
   :config
-  (smartrep-define-key
-      global-map "C-x"
-    '(("}" . enlarge-window-horizontally)
-      ("{" . shrink-window-horizontally)
-      ("o" . other-window)))
-  (smartrep-define-key
-      global-map "C-l"
-    '(("<tab>" . tab-to-tab-stop)))
-  (smartrep-define-key
-      global-map "C-x"
-    '(("C-+" . kle/zoom-frame)
-      ("C--" . kle/zoom-frame-out)))
-  )
+  (defvar-keymap window-resize-repeat-map
+    :repeat t
+    "}" #'enlarge-window-horizontally
+    "{" #'shrink-window-horizontally
+    "o" #'other-window)
+
+  (defvar-keymap tab-stop-repeat-map
+    :repeat t
+    "<tab>" #'tab-to-tab-stop))
+
+()
 
 (use-package shackle
   :ensure t
@@ -1043,8 +1015,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :pin melpa
   :custom
-  (flyecheck-disabled-checkers 'python-ruff)
-  )
+  (flycheck-disabled-checkers '(python-ruff)))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -1070,14 +1041,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :mode
   (("\\.py\\'" . python-ts-mode))
   :config
-  (smartrep-define-key
-      python-mode-map "C-c"
-    '(("<" . python-indent-shift-left)
-      (">" . python-indent-shift-right)))
-  (smartrep-define-key
-      python-ts-mode-map "C-c"
-    '(("<" . python-indent-shift-left)
-      (">" . python-indent-shift-right)))
+  (defvar-keymap python-indent-repeat-map
+    :repeat t
+    "<" #'python-indent-shift-left
+    ">" #'python-indent-shift-right)
   (defun ruff-fix-buffer ()
     "Use ruff to fix lint violations in the current buffer."
     (interactive)
