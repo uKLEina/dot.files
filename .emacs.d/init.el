@@ -2047,8 +2047,7 @@ test: ユーザー登録APIの境界値テストを追加
   (use-package eat
     :ensure t
     :init
-    (setq explicit-shell-file-name "tmux"
-          explicit-tmux-args '("new-session" "-A" "-s" "main"))
+    (setq explicit-shell-file-name "env -u TMUX tmux new-session -A -s main")
     (defun toggle-eat (arg)
       "Toggle eat terminal in bottom window.  With prefix ARG, open fullscreen."
       (interactive "P")

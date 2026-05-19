@@ -220,7 +220,7 @@ vterm_printf() {
 [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
 [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
 
-if [ $SHLVL = 1 ];then
+if [ -z "$TMUX" ] && [ -z "$INSIDE_EMACS" ];then
   tmux
 fi
 
