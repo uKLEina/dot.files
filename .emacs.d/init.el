@@ -918,18 +918,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package wgrep
   :ensure t)
 
-(use-package ace-jump-mode
-  :ensure t)
-
-(use-package ace-isearch
-  :ensure t
-  :custom
-  (ace-isearch-function 'ace-jump-char-mode)
-  (ace-isearch-use-function-from-isearch nil)
-  (ace-isearch-jump-delay 0.8)
-  :init
-  (global-ace-isearch-mode +1))
-
 (use-package corfu
   :ensure t
   :after (evil)
