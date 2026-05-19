@@ -1619,7 +1619,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package yaml-mode
   :ensure t
   :init
-  (add-hook 'yaml-mode-hook #'(lambda () (buffer-face-set 'default)))
   (defun kle/yaml-indent-shift-right (beg end)
     (interactive "r")
     (let ((tab-stop-list '(2 4 6))
@@ -1635,9 +1634,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :bind
   (:map yaml-mode-map
         ("M-<right>" . kle/yaml-indent-shift-right)
-        ("M-<left>" . kle/yaml-indent-shift-left))
-  :config
-  (buffer-face-set 'default))
+        ("M-<left>" . kle/yaml-indent-shift-left)))
 
 (use-package dockerfile-mode
   :ensure t)
