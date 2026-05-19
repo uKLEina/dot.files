@@ -894,7 +894,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package corfu
   :ensure t
-  :after (evil)
   :custom ((corfu-auto t)
            (corfu-auto-delay 0)
            (corfu-auto-prefix 2)
@@ -906,11 +905,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
               ("C-p" . corfu-previous))
   :init (global-corfu-mode +1)
   :config
-  (define-key evil-insert-state-map (kbd "C-n") nil)
-  (define-key evil-insert-state-map (kbd "C-p") nil)
-  (evil-define-key 'insert corfu-map (kbd "C-n") 'corfu-next)
-  (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)
-  )
+  (with-eval-after-load 'evil
+    (define-key evil-insert-state-map (kbd "C-n") nil)
+    (define-key evil-insert-state-map (kbd "C-p") nil)
+    (evil-define-key 'insert corfu-map (kbd "C-n") 'corfu-next)
+    (evil-define-key 'insert corfu-map (kbd "C-p") 'corfu-previous)))
 
 (use-package cape
   :ensure t
@@ -964,8 +963,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package shackle
   :ensure t
-  :init
-  (shackle-mode 1))
+  :hook (after-init . shackle-mode))
 
 (use-package xref
   :init
@@ -1025,15 +1023,13 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-diagnostics-provider :auto)
   (lsp-completion-provider :none)
   :init
-  ;; (defun my-reorder-eldoc-functions ()
-  ;;   "Ensure `flymake-eldoc-function` is the first in `eldoc-documentation-functions`."
-  ;;   (when (and (boundp 'eldoc-documentation-functions)
-  ;;              (listp eldoc-documentation-functions))
-  ;;     (let ((flymake-fn 'flymake-eldoc-function))
-  ;;       (setq eldoc-documentation-functions
-  ;;             (cons flymake-fn (remove flymake-fn eldoc-documentation-functions))))))
   (with-eval-after-load 'tramp
     (add-to-list 'tramp-remote-path "/workspace/.venv/bin"))
+  :hook
+  (lsp-mode . (lambda () (when (file-remote-p default-directory)
+                           (setq-local lsp-enable-file-watchers nil))))
+  :config
+  ;; lsp-booster
   (defun lsp-booster--advice-json-parse (old-fn &rest args)
     "Try to parse bytecode instead of json."
     (or
@@ -1063,10 +1059,6 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
             (cons "emacs-lsp-booster" orig-result))
         orig-result)))
   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  :hook
-  (lsp-mode . (lambda () (when (file-remote-p default-directory)
-                           (setq-local lsp-enable-file-watchers nil))))
-  :config
   (dolist (re '("[/\\\\]\\.aws-sam\\'"
                 "[/\\\\]\\.cache\\'"
                 "[/\\\\]\\.claude\\'"
