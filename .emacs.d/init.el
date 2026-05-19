@@ -377,8 +377,8 @@ focus-stealing prevention so the frame actually comes to the front."
   (which-key-setup-side-window-right))
 
 (use-package winner
-  :init
-  (winner-mode 1)
+  :hook
+  (after-init . winner-mode)
   :config
   (defun winner-dwim (arg)
     (interactive "p")
