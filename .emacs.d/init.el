@@ -255,12 +255,6 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 ;; (add-hook 'Info-mode-hook
 ;;           #'(lambda ()
 ;;               (buffer-face-set 'variable-pitch)))
-(defun set-face-font-height (size)
-  (interactive "nSize: ")
-  (set-face-attribute 'default nil
-                      :height size)
-  (set-face-attribute 'variable-pitch nil
-                      :height size))
 ;; 複数行をまとめる関数
 ;; 標準のdelete-indentationsは空白を入れるしかないので自作版
 (defun kle/join-lines (beg end &optional with-space)
