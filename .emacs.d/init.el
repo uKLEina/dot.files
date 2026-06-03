@@ -1809,22 +1809,25 @@ test: ユーザー登録APIの境界値テストを追加
               #'my-gptel-magit--format-commit-message)
   (setq gptel-magit-model 'gpt-5.4-nano))
 
+(use-package eca
+  :ensure t)
+
 (use-package agent-shell
   :ensure t
   :bind (:map agent-shell-diff-mode-map
-         ("C-c C-c" . agent-shell-diff-accept-all)
-         ("C-c C-k" . agent-shell-diff-reject-all))
+              ("C-c C-c" . agent-shell-diff-accept-all)
+              ("C-c C-k" . agent-shell-diff-reject-all))
   :custom
   (agent-shell-anthropic-make-authentication :login t)
   (agent-shell-session-strategy 'prompt)
   (agent-shell-context-sources nil)
   (agent-shell-cwd-function
-      (lambda ()
-        (let ((default-directory (file-truename default-directory)))
-          (or (when (fboundp 'project-root)
-                (when-let ((proj (project-current)))
-                  (project-root proj)))
-              default-directory))))
+   (lambda ()
+     (let ((default-directory (file-truename default-directory)))
+       (or (when (fboundp 'project-root)
+             (when-let ((proj (project-current)))
+               (project-root proj)))
+           default-directory))))
   :init
   (defun my-agent-shell-open-previous-transcript (event)
     "セッション再開時に、前回のトランスクリプトをサイドウィンドウで開く。"
@@ -1939,31 +1942,33 @@ test: ユーザー登録APIの境界値テストを追加
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
-  (use-package eat
+  (use-package ghostel
     :ensure t
     :init
-    (setq explicit-shell-file-name "env -u TMUX tmux new-session -A -s main")
-    (defun toggle-eat (arg)
-      "Toggle eat terminal in bottom window.  With prefix ARG, open fullscreen."
+    (setq ghostel-shell '("env" "-u" "TMUX" "tmux" "new-session" "-A" "-s" "main"))
+    (defun toggle-ghostel (arg)
+      "Toggle ghostel terminal in bottom window.  With prefix ARG, open fullscreen."
       (interactive "P")
       (if arg
-          (eat)
-        (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'eat-mode))
+          (ghostel)
+        (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'ghostel-mode))
                                 (buffer-list)))
                  (win (get-buffer-window buf)))
             (delete-window win)
-          (eat-other-window))))
-    (bind-key "<f10>" #'toggle-eat)
+          (let ((display-buffer-overriding-action
+                 '((display-buffer-in-direction) (direction . below) (window-height . 0.3))))
+            (ghostel)))))
+    (bind-key "<f10>" #'toggle-ghostel)
     (with-eval-after-load 'shackle
-      (add-to-list 'shackle-rules '(eat-mode :align below :size 0.3)))
+      (add-to-list 'shackle-rules '(ghostel-mode :align below :size 0.3)))
     :config
     (with-eval-after-load 'evil
-      (evil-set-initial-state 'eat-mode 'emacs)
-      (advice-add 'eat-emacs-mode :after
+      (evil-set-initial-state 'ghostel-mode 'emacs)
+      (advice-add 'ghostel-copy-mode :after
                   (lambda (&rest _) (evil-normal-state)))
-      (advice-add 'eat-semi-char-mode :after
+      (advice-add 'ghostel-semi-char-mode :after
                   (lambda (&rest _) (evil-emacs-state))))
-    (bind-key "C-t" #'other-window-or-split eat-semi-char-mode-map))
+    (bind-key "C-t" #'other-window-or-split ghostel-semi-char-mode-map))
 
   (use-package treesit-fold
     :init
