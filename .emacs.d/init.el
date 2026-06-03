@@ -875,6 +875,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (defun consult-ghq-root-dir ()
     "Directory switch to ghq project root dir."
     (interactive)
+    (require 'consult)
     (dired (consult--read (consult-ghq--list-candidates) :prompt "Repo: "))))
 
 (use-package consult-jq
