@@ -1923,6 +1923,109 @@ test: ユーザー登録APIの境界値テストを追加
   (setq agent-shell-permission-responder-function
         #'my-agent-shell-permission-responder)
 
+  ;; --- tab-line: 複数 agent-shell バッファのタブ管理 ---
+
+  (defvar-local my-agent-shell-tab-name nil
+    "手動設定されたタブ名。nilなら自動生成。")
+
+  (defun my-agent-shell-rename-tab (name)
+    "現在の agent-shell タブの名前を設定する。"
+    (interactive "sTab name: ")
+    (setq my-agent-shell-tab-name (if (string-empty-p name) nil name))
+    (my-agent-shell-refresh-tab-line))
+
+  (defun my-agent-shell-tab-label (buf)
+    "バッファ BUF のタブラベルを生成。番号+タイトル。"
+    (let* ((bufs (my-agent-shell--sorted-buffers))
+           (idx (1+ (or (seq-position bufs buf #'eq) 0))))
+      (with-current-buffer buf
+        (let* ((custom-name (buffer-local-value 'my-agent-shell-tab-name buf))
+               (title (and (boundp 'agent-shell--state)
+                           (map-nested-elt agent-shell--state '(:session :title))))
+               (label (or custom-name
+                          (when title (truncate-string-to-width title 20 nil nil "…"))
+                          "new")))
+          (concat " " (number-to-string idx) ":" label " ")))))
+
+  (defun my-agent-shell--sorted-buffers ()
+    "agent-shell バッファをバッファ名順で返す。"
+    (sort (copy-sequence (agent-shell-buffers))
+          (lambda (a b) (string< (buffer-name a) (buffer-name b)))))
+
+  (defun my-agent-shell-tab-line-tabs ()
+    "agent-shell バッファを tab-line タブとして返す。"
+    (let* ((current (current-buffer))
+           (bufs (my-agent-shell--sorted-buffers)))
+      (mapcar
+       (lambda (buf)
+         `(tab
+           (name . ,(my-agent-shell-tab-label buf))
+           (buffer . ,buf)
+           (selected . ,(eq buf current))))
+       bufs)))
+
+  (defun my-agent-shell-tab-close (&optional e)
+    "tab-line のクローズボタンでバッファを閉じる。"
+    (interactive "e")
+    (let* ((posnp (event-start e))
+           (window (posn-window posnp))
+           (tab (get-pos-property 1 'tab (car (posn-string posnp))))
+           (buf (if (bufferp tab) tab (cdr (assq 'buffer tab)))))
+      (when (and buf (buffer-live-p buf))
+        (with-selected-window window
+          (when (eq buf (current-buffer))
+            (when-let ((other (seq-find (lambda (b) (not (eq b buf)))
+                                        (agent-shell-buffers))))
+              (switch-to-buffer other)))
+          (kill-buffer buf)))))
+
+  (defvar my-agent-shell-tab-close-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map [tab-line mouse-1] #'my-agent-shell-tab-close)
+      (define-key map [tab-line mouse-2] #'my-agent-shell-tab-close)
+      map))
+
+  (defun my-agent-shell-tab-face (tab _tabs face _selected-p _buffer)
+    "ビジー状態のタブを視覚的に区別する。"
+    (let* ((buf (cdr (assq 'buffer tab)))
+           (selectedp (cdr (assq 'selected tab)))
+           (busyp (and buf (buffer-live-p buf)
+                       (when-let ((st (buffer-local-value 'agent-shell--state buf)))
+                         (map-nested-elt st '(:active-requests))))))
+      (cond
+       ((and busyp (not selectedp)) `(:inherit (warning ,face)))
+       ((not selectedp) `(:inherit (shadow ,face)))
+       (t face))))
+
+  (defun my-agent-shell-refresh-tab-line ()
+    "全 agent-shell ウィンドウの tab-line キャッシュをクリアして再描画。"
+    (walk-windows
+     (lambda (win)
+       (when (with-current-buffer (window-buffer win)
+               (derived-mode-p 'agent-shell-mode))
+         (set-window-parameter win 'tab-line-cache nil)))
+     nil t)
+    (force-mode-line-update t))
+
+  (defun my-agent-shell-setup-tab-line ()
+    "agent-shell バッファで tab-line を有効化。"
+    (require 'tab-line)
+    (setq-local tab-line-tabs-function #'my-agent-shell-tab-line-tabs)
+    (setq-local tab-line-new-button-show t)
+    (setq-local tab-line-close-button-show t)
+    (setq-local tab-line-new-tab-function #'agent-shell-new-shell)
+    (setq-local tab-line-separator "")
+    (setq-local tab-line-tab-face-functions '(my-agent-shell-tab-face))
+    (setq-local tab-line-close-button
+                (propertize " x "
+                            'keymap my-agent-shell-tab-close-map
+                            'mouse-face 'tab-line-close-highlight
+                            'help-echo "Close shell"))
+    (tab-line-mode 1)
+    (my-agent-shell-refresh-tab-line))
+
+  (add-hook 'agent-shell-mode-hook #'my-agent-shell-setup-tab-line)
+
   (add-hook 'agent-shell-mode-hook
             (lambda ()
               (agent-shell-subscribe-to
@@ -1931,7 +2034,8 @@ test: ユーザー登録APIの境界値テストを追加
                :on-event
                (lambda (event)
                  (when (map-nested-elt event '(:data :session-id))
-                   (my-agent-shell-open-previous-transcript event)))))))
+                   (my-agent-shell-open-previous-transcript event)
+                   (my-agent-shell-refresh-tab-line)))))))
 
 (use-package emojify
   :ensure t
