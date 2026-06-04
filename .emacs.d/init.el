@@ -2036,18 +2036,26 @@ test: ユーザー登録APIの境界値テストを追加
     (tab-line-mode 1)
     (my-agent-shell-refresh-tab-line))
 
-  (add-hook 'agent-shell-mode-hook #'my-agent-shell-setup-tab-line)
+  (defun my-agent-shell-auto-goto-input ()
+    "入力しようとした時にread-only領域なら末尾に飛ぶ。"
+    (when (and (eq this-command 'self-insert-command)
+               (get-text-property (point) 'read-only))
+      (goto-char (point-max))))
 
-  (add-hook 'agent-shell-mode-hook
-            (lambda ()
-              (agent-shell-subscribe-to
-               :shell-buffer (current-buffer)
-               :event 'session-selected
-               :on-event
-               (lambda (event)
-                 (when (map-nested-elt event '(:data :session-id))
-                   (my-agent-shell-open-previous-transcript event)
-                   (my-agent-shell-refresh-tab-line)))))))
+  (defun my-agent-shell-mode-setup ()
+    "agent-shell-mode の初期化。tab-line・自動カーソル移動・イベント購読。"
+    (my-agent-shell-setup-tab-line)
+    (add-hook 'pre-command-hook #'my-agent-shell-auto-goto-input nil t)
+    (agent-shell-subscribe-to
+     :shell-buffer (current-buffer)
+     :event 'session-selected
+     :on-event
+     (lambda (event)
+       (when (map-nested-elt event '(:data :session-id))
+         (my-agent-shell-open-previous-transcript event)
+         (my-agent-shell-refresh-tab-line)))))
+  :hook
+  (agent-shell-mode . my-agent-shell-mode-setup))
 
 (use-package emojify
   :ensure t
