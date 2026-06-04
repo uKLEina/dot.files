@@ -2038,7 +2038,7 @@ test: ユーザー登録APIの境界値テストを追加
 
   (defun my-agent-shell-auto-goto-input ()
     "入力しようとした時にread-only領域なら末尾に飛ぶ。"
-    (when (and (eq this-command 'self-insert-command)
+    (when (and (memq this-command '(self-insert-command skk-insert))
                (get-text-property (point) 'read-only))
       (goto-char (point-max))))
 
