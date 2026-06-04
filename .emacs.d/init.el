@@ -1724,11 +1724,32 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (setopt gptel-magit-commit-prompt
           "Generate a single Git commit message following Conventional Commits v1.0.0.
 
+### CORE PRINCIPLE
+
+A commit message describes ONE primary purpose: the most valuable change in the diff.
+When multiple changes are mixed in one diff:
+- Choose the single most important change as the subject line.
+- Priority for \"most important\": feat > fix > perf > refactor > others,
+  but always judged by user-facing value, not by line count.
+- Move the remaining meaningful changes into the body as bullet points.
+- Never let cosmetic diffs (formatting, renames, generated code) become the subject.
+
 ### INPUT
 
 You will receive the output of `git diff --cached` (unified diff format).
-Focus on WHAT changed and WHY, not on restating the diff line by line.
-If the diff is large, identify the overarching intent rather than listing every file.
+Capture WHAT changed and WHY at the level of intent, not a line-by-line restatement.
+For a large diff, first identify the overarching intent, then the supporting changes.
+
+### PROCESS
+
+Follow these steps to decide the commit message structure:
+1. Split the diff into groups by feature/purpose.
+2. Decide a Conventional Commits type for each group.
+3. Pick the single most important group -> it becomes the subject.
+4. Put the other meaningful groups into the body as bullets.
+5. Drop cosmetic-only diffs (formatting/rename/generated) from the subject.
+The body is where you show the result of this analysis.
+If more than one meaningful change exists, a body is REQUIRED.
 
 ### FORMAT
 
@@ -1747,35 +1768,44 @@ If the diff is large, identify the overarching intent rather than listing every 
 - docs: Documentation only changes
 - perf: A code change that improves performance
 - refactor: A code change that neither fixes a bug nor adds a feature
-- style: Changes that do not affect the meaning of the code (formatting, semicolons, etc.)
+- style: Changes that do not affect the meaning of the code (formatting, etc.)
 - test: Adding missing tests or correcting existing tests
 
 ### SCOPE
 
-- Use a noun that represents the affected area of the codebase (e.g., parser, api, auth, cli).
-- Add a scope when the change is confined to a single module, package, or component.
-- Omit the scope when the change spans multiple areas or affects the project as a whole.
-- Follow existing scope conventions already used in the repository.
+- Use a noun for the affected area (e.g., parser, api, auth, cli).
+- Infer the scope from the file paths in the diff.
+- Add a scope when the change is confined to a single module/component.
+- Omit the scope when the change spans multiple areas or the whole project.
 
 ### BREAKING CHANGES
 
-Indicate with `!` after the type/scope (e.g., `feat!:` or `feat(api)!:`) or with a `BREAKING CHANGE:` footer.
+Indicate with `!` after the type/scope (e.g., `feat!:` or `feat(api)!:`)
+or with a `BREAKING CHANGE:` footer.
 
 ### BODY
 
-- Omit the body if the subject line alone conveys the change clearly enough.
-- When included, use a bullet list (`- ` prefix) and wrap each line at 72 characters.
-- Focus on WHY the change was made and what to watch out for, not WHAT was changed.
+- Omit the body only when a single change is fully conveyed by the subject.
+- When multiple changes exist, the body is REQUIRED.
+- Use a bullet list (`- ` prefix), one meaningful change per bullet.
+- Focus on WHY and what to watch out for, not a restatement of WHAT.
+
+### AVOID
+
+- Do not mechanically list file names, function names, or module names.
+- Do not use empty verbs: \"〜を更新\", \"〜を変更\", \"各種修正\", \"〜関連の対応\".
+- Do not make a large-but-cosmetic diff (formatting/rename) the subject.
+- Do not stuff multiple purposes into one subject line.
 
 ### OUTPUT RULES
 
-- Return ONLY the commit message text. No code fences, no commentary, no extra markup.
-- Subject line: imperative mood, ≤72 characters, no trailing period.
-- All body lines: ≤72 characters.
+- Return ONLY the commit message text. No code fences, no commentary.
+- Subject line: imperative mood, concise, no trailing period.
 
 ### LANGUAGE
 
 - Write the commit message in Japanese.
+- End the subject with a verb in dictionary form (e.g., 追加, 修正, 分離). Never use polite form (〜しました) or past tense (〜した).
 - Keep type, scope, and BREAKING CHANGE keywords in English as-is.
 
 ### EXAMPLES
@@ -1792,24 +1822,30 @@ refactor(api): レスポンス生成処理をハンドラから分離
 
 ---
 
-docs: READMEにデプロイ手順を追加
-
----
-
 feat(parser)!: 設定ファイルのフォーマットをTOMLに変更
 
 BREAKING CHANGE: YAML形式の設定ファイルはサポート外になります
 
 ---
 
-fix(db): マイグレーション実行時にコネクションがリークする問題を修正
+The following example shows a commit with multiple changes.
+The primary feature is the subject; supporting changes go in the body.
 
-- コネクションプールの解放処理が例外発生時にスキップされていた
-- defer文を使ってClose()が確実に呼ばれるように修正
+feat(editor): エージェント用ターミナルにタブ管理を追加
+
+- tab-lineで複数セッションのタブ切り替えを可能にした
+- 各タブにビジー状態のインジケータを表示
+- 初期化処理を整理し関連設定を集約
 
 ---
 
-test: ユーザー登録APIの境界値テストを追加
+BAD: feat: init.elを更新しtab-lineとhideshowとagent-shell-modeを変更
+(This mechanically lists names without identifying the primary purpose.)
+
+GOOD:
+feat(editor): hideshowを有効化し全体トグルを追加
+
+- agent-shellのtab-line表示とビジー表示も併せて整理
 "
           )
   (setopt gptel-magit-diff-explain-prompt
@@ -1819,7 +1855,7 @@ test: ユーザー登録APIの境界値テストを追加
     message)
   (advice-add 'gptel-magit--format-commit-message :override
               #'my-gptel-magit--format-commit-message)
-  (setq gptel-magit-model 'gpt-5.4-nano))
+  (setq gptel-magit-model 'gpt-5.4-mini))
 
 (use-package eca
   :ensure t)
