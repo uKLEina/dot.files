@@ -447,6 +447,18 @@ focus-stealing prevention so the frame actually comes to the front."
   :custom
   (treesit-font-lock-level 4))
 
+(use-package hideshow
+  :hook (prog-mode . hs-minor-mode)
+  :bind (("C-l h" . hs-toggle-hiding)
+         ("C-l H" . my-hs-toggle-all))
+  :init
+  (defvar my-hs-hide nil "Current state of hideshow for toggling all.")
+  (defun my-hs-toggle-all ()
+    "Toggle hideshow all."
+    (interactive)
+    (setq my-hs-hide (not my-hs-hide))
+    (if my-hs-hide (hs-hide-all) (hs-show-all))))
+
 (use-package js
   :mode (("\\.js\\'" . js-ts-mode)))
 
