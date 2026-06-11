@@ -1932,7 +1932,11 @@ feat(editor): hideshowを有効化し全体トグルを追加
                         command)))
          (not (string-match-p "[^|]>[^&]\\|>>" stripped)))
        ;; &&, ||, ;, | で分割して各コマンドをチェック
-       (let ((parts (split-string command "&&\\|||\\|;\\||" t "[ \t]+")))
+       ;; クォート内の | や \| を誤検出しないよう、引用符の中身を除去してから分割
+       (let* ((dequoted (replace-regexp-in-string
+                         "\"[^\"]*\"\\|'[^']*'" "\"\""
+                         command))
+              (parts (split-string dequoted "&&\\|||\\|;\\||" t "[ \t]+")))
          (seq-every-p #'my-agent-shell--safe-single-command-p parts)))))
 
   (defun my-agent-shell--safe-single-command-p (cmd)
