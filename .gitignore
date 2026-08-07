@@ -52,6 +52,7 @@ xelatex
 !/.emacs.d/build-treesit-grammar.sh
 !/.emacs.d/install-all-treesit-grammars.sh
 !/.emacs.d/update-icon-cache.sh
+!/.emacs.d/fix-wslg-taskbar-icon.sh
 !/.emacs.d/inits/
 /.emacs.d/inits/*
 !/.emacs.d/inits/*.el
