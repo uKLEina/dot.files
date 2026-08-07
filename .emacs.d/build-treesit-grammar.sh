@@ -58,17 +58,25 @@ fi
 
 mkdir -p "$INSTALL_DIR"
 
-# 言語名をgrammar.jsのあるディレクトリから推測
+# 言語名をgrammar.jsのname:フィールドから取得する
+# （ディレクトリ名だけで推測すると、tree-sitter-yamlのschema/json/のような
+#   モノレポのサブディレクトリを誤って別言語（json等）と誤認識してしまうため）
 detect_language() {
     local grammar_dir="$1"
+    local name
+    name=$(grep -m1 -oP "name:\s*['\"]\K[A-Za-z0-9_]+" "$grammar_dir/grammar.js" 2>/dev/null)
+
+    if [ -n "$name" ]; then
+        echo "$name"
+        return
+    fi
+
+    # フォールバック: grammar.jsから取得できない場合はディレクトリ名から推測
     local dir_name
     dir_name=$(basename "$grammar_dir")
-
-    # ディレクトリ名がtree-sitter-xxxならxxxを使う
     if [[ "$dir_name" == tree-sitter-* ]]; then
         echo "${dir_name#tree-sitter-}"
     else
-        # モノレポのサブディレクトリ（typescript, tsx等）はそのまま使う
         echo "$dir_name"
     fi
 }
