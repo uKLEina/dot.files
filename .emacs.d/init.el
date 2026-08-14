@@ -311,6 +311,7 @@ focus-stealing prevention so the frame actually comes to the front."
         (switch-to-prev-buffer)
         (select-frame-set-input-focus my/claude-code-frame)
         (switch-to-buffer buf))
+      (goto-char (point-max))
       (evil-insert-state)
       (skk-mode 1)))
   (defun iconify-emacs-when-server-is-done ()
