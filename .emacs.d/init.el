@@ -1432,6 +1432,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (advice-add 'magit-run-git-with-editor :before #'suppress-iconify)
   (advice-add 'with-editor-finish :after #'apply-iconify))
 
+(use-package forge
+  :ensure t
+  :pin melpa-stable
+  :after magit)
+
 (use-package rainbow-delimiters
   :ensure t
   :hook
