@@ -319,7 +319,10 @@ focus-stealing prevention so the frame actually comes to the front."
      (my/claude-code-session-active
       (setq my/claude-code-session-active nil)
       (when (and my/claude-code-frame (frame-live-p my/claude-code-frame))
-        (make-frame-invisible my/claude-code-frame)))
+        ;; make-frame-invisible だとフォーカスの受け渡しがコンポジタ任せになり、
+        ;; 本体フレームにフォーカスが飛ぶことがある。iconify-frame は最小化の意図が
+        ;; WM に伝わるため、直前のウィンドウ (Windows Terminal 側) に戻りやすい。
+        (iconify-frame my/claude-code-frame)))
      (t (iconify-frame))))
   (defun my/server-visit-setup-keybindings ()
     "Setup C-c C-c to save and finish in emacsclient buffers."
