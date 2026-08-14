@@ -1435,7 +1435,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 (use-package forge
   :ensure t
   :pin melpa-stable
-  :after magit)
+  :after magit
+  :config
+  (setopt auth-sources '("~/.authinfo")))
 
 (use-package rainbow-delimiters
   :ensure t
