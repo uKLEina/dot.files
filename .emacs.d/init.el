@@ -45,6 +45,8 @@
 (setopt auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
 (setq auto-save-timeout 15)
 (setq auto-save-interval 60)
+(setopt treesit-auto-install-grammar 'always)
+(setopt treesit-enabled-modes t)
 
 (defun my/setup-modes ()
   "各種モードの有効化"
