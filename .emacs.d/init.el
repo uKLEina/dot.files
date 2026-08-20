@@ -1397,21 +1397,21 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 ;;     その時点で elpa の compat ディレクトリがまだ load-path に無く、compat.el 内の
 ;;     (require 'compat-31) が落ちる (compat-autoloads.el は後でロードされる)。
 ;; → magit 関連を触る前に compat 31 を明示的かつ強制的に install する。
-(when (and (fboundp 'package--active-built-in-p)
-           (package--active-built-in-p 'compat))
-  (unless package-archive-contents
-    (package-read-all-archive-contents))
-  (let* ((desc (cadr (assq 'compat package-archive-contents)))
-         (compat-dir (and desc
-                          (expand-file-name
-                           (format "compat-%s"
-                                   (package-version-join
-                                    (package-desc-version desc)))
-                           package-user-dir))))
-    (when compat-dir
-      (add-to-list 'load-path compat-dir)))
-  (let ((package-install-upgrade-built-in t))
-    (package-install 'compat)))
+;; (when (and (fboundp 'package--active-built-in-p)
+;;            (package--active-built-in-p 'compat))
+;;   (unless package-archive-contents
+;;     (package-read-all-archive-contents))
+;;   (let* ((desc (cadr (assq 'compat package-archive-contents)))
+;;          (compat-dir (and desc
+;;                           (expand-file-name
+;;                            (format "compat-%s"
+;;                                    (package-version-join
+;;                                     (package-desc-version desc)))
+;;                            package-user-dir))))
+;;     (when compat-dir
+;;       (add-to-list 'load-path compat-dir)))
+;;   (let ((package-install-upgrade-built-in t))
+;;     (package-install 'compat)))
 
 (use-package magit
   :ensure t
