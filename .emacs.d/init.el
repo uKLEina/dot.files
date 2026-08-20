@@ -141,7 +141,7 @@ Used to detect window focus changes.")
   "Copy the current buffer's file path to the kill ring.
 If called with a prefix argument (C-u), copy only the file name (without path)."
   (interactive "P")
-  (if-let ((file-path (buffer-file-name)))
+  (if-let* ((file-path (buffer-file-name)))
       (let ((text-to-copy (if use-file-name-only
                               (file-name-nondirectory file-path)
                             file-path)))
@@ -152,7 +152,7 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 (defun copy-project-buffer-file-path ()
   (interactive)
   (let* ((project-root (file-local-name (abbreviate-file-name
-                                         (or (when-let ((project (project-current)))
+                                         (or (when-let* ((project (project-current)))
                                                (expand-file-name
                                                 (if (fboundp 'project-root)
                                                     (project-root project)
@@ -163,10 +163,10 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
            ;; Project directory
            (concat (file-name-nondirectory (directory-file-name project-root)) "/")
            ;; relative path
-           (when-let (relative-path (file-relative-name
-                                     (or (file-name-directory buffer-file-name)
-                                         "./")
-                                     project-root))
+           (when-let* ((relative-path (file-relative-name
+                                       (or (file-name-directory buffer-file-name)
+                                           "./")
+                                       project-root)))
              (if (string= relative-path "./")
                  ""
                relative-path))
@@ -956,7 +956,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (defun my-cape-project-buffers ()
     "現在のバッファがプロジェクト内なら同じプロジェクトの全バッファ、
   そうでなければ同じメジャーモードのバッファを返す"
-    (if-let ((proj (project-current)))
+    (if-let* ((proj (project-current)))
         ;; プロジェクト内: project.elの標準関数を使う
         (project-buffers proj)
       ;; プロジェクト外: 同じメジャーモードのバッファ
@@ -1083,7 +1083,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                (not (functionp 'json-rpc-connection))  ;; native json-rpc
                (executable-find "emacs-lsp-booster"))
           (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+            (when-let* ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
               (setcar orig-result command-from-exec-path))
             (message "Using emacs-lsp-booster for %s!" orig-result)
             (cons "emacs-lsp-booster" orig-result))
@@ -2146,7 +2146,7 @@ feat(editor): hideshowを有効化し全体トグルを追加
       (interactive "P")
       (if arg
           (ghostel)
-        (if-let ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'ghostel-mode))
+        (if-let* ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'ghostel-mode))
                                 (buffer-list)))
                  (win (get-buffer-window buf)))
             (delete-window win)
