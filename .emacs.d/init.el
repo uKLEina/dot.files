@@ -794,6 +794,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-echo-state nil)
   (evil-undo-system 'undo-tree)
   :init
+  ;; Emacs 31 で `define-globalized-minor-mode' の実装が変わり、
+  ;; `evil-mode-buffers' を自動生成しなくなった (evil-core.el は前方宣言のみ)。
+  ;; evil-1.15.0 の `evil-initializing-p' がこの変数を参照するので、
+  ;; void-variable エラーを防ぐため明示的に定義しておく。
+  (defvar evil-mode-buffers nil)
   (defun evil-swap-key (map key1 key2)
     "Swap KEY1 and KEY2 in MAP."
     (let ((def1 (lookup-key map key1))
