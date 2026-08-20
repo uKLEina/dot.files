@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t; -*-
 (defvar my/startup-file-name-handler-alist file-name-handler-alist)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.8
