@@ -835,6 +835,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
                                '("/usr/share/cmigemo/utf-8/migemo-dict"
                                  (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
   :init
+  ;; migemo は遅延ロードなので、コンパイル時に special 変数と認識させるための前方宣言。
+  ;; :init はここに書いた通りの順でトップレベルへ直接展開される (deferされない) ので、
+  ;; ここに置けば下の kle/isearch-forward-migemo 等の let による一時的な動的束縛が
+  ;; lexical-binding 下でバイトコンパイルしても効くようになる。
+  (defvar migemo-isearch-enable-p)
   ;; C-u で migemo を有効にする isearch
   (defun kle/isearch-forward-migemo (arg)
     "通常は通常のisearch。C-uでmigemoが有効になる。"
@@ -1164,6 +1169,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
       (concat
        (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align vis-len margin))))
        (propertize str 'display (lsp-ui-sideline--compute-height)))))
+
+  ;; markdown-mode 側の special 変数の前方宣言。
+  ;; 下の let で一時的に動的束縛しているが、markdown-mode 未ロード状態で
+  ;; lexical-binding 下でバイトコンパイルされるとただのレキシカル変数になり
+  ;; 効果が消えるので、同じ :config ブロック内で defvar しておく。
+  (defvar markdown-hr-display-char)
 
   ;; push-info: final-string の長さ（表示幅）を string-width で計算する
   (defun lsp-ui-sideline--push-info (win-width symbol bounds info bol eol)
