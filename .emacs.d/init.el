@@ -55,7 +55,8 @@
   (column-number-mode 1)
   (show-paren-mode 1)
   (pixel-scroll-precision-mode 1)
-  (global-auto-revert-mode 1))
+  (global-auto-revert-mode 1)
+  (global-subword-mode 1))
 (add-hook 'after-init-hook #'my/setup-modes)
 
 ;;; delete path hierarchy by hierarchy in minibuffer by M-h
