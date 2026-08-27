@@ -17,7 +17,7 @@
   (setq inhibit-compacting-font-caches t)   ; 日本語フォントのキャッシュ圧縮によるGC停滞を防ぐ
   (setq ring-bell-function #'ignore)        ; w32のvisible-bellは画面全体が点滅してうるさい
   ;; .emacs.d/cmigemo/ にcmigemo一式(exe+dll+dict)を置けばPATHを通さなくても使えるようにする
-  (let ((cmigemo-dir (locate-user-emacs-file "cmigemo")))
+  (let ((cmigemo-dir (expand-file-name (locate-user-emacs-file "cmigemo"))))
     (when (file-directory-p cmigemo-dir)
       (add-to-list 'exec-path cmigemo-dir))))
 
@@ -901,7 +901,10 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
               ,(expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict")
               ;; Windows: 配布バイナリのzipを展開して置く想定の場所
               ,(expand-file-name "~/opt/cmigemo/dict/utf-8/migemo-dict")
-              ,(locate-user-emacs-file "cmigemo/dict/utf-8/migemo-dict")))
+              ;; locate-user-emacs-file は "~" 付きの省略パスを返すが、
+              ;; このパスは外部プログラムのcmigemoに渡すため絶対パスに展開しておく
+              ,(expand-file-name
+                (locate-user-emacs-file "cmigemo/dict/utf-8/migemo-dict"))))
   "最初に見つかったmigemo辞書。nilならmigemoは無効。")
 
 (use-package migemo
