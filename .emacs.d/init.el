@@ -150,6 +150,7 @@ Used to detect window focus changes.")
                (window-live-p current-win)                      ; 現在のウィンドウが有効なこと
                (not (window-minibuffer-p current-win))          ; ミニバッファではないこと
                (or (not previous-win)                           ; 最初の1回目はprevious-winがnilなのでok
+                   (not (window-live-p previous-win))           ; 直前のウィンドウが削除済みなら気にしない
                    (not (window-minibuffer-p previous-win))))   ; 直前のウィンドウがミニバッファではないこと
       (with-selected-window current-win
         (pulse-momentary-highlight-region (point-min) (point-max))))
