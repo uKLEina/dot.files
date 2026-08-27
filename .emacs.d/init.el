@@ -213,7 +213,7 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 
 (defvar my/font-candidates
   (if my/windows-p
-      '("HackGen" "PlemolJP" "BIZ UDGothic" "MS Gothic")
+      '("ProtoGen" "HackGen" "PlemolJP" "BIZ UDGothic" "MS Gothic")
     '("ProtoGen" "HackGen"))
   "使いたい順のフォント候補。最初に見つかったものを使う。")
 (defvar my/font-family
