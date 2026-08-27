@@ -221,7 +221,7 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
            (seq-find (lambda (f) (find-font (font-spec :family f)))
                      my/font-candidates))
       (car my/font-candidates)))
-(defvar my/font-height (if my/windows-p 120 140)
+(defvar my/font-height (if my/windows-p 110 140)
   "要求するデフォルトのフォント高さ（:height の単位）。")
 (set-face-attribute 'default nil :family my/font-family :height my/font-height)
 (defvar my/font-step 10
