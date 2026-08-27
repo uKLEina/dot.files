@@ -10,6 +10,7 @@
     3. cmigemo (win64バイナリ+utf-8辞書) を .emacs.d\cmigemo に配置
     4. SKK辞書 (SKK-JISYO.L ほか) を .emacs.d\skk-get-jisyo にダウンロード
     5. HackGen / Symbols Nerd Font をユーザーフォントとしてインストール
+    6. MSYS2のlibgccjitが導入済みならユーザーPATHに追加 (native-comp用)
   管理者権限は不要。
 
 .EXAMPLE
@@ -202,6 +203,28 @@ if (-not $SkipFonts) {
     } catch {
         Warn "HackGenの取得に失敗: $($_.Exception.Message)"
     }
+}
+
+# --- 6. native-comp用ツールチェーン (MSYS2導入済みの場合のみ) --------------
+# Emacsのlibgccjit検出はプロセス初期化時のPATHを見るため、elisp側からの追加では
+# 間に合わない。ユーザー環境変数のPathに恒久追加する必要がある。
+Step 'native-comp (libgccjit)'
+$jitDir = @('C:\msys64\mingw64\bin', 'C:\msys64\ucrt64\bin') |
+          Where-Object { Test-Path (Join-Path $_ 'libgccjit-0.dll') } |
+          Select-Object -First 1
+if ($jitDir) {
+    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+    if (-not $userPath) { $userPath = '' }
+    if (($userPath -split ';') -contains $jitDir) {
+        Ok 'ユーザーPATHに設定済み'
+    } else {
+        $newPath = ($userPath.TrimEnd(';') + ';' + $jitDir).TrimStart(';')
+        [Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+        Ok "$jitDir をユーザーPATHの末尾に追加"
+    }
+} else {
+    Warn 'libgccjitが見つからないためスキップ。native-compを使うならMSYS2で以下を入れて再実行:'
+    Warn '  pacman -S mingw-w64-x86_64-libgccjit mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils'
 }
 
 # --- 完了 -----------------------------------------------------------------

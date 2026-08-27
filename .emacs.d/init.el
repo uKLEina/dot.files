@@ -24,7 +24,6 @@
   (let ((cmigemo-dir (expand-file-name (locate-user-emacs-file "cmigemo"))))
     (when (file-directory-p cmigemo-dir)
       (add-to-list 'exec-path cmigemo-dir))))
-;; libgccjit用のPATH追加はearly-init.elにある (native-comp判定より先に必要なため)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-l"))
