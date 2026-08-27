@@ -15,7 +15,11 @@
 (when my/windows-p
   (setq w32-get-true-file-attributes nil)   ; ファイル属性の詳細取得をやめてファイル操作を軽くする
   (setq inhibit-compacting-font-caches t)   ; 日本語フォントのキャッシュ圧縮によるGC停滞を防ぐ
-  (setq ring-bell-function #'ignore))       ; w32のvisible-bellは画面全体が点滅してうるさい
+  (setq ring-bell-function #'ignore)        ; w32のvisible-bellは画面全体が点滅してうるさい
+  ;; .emacs.d/cmigemo/ にcmigemo一式(exe+dll+dict)を置けばPATHを通さなくても使えるようにする
+  (let ((cmigemo-dir (locate-user-emacs-file "cmigemo")))
+    (when (file-directory-p cmigemo-dir)
+      (add-to-list 'exec-path cmigemo-dir))))
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-l"))
