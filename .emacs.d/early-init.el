@@ -23,6 +23,9 @@
 (push '(vertical-scroll-bars . nil) default-frame-alist)
 (when (eq system-type 'gnu/linux)
   (push '(alpha-background . 90) default-frame-alist))  ; pgtk専用パラメータ
+(when (eq system-type 'windows-nt)
+  ;; w32はalpha-background(背景のみ透過)非対応。alphaは文字も含むフレーム全体の透過。
+  (push '(alpha . 93) default-frame-alist))
 (push '(undecorated . nil) default-frame-alist)  ; ウィンドウ装飾
 
 ;; 起動後の復元処理を一元化
