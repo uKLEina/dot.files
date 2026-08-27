@@ -25,7 +25,17 @@
   (push '(alpha-background . 90) default-frame-alist))  ; pgtk専用パラメータ
 (when (eq system-type 'windows-nt)
   ;; w32はalpha-background(背景のみ透過)非対応。alphaは文字も含むフレーム全体の透過。
-  (push '(alpha . 93) default-frame-alist))
+  (push '(alpha . 93) default-frame-alist)
+  ;; native-comp用: MSYS2のlibgccjit+ツールチェーンをEmacsのPATHにだけ追加する。
+  ;; 公式WindowsビルドはNATIVE_COMP対応だがlibgccjitを同梱しないため、MSYS2から借りる。
+  ;; C側のlibgccjit検出は最初の一回でキャッシュされ、init.elでは間に合わないことがある
+  ;; ため、最速で読まれるここで設定する (グローバルなPATHは汚さない)。
+  (let ((jit-dir (seq-find (lambda (d)
+                             (file-exists-p (expand-file-name "libgccjit-0.dll" d)))
+                           '("c:/msys64/mingw64/bin" "c:/msys64/ucrt64/bin"))))
+    (when jit-dir
+      (setenv "PATH" (concat (getenv "PATH") ";" (subst-char-in-string ?/ ?\\ jit-dir)))
+      (add-to-list 'exec-path jit-dir t))))
 (push '(undecorated . nil) default-frame-alist)  ; ウィンドウ装飾
 
 ;; 起動後の復元処理を一元化

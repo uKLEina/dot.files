@@ -23,16 +23,8 @@
   ;; .emacs.d/cmigemo/ にcmigemo一式(exe+dll+dict)を置けばPATHを通さなくても使えるようにする
   (let ((cmigemo-dir (expand-file-name (locate-user-emacs-file "cmigemo"))))
     (when (file-directory-p cmigemo-dir)
-      (add-to-list 'exec-path cmigemo-dir)))
-  ;; native-comp用: MSYS2のlibgccjit+ツールチェーンをEmacsのPATHにだけ追加する。
-  ;; 公式WindowsビルドはNATIVE_COMP対応だがlibgccjitを同梱しないため、MSYS2から借りる。
-  ;; グローバルなPATHは汚さない (msys2のls等がWindows標準コマンドを隠すのを避ける)。
-  (let ((jit-dir (seq-find (lambda (d)
-                             (file-exists-p (expand-file-name "libgccjit-0.dll" d)))
-                           '("c:/msys64/mingw64/bin" "c:/msys64/ucrt64/bin"))))
-    (when jit-dir
-      (setenv "PATH" (concat (getenv "PATH") ";" (subst-char-in-string ?/ ?\\ jit-dir)))
-      (add-to-list 'exec-path jit-dir t))))
+      (add-to-list 'exec-path cmigemo-dir))))
+;; libgccjit用のPATH追加はearly-init.elにある (native-comp判定より先に必要なため)
 
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-l"))
