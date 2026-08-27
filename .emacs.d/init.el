@@ -17,6 +17,9 @@
   (setq inhibit-compacting-font-caches t)   ; 日本語フォントのキャッシュ圧縮によるGC停滞を防ぐ
   (setq ring-bell-function #'ignore)        ; w32のvisible-bellは画面全体が点滅してうるさい
   (setq w32-pipe-buffer-size (* 64 1024))   ; 外部プロセス出力(git等)の読み取りを速くする
+  ;; 起動直後のカレントディレクトリがemacs.exeの場所(C:/Program Files/...)になるのを防ぐ
+  (setq default-directory (expand-file-name "~/"))
+  (setq command-line-default-directory (expand-file-name "~/"))
   ;; .emacs.d/cmigemo/ にcmigemo一式(exe+dll+dict)を置けばPATHを通さなくても使えるようにする
   (let ((cmigemo-dir (expand-file-name (locate-user-emacs-file "cmigemo"))))
     (when (file-directory-p cmigemo-dir)
