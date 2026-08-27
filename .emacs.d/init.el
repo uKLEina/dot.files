@@ -5,6 +5,18 @@
 (setopt custom-file (locate-user-emacs-file "custom.el"))
 (setopt initial-major-mode 'fundamental-mode)
 
+;;; OS判定
+;; Windows (非WSL) では開発をしないため、テキスト読み書きに必要な最小構成のみ読み込む。
+;; 開発系・外部バイナリ依存・重量級の外部パッケージは use-package の :if my/linux-p で無効化する。
+(defconst my/windows-p (eq system-type 'windows-nt))
+(defconst my/linux-p (eq system-type 'gnu/linux))
+
+;;; Windows固有の調整
+(when my/windows-p
+  (setq w32-get-true-file-attributes nil)   ; ファイル属性の詳細取得をやめてファイル操作を軽くする
+  (setq inhibit-compacting-font-caches t)   ; 日本語フォントのキャッシュ圧縮によるGC停滞を防ぐ
+  (setq ring-bell-function #'ignore))       ; w32のvisible-bellは画面全体が点滅してうるさい
+
 (define-key key-translation-map (kbd "C-h") (kbd "<DEL>"))
 (global-unset-key (kbd "C-l"))
 (defun my/server-edit-save-and-done ()
@@ -42,12 +54,16 @@
 (setopt require-final-newline t)
 (setopt backup-by-copying t)
 (setq-default indicate-buffer-boundaries 'left)
-(setopt backup-directory-alist `((".*" . ,(expand-file-name "~/.emacs.d/backup"))))
-(setopt auto-save-file-name-transforms `((".*" ,(expand-file-name "~/.emacs.d/backup") t)))
+(defvar my/backup-dir (locate-user-emacs-file "backup/"))
+(make-directory my/backup-dir t)
+(setopt backup-directory-alist `((".*" . ,my/backup-dir)))
+(setopt auto-save-file-name-transforms `((".*" ,my/backup-dir t)))
 (setq auto-save-timeout 15)
 (setq auto-save-interval 60)
-(setopt treesit-auto-install-grammar 'always)
-(setopt treesit-enabled-modes t)
+;; treesitはgrammarのビルドにコンパイラが要るのでLinuxのみ
+(when my/linux-p
+  (setopt treesit-auto-install-grammar 'always)
+  (setopt treesit-enabled-modes t))
 
 (defun my/setup-modes ()
   "各種モードの有効化"
@@ -183,7 +199,6 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 ;; (set-face-attribute 'default nil :family "IBM Plex Mono" :height 130)
 ;; (set-face-attribute 'default nil :family "Ricty Discord" :height 120)
 ;; (set-face-attribute 'default nil :family "0xProto" :height 110)
-(set-face-attribute 'default nil :family "ProtoGen" :height 140)
 ;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 130) ;; :D
 ;; (set-face-attribute 'default nil :family "Cascadia Code" :height 105)
 ;; non-ASCII Unicode font
@@ -192,9 +207,19 @@ If called with a prefix argument (C-u), copy only the file name (without path)."
 ;; (set-fontset-font t nil (font-spec :family "Noto Sans" :size 100))
 (setq use-default-font-for-symbols nil)
 
-(defvar my/font-family "ProtoGen")
-(defvar my/font-height 140
+(defvar my/font-candidates
+  (if my/windows-p
+      '("HackGen" "PlemolJP" "BIZ UDGothic" "MS Gothic")
+    '("ProtoGen" "HackGen"))
+  "使いたい順のフォント候補。最初に見つかったものを使う。")
+(defvar my/font-family
+  (or (and (display-graphic-p)
+           (seq-find (lambda (f) (find-font (font-spec :family f)))
+                     my/font-candidates))
+      (car my/font-candidates)))
+(defvar my/font-height (if my/windows-p 120 140)
   "要求するデフォルトのフォント高さ（:height の単位）。")
+(set-face-attribute 'default nil :family my/font-family :height my/font-height)
 (defvar my/font-step 10
   "フォント高さを増減する単位（:height の単位）。")
 (defvar my/font-min-height 10
@@ -276,6 +301,38 @@ Otherwise, join lines with no space."
   :config
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
   (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/")))
+
+;; Windowsでは use-package の ensure を全面無効化し、使うパッケージのみ明示的に入れる。
+;; use-package の :ensure と :pin は :if が nil でもマクロ展開時に発火する仕様のため、
+;; :if my/linux-p だけでは開発系パッケージのインストールを防げない。
+;; :pin は package-archives を参照するので、先に package を読み込んでおく。
+(when my/windows-p
+  (require 'package)
+  (require 'use-package)
+  (setq use-package-ensure-function #'ignore)
+  (defvar my/windows-packages
+    '(evil undo-tree multiple-cursors expreg                  ; 編集の基本操作
+      vertico orderless marginalia consult                    ; ミニバッファ補完
+      corfu cape kind-icon                                    ; バッファ内補完
+      ddskk migemo                                            ; 日本語入力・検索
+      doom-themes doom-modeline dashboard diminish            ; 見た目
+      nerd-icons nerd-icons-completion nerd-icons-dired
+      ligature emojify
+      posframe shackle                                        ; ウィンドウ・UI部品
+      markdown-mode yaml-mode powershell                      ; メジャーモード
+      paredit smartparens rainbow-delimiters                  ; 括弧・入力支援
+      electric-operator anzu
+      highlight-symbol highlight-indent-guides backward-forward
+      magit forge gptel gptel-magit                           ; Git・AI
+      dired-quick-sort                                        ; dired
+      super-save open-junk-file)                              ; 自動保存・メモ
+    "Windows環境でインストールする外部パッケージ。
+consult-jq は :vc (git経由) でインストールされるためこのリストには含めない。")
+  (let ((missing (seq-remove #'package-installed-p my/windows-packages)))
+    (when missing
+      (package-refresh-contents)
+      (dolist (pkg missing)
+        (package-install pkg)))))
 
 ;;; configure built-in packages before package-initialize
 (use-package server
@@ -392,6 +449,7 @@ focus-stealing prevention so the frame actually comes to the front."
   (add-to-list 'interpreter-mode-alist '("miniperl" . cperl-mode)))
 
 (use-package json-ts-mode
+  :if my/linux-p
   :mode
   (("\\.json\\'" . json-ts-mode))
   :custom (json-ts-mode-indent-offset 4))
@@ -448,10 +506,12 @@ focus-stealing prevention so the frame actually comes to the front."
   :demand t)
 
 (use-package java-ts-mode
+  :if my/linux-p
   :mode
   (("\\.java\\'" . java-ts-mode)))
 
 (use-package treesit
+  :if my/linux-p
   :custom
   (treesit-font-lock-level 4))
 
@@ -468,6 +528,7 @@ focus-stealing prevention so the frame actually comes to the front."
     (if my-hs-hide (hs-hide-all) (hs-show-all))))
 
 (use-package js
+  :if my/linux-p
   :mode (("\\.js\\'" . js-ts-mode)))
 
 (when (eq system-type 'gnu/linux)
@@ -517,6 +578,7 @@ Uses explorer.exe for WSL with properly escaped paths and nautilus for non-WSL."
 ;; External packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package auto-compile
+  :if my/linux-p
   :ensure t
   :hook
   (emacs-startup . auto-compile-on-load-mode)
@@ -785,7 +847,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :ensure t
   :hook (after-init . global-undo-tree-mode)
   :custom
-  (undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history/"))))
+  (undo-tree-history-directory-alist `(("." . ,(locate-user-emacs-file "undo-tree-history/")))))
 
 (use-package evil
   :ensure t
@@ -827,13 +889,23 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (evil-swap-key evil-motion-state-map "k" "gk")
   (evil-define-key 'normal global-map (kbd "C-M-p") 'consult-yank-from-kill-ring))
 
+;; cmigemoバイナリと辞書が見つかった時だけ有効化する。
+;; 見つからない環境 (未セットアップのWindows等) では素のisearch (C-s/C-r) のまま。
+(defvar my/migemo-dictionary
+  (seq-find #'file-exists-p
+            `("/usr/share/cmigemo/utf-8/migemo-dict"
+              ,(expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict")
+              ;; Windows: 配布バイナリのzipを展開して置く想定の場所
+              ,(expand-file-name "~/opt/cmigemo/dict/utf-8/migemo-dict")
+              ,(locate-user-emacs-file "cmigemo/dict/utf-8/migemo-dict")))
+  "最初に見つかったmigemo辞書。nilならmigemoは無効。")
+
 (use-package migemo
+  :if (and (executable-find "cmigemo") my/migemo-dictionary)
   :ensure t
   :custom
   (migemo-isearch-enable-p nil)
-  (migemo-dictionary (seq-find #'file-exists-p
-                               '("/usr/share/cmigemo/utf-8/migemo-dict"
-                                 (expand-file-name "~/opt/migemo/dict/utf-8/migemo-dict"))))
+  (migemo-dictionary my/migemo-dictionary)
   :init
   ;; migemo は遅延ロードなので、コンパイル時に special 変数と認識させるための前方宣言。
   ;; :init はここに書いた通りの順でトップレベルへ直接展開される (deferされない) ので、
@@ -880,6 +952,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :hook (after-init . marginalia-mode))
 
 (use-package embark
+  :if my/linux-p
   :ensure t
   :bind
   (("<backtab>" . embark-act)))
@@ -899,6 +972,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (consult-customize consult-line-thing-at-point :initial (thing-at-point 'symbol)))
 
 (use-package consult-ghq
+  :if my/linux-p
   :ensure t
   :commands (consult-ghq--list-candidates)
   :init
@@ -913,12 +987,14 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :vc (:url "https://github.com/bigbuger/consult-jq" :rev :newest))
 
 (use-package embark-consult
+  :if my/linux-p
   :ensure t)
 
 (use-package nerd-icons
   :ensure t)
 
 (use-package wgrep
+  :if my/linux-p
   :ensure t)
 
 (use-package corfu
@@ -1006,6 +1082,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
         ("k" . xref-prev-line)))
 
 (use-package flycheck
+  :if my/linux-p
   :ensure t
   :pin melpa
   :custom
@@ -1020,9 +1097,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (highlight-indent-guides-method 'column))
 
 (use-package docker
+  :if my/linux-p
   :ensure t)
 
 (use-package python
+  :if my/linux-p
   :custom
   (eldoc-echo-area-use-multiline-p nil)
   :init
@@ -1047,6 +1126,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (revert-buffer t t t)))
 
 (use-package lsp-mode
+  :if my/linux-p
   :ensure t
   ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
   :custom
@@ -1100,6 +1180,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (add-to-list 'lsp-file-watch-ignored-directories re)))
 
 (use-package lsp-pyright
+  :if my/linux-p
   :ensure t
   :hook
   ((python-mode python-ts-mode) . start-lsp-for-python)
@@ -1116,10 +1197,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
 
 (use-package lsp-ruff
+  :if my/linux-p
   :custom
   (lsp-ruff-log-level "debug"))
 
 (use-package lsp-java
+  :if my/linux-p
   :ensure t
   :hook (java-ts-mode . lsp-deferred)
   :custom
@@ -1130,6 +1213,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
           (:name "JavaSE-21"  :path "/usr/lib/jvm/java-21-openjdk-amd64")]))
 
 (use-package lsp-ui
+  :if my/linux-p
   :ensure t
   :after lsp-mode
   :init
@@ -1292,6 +1376,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 
 (use-package dap-mode
+  :if my/linux-p
   :ensure t
   :after lsp-mode
   :config
@@ -1300,7 +1385,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (setq dap-python-debugger 'debugpy))
 
 ;;; dired
-(use-package lv :ensure t)
+(use-package lv :if my/linux-p :ensure t)
 (use-package dired
   :custom
   ;; fix keybind for SKK
@@ -1361,15 +1446,21 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (skk-dcomp-activate t)
   (skk-show-candidates-always-pop-to-buffer t)
   (skk-isearch-start-mode 'latin)
-  (skk-large-jisyo "~/.emacs.d/skk-get-jisyo/SKK-JISYO.L")
+  ;; 辞書は locate-user-emacs-file 基準で解決し、存在するものだけ使う
+  ;; (Windowsなど辞書未配置の環境でもエラーにならないように)
+  (skk-large-jisyo (let ((jisyo (locate-user-emacs-file "skk-get-jisyo/SKK-JISYO.L")))
+                     (and (file-exists-p jisyo) jisyo)))
   (skk-extra-jisyo-file-list
-   '("~/.emacs.d/skk-get-jisyo/SKK-JISYO.jinmei"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.fullname"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.geo"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.propernoun"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.station"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.law"
-     "~/.emacs.d/skk-get-jisyo/SKK-JISYO.okinawa"))
+   (seq-filter #'file-exists-p
+               (mapcar (lambda (name)
+                         (locate-user-emacs-file (concat "skk-get-jisyo/" name)))
+                       '("SKK-JISYO.jinmei"
+                         "SKK-JISYO.fullname"
+                         "SKK-JISYO.geo"
+                         "SKK-JISYO.propernoun"
+                         "SKK-JISYO.station"
+                         "SKK-JISYO.law"
+                         "SKK-JISYO.okinawa"))))
   (skk-show-annotation t)
   (skk-annotation-delay 0.01)
   (skk-show-candidates-nth-henkan-char 3)
@@ -1395,6 +1486,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
 
 (use-package imenu-list
+  :if my/linux-p
   :ensure t
   :custom
   (imenu-list-position 'left)
@@ -1498,9 +1590,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (sp-local-pair 'emacs-lisp-mode "'" nil :actions nil))
 
 (use-package sudo-edit
+  :if my/linux-p
   :ensure t)
 
 (use-package google-translate
+  :if my/linux-p
   :ensure t
   :commands (google-translate-translate)
   :init
@@ -1530,16 +1624,19 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (use-package google-translate-smooth-ui))
 
 (use-package visual-regexp-steroids
+  :if my/linux-p
   :ensure t
   :bind
   (("M-%" . vr/query-replace)))
 
 (use-package google-this
+  :if my/linux-p
   :ensure t
   :bind
   (("C-l g" . google-this)))
 
 (use-package yasnippet
+  :if my/linux-p
   :ensure t
   :pin melpa
   :commands (yas-expand)
@@ -1548,11 +1645,13 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :bind (("C-<tab>" . yas-expand)))
 
 (use-package yasnippet-snippets
+  :if my/linux-p
   :ensure t
   :pin melpa
   :after yasnippet)
 
 (use-package web-mode
+  :if my/linux-p
   :ensure t
   :mode (;; ("\\.html?\\'" . web-mode)
          ("\\.vue\\'" . web-mode)
@@ -1560,9 +1659,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
          ))
 
 (use-package typescript-mode
+  :if my/linux-p
   :ensure t)
 
 (use-package tuareg
+  :if my/linux-p
   :ensure t
   :mode (("\\.ml\\'" . tuareg-mode)
          ("\\.mli\\'" . tuareg-mode)
@@ -1572,7 +1673,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
 (use-package powershell
   :ensure t
-  :mode (("\\.ps1'" . powershell-mode)))
+  :mode (("\\.ps1\\'" . powershell-mode)))
 
 (use-package markdown-mode
   :ensure t
@@ -1595,9 +1696,11 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (setq markdown-preview-stylesheets (list "http://thomasf.github.io/solarized-css/solarized-light.min.css")))
 
 (use-package markdown-preview-mode
+  :if my/linux-p
   :ensure t)
 
 (use-package rust-mode
+  :if my/linux-p
   :ensure t
   :hook
   ((rust-mode . smartparens-mode)
@@ -1606,6 +1709,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (rust-format-on-save t))
 
 (use-package auctex
+  :if my/linux-p
   :ensure t
   :mode (("\\.tex\\'" . TeX-tex-mode)
          ("\\.latex\\'" . TeX-tex-mode))
@@ -1631,6 +1735,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
             (cadr latex-list) "%l"))))
 
 (use-package vimrc-mode
+  :if my/linux-p
   :ensure t
   :defer t)
 
@@ -1655,13 +1760,16 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
         ("M-<left>" . kle/yaml-indent-shift-left)))
 
 (use-package dockerfile-mode
+  :if my/linux-p
   :ensure t)
 
 (use-package textile-mode
+  :if my/linux-p
   :ensure t
   :mode "\\.textile\\'")
 
 (use-package yaml-pro
+  :if my/linux-p
   :ensure t
   :hook (yaml-mode . yaml-pro-mode))
 
