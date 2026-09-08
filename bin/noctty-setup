@@ -259,6 +259,19 @@ font-size = 11
 theme = Dracula
 background-opacity = 0.9
 
+# tmux 常用ならこれが必要。
+# background-opacity は既定では「ウィンドウ背景」にしか効かず、
+# セルに明示的な背景色が入っているとそのセルは不透明のままになる。
+# tmux や neovim は画面を塗り直すのでこれに該当し、透過が効かなく見える
+# (ドキュメントが名指しで tmux を挙げている)。
+# true にすると明示背景を持つセルにも opacity を適用する。
+background-opacity-cells = true
+
+# Windows 11 22H2 (build 22621) 以降では、これを true にすると
+# DWM のシステムバックドロップ (アクリル状のすりガラス) が有効になる。
+# 単なる透過で良ければ false のままにする。
+background-blur = false
+
 # ------------------------------------------------------------
 #  ウィンドウ
 # ------------------------------------------------------------
@@ -279,6 +292,15 @@ auto-update = check
 # Windows Terminal の alt+shift+d (DuplicatePaneAuto) の代替。
 # new_split に auto は無いので right を割り当てる。
 keybind = alt+shift+d=new_split:right
+
+# ------------------------------------------------------------
+#  ローカル上書き
+# ------------------------------------------------------------
+# config-file は「後から」読まれるので、ここで読むファイルの値が
+# 上の設定を上書きする。? を付けると存在しなくてもエラーにならない。
+# noctty-setup はこのファイルを生成しないし、上書きもしない。
+# 見た目の微調整はすべて config.local.ghostty 側でやること。
+config-file = ?config.local.ghostty
 CONFIG_EOF
 
 if [ "$DUMP" = 1 ]; then
@@ -309,6 +331,50 @@ else
     skip "  差分:"
     diff -u "$CONFIG_FILE" "$TMP_CONFIG" 2>/dev/null | sed 's/^/       /' | head -40
     skip "  上書きするなら --force を付けてください"
+fi
+
+# ---- 4b. ローカル上書きファイル ------------------------------------
+section "4b. ローカル上書き (config.local.ghostty)"
+
+LOCAL_FILE="$CONFIG_DIR/config.local.ghostty"
+if [ -e "$LOCAL_FILE" ]; then
+    ok "あり（内容には触りません）: $(basename "$LOCAL_FILE")"
+elif [ "$CHECK_ONLY" = 1 ]; then
+    skip "未作成（--check なので作りません）"
+else
+    mkdir -p "$CONFIG_DIR"
+    cat > "$LOCAL_FILE" <<'LOCAL_EOF'
+# noctty のローカル上書き設定。
+#
+# config.ghostty から config-file = ?config.local.ghostty で読まれる。
+# インクルードは後から読まれるので、ここの値が生成側を上書きする。
+# noctty-setup はこのファイルを二度と触らないので、見た目の微調整は
+# すべてここでやること。
+#
+# 反映: Ctrl+Shift+, （効かない項目は noctty を完全終了して再起動）
+
+# --- 透過と可読性のつまみ ------------------------------------
+# tmux を使う場合、透過を見せるには background-opacity-cells = true が
+# 要る。ただし明示的な背景色を持つセルが全部透けるため、文字が
+# 読みにくくなる。下の3つで釣り合いを取る。
+
+# 透過の強さ。1 で完全に不透明。生成側は 0.9。
+background-opacity = 0.95
+
+# 文字を太く描く。色を変えずに視認性だけ上げられる。
+font-thicken = true
+
+# 前景と背景の最低コントラスト比 (1〜21)。
+# 1.1 で「背景と同色で見えない」を防ぐ程度。
+# 3 以上にすると読みやすくなるが、文字色が黒か白へ寄るので
+# Dracula の配色は崩れる。必要なら外して調整する。
+# minimum-contrast = 1.1
+
+# 透過そのものをやめる場合は下2行を有効にする
+# background-opacity = 1
+# background-opacity-cells = false
+LOCAL_EOF
+    ok "作成しました: $(basename "$LOCAL_FILE")"
 fi
 
 # ---- 5. dot.files 側の検査 -----------------------------------------
