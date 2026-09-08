@@ -1,0 +1,69 @@
+#!/bin/bash
+# noctty から WSL のログインシェルを起動するためのラッパー。
+#
+# 扱っている問題は3つ。
+#
+# (1) TERM が届かない
+#   noctty は子プロセスに TERM=xterm-ghostty を渡すが、wsl.exe は
+#   Windows 側の環境変数を既定では引き継がず、WSLENV に列挙された
+#   ものだけを通す。結果 WSL 側は常に xterm-256color になる。
+#   `wsl.exe -- env TERM=...` も効かないことを実測で確認済み。
+#
+# (2) 作業ディレクトリが Windows 側になる
+#   noctty の working-directory = inherit が wsl.exe の --cd ~ を
+#   上書きし、/mnt/c/Users/... で始まってしまう。
+#
+# (3) fd の保険（実害は未確認）
+#   stdin/stdout が tty でないと tmux 等は起動できない。ここでは
+#   繋がっていない fd だけを /dev/tty に繋ぎ直しておく。
+#   通常は何もしない no-op。
+#   補足: 2026-09-08 に "open terminal failed: not a terminal" が
+#   出た件は fd とは無関係で、tmux を 3.5a→3.6b に上げた後も
+#   旧サーバ(3.5a)が動き続けていたことが原因だった。
+#   tmux kill-server で復旧する。
+#
+# noctty 側の設定:
+#   command = direct:wsl.exe -d Debian --cd ~ -- /home/nkob/bin/noctty-shell
+
+# --- 起動直後の状態を記録（修復前）---------------------------------
+# 注意: [ -t 1 ] を $( ) の中で評価してはいけない。コマンド置換は
+# stdout をパイプに差し替えるため、必ず NOTTY と報告されてしまう。
+_tty="$(tty 2>&1)"
+if [ -t 0 ]; then _s0=TTY; else _s0=NOTTY; fi
+if [ -t 1 ]; then _s1=TTY; else _s1=NOTTY; fi
+if [ -t 2 ]; then _s2=TTY; else _s2=NOTTY; fi
+
+# --- (2) の修復 -----------------------------------------------------
+# 制御端末が使えるなら、tty に繋がっていない fd だけを繋ぎ直す。
+if [ -w /dev/tty ] 2>/dev/null; then
+    [ -t 1 ] || exec 1>/dev/tty
+    [ -t 2 ] || exec 2>/dev/tty
+fi
+
+# --- (1) の修復 -----------------------------------------------------
+export TERM=xterm-ghostty
+export COLORTERM=truecolor
+# terminfo を引けない場合は安全側に倒す
+infocmp -1 "$TERM" >/dev/null 2>&1 || export TERM=xterm-256color
+
+# --- 作業ディレクトリ -----------------------------------------------
+# noctty の working-directory = inherit が wsl.exe の --cd ~ を上書きし、
+# Windows 側の cwd (/mnt/c/Users/... など) で始まってしまう。
+# Linux 側のパスにいるとき（分割やタブの引き継ぎ）はそれを尊重し、
+# Windows 側に落ちたときだけホームへ寄せる。
+case "$PWD" in
+    /mnt/*) cd "$HOME" || true ;;
+esac
+
+# --- ログ -----------------------------------------------------------
+# 修復後の状態は、ログ用のリダイレクトを掛ける「前に」変数へ確保する。
+# ブロック内で [ -t 1 ] を評価するとログファイル側を測ってしまう。
+if [ -t 1 ]; then _a1=TTY; else _a1=NOTTY; fi
+if [ -t 2 ]; then _a2=TTY; else _a2=NOTTY; fi
+{
+    printf '%s tty=%s in=%s out=%s err=%s -> out=%s err=%s TERM=%s pwd=%s\n' \
+        "$(date '+%m-%d %H:%M:%S')" "$_tty" "$_s0" "$_s1" "$_s2" \
+        "$_a1" "$_a2" "$TERM" "$PWD"
+} >> ~/.local/state/noctty-shell.log 2>/dev/null
+
+exec /usr/bin/zsh -l

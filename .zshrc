@@ -213,6 +213,26 @@ vterm_printf() {
     fi
 }
 
+# noctty / Ghostty シェル統合 (OSC 133 プロンプトマーク)
+#
+# Windows版 noctty の自動注入は pwsh/powershell のみが対象で、
+# command = wsl.exe 起動では発火しないため手動で読み込む。
+# TERM で分岐してはいけない: tmux 内では TERM=tmux-256color になり、
+# しかし OSC 133 を出すべきなのは tmux 内のシェルの方。
+# (tmux がマークを解釈し previous-prompt/next-prompt を提供する)
+# noctty 以外の端末に出ても無害なので無条件で読み込む。
+#
+# 実体は noctty 同梱スクリプトのコピー。scoop で noctty を更新したら
+# 下記で追随させる。CRLF のまま置くと zsh が ^M で構文エラーを出すので
+# tr での除去は必須。
+#   tr -d '\r' \
+#     < /mnt/c/Users/$USER/scoop/apps/noctty/current/share/ghostty/shell-integration/zsh/ghostty-integration \
+#     > ~/.config/noctty/ghostty-integration
+if [ -r ~/.config/noctty/ghostty-integration ]; then
+    export GHOSTTY_SHELL_FEATURES=cursor,title
+    source ~/.config/noctty/ghostty-integration
+fi
+
 # 環境依存の内容は別ファイルに置いておく
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
@@ -228,6 +248,11 @@ function y() {
     command rm -f -- "$tmp"
 }
 
-if [ -z "$TMUX" ] && [ -z "$INSIDE_EMACS" ];then
+# tty がない状態 (scp 経由など) で tmux を呼んでもエラーを出すだけなので、
+# その場合は素の zsh のままにしておく。
+# なお "open terminal failed: not a terminal" は fd 以外の理由でも出る。
+# 実例: tmux をアップグレードすると、稼働中の旧サーバへ新クライアントが
+# 接続できずこのメッセージになる (tmux kill-server で復旧)。
+if [ -z "$TMUX" ] && [ -z "$INSIDE_EMACS" ] && [ -t 0 ] && [ -t 1 ];then
   tmux
 fi
