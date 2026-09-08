@@ -1,0 +1,391 @@
+#!/usr/bin/env bash
+#
+# noctty (Windows) + WSL のセットアップ。
+#
+# noctty を scoop / インストーラで導入した「後に」WSL 側で走らせる。
+# 冪等なので何度でも実行してよい。noctty を更新した後にも走らせること
+# （同梱の terminfo とシェル統合スクリプトを取り直すため）。
+#
+#   noctty-setup           セットアップを実行
+#   noctty-setup --check   検査のみ。何も変更しない
+#   noctty-setup --force   既存の config.ghostty を上書き（バックアップは取る）
+#   noctty-setup --dump    生成される設定を標準出力へ（差分確認用）
+#
+# このスクリプトが面倒を見るのは「リポジトリ外の、環境ごとに作るもの」だけ:
+#   - %LOCALAPPDATA%\noctty\config.ghostty   (noctty 本体の設定)
+#   - ~/.terminfo/x/xterm-ghostty            (terminfo)
+#   - ~/.config/noctty/ghostty-integration   (シェル統合スクリプトの複製)
+#
+# .zshrc / .tmux.conf / bin/noctty-shell は dot.files 管理なので、
+# ここでは内容を検査して不足を報告するだけで、書き換えはしない。
+
+set -uo pipefail
+
+CHECK_ONLY=0
+FORCE=0
+DUMP=0
+for arg in "$@"; do
+    case "$arg" in
+        --check) CHECK_ONLY=1 ;;
+        --force) FORCE=1 ;;
+        --dump)  DUMP=1 ;;
+        -h|--help)
+            # 先頭のコメントブロックをそのまま使う（行番号は固定しない）
+            awk 'NR>1 { if (/^#/) { sub(/^# ?/,""); print } else { exit } }' "$0"
+            exit 0 ;;
+        *) printf 'unknown option: %s\n' "$arg" >&2; exit 2 ;;
+    esac
+done
+
+# ---- 出力 ----------------------------------------------------------
+if [ "$DUMP" = 1 ]; then
+    exec 3>&1 1>&2          # 検査ログは stderr へ。設定本体だけ fd 3 で出す
+fi
+
+if [ -t 1 ]; then
+    C_OK=$'\033[32m'; C_WARN=$'\033[33m'; C_ERR=$'\033[31m'
+    C_HEAD=$'\033[1m'; C_OFF=$'\033[0m'
+else
+    C_OK=''; C_WARN=''; C_ERR=''; C_HEAD=''; C_OFF=''
+fi
+WARN_COUNT=0
+ERR_COUNT=0
+section() { printf '\n%s== %s ==%s\n' "$C_HEAD" "$1" "$C_OFF"; }
+ok()    { printf '  %sok%s   %s\n' "$C_OK" "$C_OFF" "$1"; }
+skip()  { printf '  --   %s\n' "$1"; }
+warn()  { printf '  %swarn%s %s\n' "$C_WARN" "$C_OFF" "$1"; WARN_COUNT=$((WARN_COUNT+1)); }
+fail()  { printf '  %sNG%s   %s\n' "$C_ERR" "$C_OFF" "$1"; ERR_COUNT=$((ERR_COUNT+1)); }
+die()   { printf '\n%serror%s %s\n' "$C_ERR" "$C_OFF" "$1" >&2; exit 1; }
+
+# ---- 事前確認 ------------------------------------------------------
+section "環境の確認"
+
+[ -n "${WSL_DISTRO_NAME:-}" ] || die "WSL 上で実行してください (WSL_DISTRO_NAME が空です)"
+ok "WSL ディストリ: $WSL_DISTRO_NAME"
+
+command -v wsl.exe >/dev/null 2>&1 || die "wsl.exe が見つかりません。WSL の interop が無効になっていませんか"
+
+# noctty のリソースディレクトリを探す。
+# share/terminfo と share/ghostty を持つディレクトリが正解。
+find_noctty_dir() {
+    local cand d
+    # 1) PATH 上の noctty (scoop の shim や installer が PATH を通す)
+    for exe in noctty.com noctty.exe; do
+        cand="$(command -v "$exe" 2>/dev/null)" || continue
+        d="$(dirname "$(readlink -f "$cand")")"
+        [ -d "$d/share/ghostty" ] && { printf '%s\n' "$d"; return 0; }
+    done
+    # 2) scoop の標準配置
+    for d in /mnt/c/Users/*/scoop/apps/noctty/current; do
+        [ -d "$d/share/ghostty" ] && { printf '%s\n' "$d"; return 0; }
+    done
+    # 3) インストーラの標準配置
+    for d in "/mnt/c/Program Files/noctty" /mnt/c/Users/*/AppData/Local/Programs/noctty; do
+        [ -d "$d/share/ghostty" ] && { printf '%s\n' "$d"; return 0; }
+    done
+    return 1
+}
+
+NOCTTY_DIR="$(find_noctty_dir)" \
+    || die "noctty の導入先が見つかりません。先に noctty をインストールしてください"
+ok "noctty: $NOCTTY_DIR"
+
+NOCTTY_BIN=""
+for exe in "$NOCTTY_DIR/noctty.com" "$NOCTTY_DIR/noctty.exe"; do
+    [ -x "$exe" ] && { NOCTTY_BIN="$exe"; break; }
+done
+if [ -n "$NOCTTY_BIN" ]; then
+    ok "バージョン: $("$NOCTTY_BIN" +version 2>/dev/null | head -1)"
+else
+    warn "noctty の実行ファイルが見つかりません（フォント検査を省略します）"
+fi
+
+# %LOCALAPPDATA% を WSL パスとして得る
+find_localappdata() {
+    local v p
+    # wslu があればそれが最も確実
+    if command -v wslvar >/dev/null 2>&1; then
+        v="$(wslvar LOCALAPPDATA 2>/dev/null | tr -d '\r')"
+        [ -n "$v" ] && p="$(wslpath -u "$v" 2>/dev/null)" && [ -d "$p" ] && { printf '%s\n' "$p"; return 0; }
+    fi
+    # cmd.exe 経由。cwd が Linux パスだと UNC 警告が出るので /mnt/c から実行する
+    v="$(cd /mnt/c 2>/dev/null && cmd.exe /c "echo %LOCALAPPDATA%" 2>/dev/null | tr -d '\r')"
+    if [ -n "$v" ] && [ "${v#%}" = "$v" ]; then
+        p="$(wslpath -u "$v" 2>/dev/null)" && [ -d "$p" ] && { printf '%s\n' "$p"; return 0; }
+    fi
+    # noctty が scoop 配下にあるならユーザー名を流用して推測する
+    case "$NOCTTY_DIR" in
+        /mnt/*/Users/*)
+            p="$(printf '%s\n' "$NOCTTY_DIR" | sed -E 's|^(/mnt/[^/]+/Users/[^/]+)/.*|\1/AppData/Local|')"
+            [ -d "$p" ] && { printf '%s\n' "$p"; return 0; } ;;
+    esac
+    return 1
+}
+
+LOCALAPPDATA_WSL="$(find_localappdata)" \
+    || die "%LOCALAPPDATA% を特定できませんでした"
+CONFIG_DIR="$LOCALAPPDATA_WSL/noctty"
+CONFIG_FILE="$CONFIG_DIR/config.ghostty"
+ok "設定ファイル: $CONFIG_FILE"
+
+WRAPPER="$HOME/bin/noctty-shell"
+
+# ---- 1. terminfo ---------------------------------------------------
+section "1. terminfo (xterm-ghostty)"
+
+TI_SRC="$NOCTTY_DIR/share/terminfo/ghostty.terminfo"
+if [ ! -r "$TI_SRC" ]; then
+    fail "同梱 terminfo が見つかりません: $TI_SRC"
+elif ! command -v tic >/dev/null 2>&1; then
+    fail "tic がありません。ncurses-bin を入れてください (apt install ncurses-bin)"
+elif infocmp xterm-ghostty >/dev/null 2>&1 && [ "$CHECK_ONLY" = 1 ]; then
+    ok "導入済み"
+elif [ "$CHECK_ONLY" = 1 ]; then
+    fail "未導入 (--check なので導入しません)"
+else
+    # tic は「説明フィールドをエイリアスとみなす古い tic がある」旨を
+    # stderr に出すが実害はないため、成否は infocmp で判定する
+    if tic -x -o "$HOME/.terminfo" "$TI_SRC" >/dev/null 2>&1 \
+       && infocmp xterm-ghostty >/dev/null 2>&1; then
+        ok "導入しました: ~/.terminfo/x/xterm-ghostty"
+    else
+        fail "tic に失敗しました"
+    fi
+fi
+# root / sudo からは ~/.terminfo が見えない
+if [ -d /usr/share/terminfo ] && ! [ -e /usr/share/terminfo/x/xterm-ghostty ]; then
+    skip "システム全体に入れる場合: sudo tic -x -o /usr/share/terminfo '$TI_SRC'"
+fi
+
+# ---- 2. シェル統合スクリプト ---------------------------------------
+section "2. シェル統合スクリプト"
+
+LOGIN_SHELL="$(getent passwd "$(id -u)" 2>/dev/null | cut -d: -f7)"
+SHELL_NAME="$(basename "${LOGIN_SHELL:-sh}")"
+case "$SHELL_NAME" in
+    zsh)  SI_SRC="$NOCTTY_DIR/share/ghostty/shell-integration/zsh/ghostty-integration"
+          SI_DST="$HOME/.config/noctty/ghostty-integration" ;;
+    bash) SI_SRC="$NOCTTY_DIR/share/ghostty/shell-integration/bash/ghostty.bash"
+          SI_DST="$HOME/.config/noctty/ghostty.bash" ;;
+    fish) SI_SRC="$NOCTTY_DIR/share/ghostty/shell-integration/fish/vendor_conf.d/ghostty-shell-integration.fish"
+          SI_DST="$HOME/.config/fish/conf.d/ghostty-shell-integration.fish" ;;
+    *)    SI_SRC=""; SI_DST="" ;;
+esac
+ok "ログインシェル: $SHELL_NAME"
+
+if [ -z "$SI_SRC" ]; then
+    warn "$SHELL_NAME 用の統合は自動設定しません"
+elif [ ! -r "$SI_SRC" ]; then
+    fail "同梱スクリプトが見つかりません: $SI_SRC"
+elif [ "$CHECK_ONLY" = 1 ]; then
+    if [ -r "$SI_DST" ] && ! grep -q $'\r' "$SI_DST"; then
+        if cmp -s <(tr -d '\r' < "$SI_SRC") "$SI_DST"; then
+            ok "最新と一致"
+        else
+            warn "同梱スクリプトと差異あり（noctty 更新後なら再実行してください）"
+        fi
+    else
+        fail "未導入、または CRLF が残っています"
+    fi
+else
+    mkdir -p "$(dirname "$SI_DST")"
+    # CRLF は必須で落とす。^M が残ると zsh が構文エラーで統合ごと死ぬ
+    if tr -d '\r' < "$SI_SRC" > "$SI_DST"; then
+        chmod 644 "$SI_DST"
+        ok "配置しました (CRLF 除去済み): $SI_DST"
+    else
+        fail "コピーに失敗しました"
+    fi
+fi
+
+# ---- 3. 起動ラッパー -----------------------------------------------
+section "3. 起動ラッパー"
+
+if [ -x "$WRAPPER" ]; then
+    ok "あり: $WRAPPER"
+else
+    fail "$WRAPPER がありません。dot.files の bin/ を ~/bin にリンクしてください"
+    skip "  ln -s ~/dot.files/bin ~/bin"
+fi
+mkdir -p "$HOME/.local/state" 2>/dev/null
+
+# ---- 4. noctty 本体の設定 ------------------------------------------
+section "4. noctty の設定"
+
+TMP_CONFIG="$(mktemp)"
+trap 'rm -f "$TMP_CONFIG"' EXIT
+cat > "$TMP_CONFIG" <<CONFIG_EOF
+# noctty config  --  generated by noctty-setup
+#
+# reload : Ctrl+Shift+,      open : Ctrl+,
+# verify : noctty.com +show-config      ( +validate-config は 1.3.127 時点で壊れている )
+# docs   : noctty.com +explain-config <key>
+#
+# 注意: noctty はシングルインスタンス。起動中のプロセスがあると
+# 新規起動はそこへ転送され、設定は起動時に読み込んだものが使われ続ける。
+# 設定を変えたら完全に終了してから起動し直すこと。
+
+# ------------------------------------------------------------
+#  シェル
+# ------------------------------------------------------------
+# direct: はシェル経由の再解釈を避ける指示。Windows に /bin/sh は無い。
+# ラッパーを噛ませる理由は noctty-shell の冒頭コメントを参照。
+command = direct:wsl.exe -d $WSL_DISTRO_NAME --cd ~ -- $WRAPPER
+
+working-directory = inherit
+
+# --- WSL では必須 ---
+# 作業ディレクトリの継承は OSC 7 による pwd 通知に依存するが、WSL の
+# シェルが返すのは Linux パスで、Windows プロセスの noctty はそこへ
+# chdir できない。false にすると毎回 wsl.exe --cd ~ が素直に走る。
+# 代償: 新規タブ・分割がカレントディレクトリを引き継がない。
+window-inherit-working-directory = false
+tab-inherit-working-directory = false
+split-inherit-working-directory = false
+
+# ------------------------------------------------------------
+#  フォント
+# ------------------------------------------------------------
+# font-family は繰り返すとフォールバック連鎖になる。
+# 0xProto に無い日本語を HackGen が、記号を Nerd Font が拾う。
+font-family = 0xProto
+font-family = HackGen
+font-family = Symbols Nerd Font Mono
+font-size = 11
+
+# ------------------------------------------------------------
+#  配色
+# ------------------------------------------------------------
+theme = Dracula
+background-opacity = 0.9
+
+# ------------------------------------------------------------
+#  ウィンドウ
+# ------------------------------------------------------------
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+
+# ------------------------------------------------------------
+#  更新
+# ------------------------------------------------------------
+# scoop 管理下なら通知のみに留め、自動適用はしない。
+auto-update = check
+
+# ------------------------------------------------------------
+#  キーバインド
+# ------------------------------------------------------------
+# コピー / ペーストは既定の Ctrl+Shift+C / Ctrl+Shift+V を使う。
+# Windows Terminal の alt+shift+d (DuplicatePaneAuto) の代替。
+# new_split に auto は無いので right を割り当てる。
+keybind = alt+shift+d=new_split:right
+CONFIG_EOF
+
+if [ "$DUMP" = 1 ]; then
+    cat "$TMP_CONFIG" >&3
+    exit 0
+fi
+
+if [ "$CHECK_ONLY" = 1 ]; then
+    if [ ! -s "$CONFIG_FILE" ]; then
+        fail "未設定 (--check なので書きません)"
+    elif diff -q "$TMP_CONFIG" "$CONFIG_FILE" >/dev/null 2>&1; then
+        ok "生成内容と一致"
+    else
+        warn "手で編集されています（生成内容と差異あり）"
+        skip "  差分の確認: diff '$CONFIG_FILE' <(noctty-setup --dump)"
+    fi
+elif [ ! -s "$CONFIG_FILE" ]; then
+    mkdir -p "$CONFIG_DIR"
+    cp "$TMP_CONFIG" "$CONFIG_FILE" && ok "書き込みました ($(wc -c < "$CONFIG_FILE") bytes)"
+elif diff -q "$TMP_CONFIG" "$CONFIG_FILE" >/dev/null 2>&1; then
+    ok "既に最新"
+elif [ "$FORCE" = 1 ]; then
+    BAK="$CONFIG_FILE.bak.$(date +%Y%m%d%H%M%S)"
+    cp "$CONFIG_FILE" "$BAK" && cp "$TMP_CONFIG" "$CONFIG_FILE" \
+        && ok "上書きしました (退避: $(basename "$BAK"))"
+else
+    warn "既存の設定があるため書き換えていません"
+    skip "  差分:"
+    diff -u "$CONFIG_FILE" "$TMP_CONFIG" 2>/dev/null | sed 's/^/       /' | head -40
+    skip "  上書きするなら --force を付けてください"
+fi
+
+# ---- 5. dot.files 側の検査 -----------------------------------------
+section "5. dot.files 側（書き換えはしない）"
+
+check_contains() {
+    local file="$1" pattern="$2" label="$3"
+    if [ ! -r "$file" ]; then
+        warn "$label: $file がありません"
+    elif grep -qF -- "$pattern" "$file"; then
+        ok "$label"
+    else
+        fail "$label が入っていません ($file)"
+    fi
+}
+
+case "$SHELL_NAME" in
+    zsh)  check_contains "$HOME/.zshrc" 'ghostty-integration' "シェル統合の読み込み" ;;
+esac
+
+if command -v tmux >/dev/null 2>&1; then
+    ok "tmux: $(tmux -V)"
+    check_contains "$HOME/.tmux.conf" 'xterm-ghostty' "tmux terminal-features"
+    check_contains "$HOME/.tmux.conf" 'allow-passthrough on' "tmux allow-passthrough"
+    check_contains "$HOME/.tmux.conf" 'previous-prompt' "tmux プロンプト間ジャンプ"
+    # tmux を更新した直後は旧サーバが残り、新クライアントが接続できずに
+    # "open terminal failed: not a terminal" になる
+    if srv="$(tmux display-message -p '#{version}' 2>/dev/null)" && [ -n "$srv" ]; then
+        cli="$(tmux -V 2>/dev/null | awk '{print $2}')"
+        if [ "$srv" != "$cli" ]; then
+            fail "tmux サーバ($srv) とクライアント($cli) の版が違います"
+            skip "  この状態では新規 attach が 'not a terminal' で失敗します"
+            skip "  復旧: 作業を保存してから tmux kill-server"
+        else
+            ok "tmux サーバとクライアントの版が一致 ($srv)"
+        fi
+    fi
+else
+    skip "tmux は未導入"
+fi
+
+# ---- 6. フォント ---------------------------------------------------
+section "6. フォント"
+
+if [ -n "$NOCTTY_BIN" ]; then
+    FONTS="$("$NOCTTY_BIN" +list-fonts 2>/dev/null)"
+    if [ -n "$FONTS" ]; then
+        for f in "0xProto" "HackGen" "Symbols Nerd Font Mono"; do
+            if printf '%s\n' "$FONTS" | grep -qiF "$f"; then
+                ok "$f"
+            else
+                warn "$f が見つかりません（設定はフォールバックするので致命的ではない）"
+            fi
+        done
+    else
+        skip "フォント一覧を取得できませんでした"
+    fi
+fi
+
+# ---- まとめ --------------------------------------------------------
+section "結果"
+printf '  NG: %d / warn: %d\n' "$ERR_COUNT" "$WARN_COUNT"
+
+if [ "$CHECK_ONLY" = 1 ]; then
+    printf '\n  --check のため何も変更していません。\n'
+elif [ "$ERR_COUNT" -eq 0 ]; then
+    cat <<'NEXT_EOF'
+
+  次の手順:
+    1. noctty を「完全に」終了する（プロセスが1つでも残ると設定が反映されない）
+    2. 起動し直す
+    3. 確認:
+         tmux display-message -p '#{client_termname}'   # -> xterm-ghostty
+         tmux display-message -p '#{client_termfeatures}'
+         cat ~/.local/state/noctty-shell.log            # tty / TERM / pwd
+NEXT_EOF
+fi
+
+[ "$ERR_COUNT" -eq 0 ] || exit 1
+exit 0

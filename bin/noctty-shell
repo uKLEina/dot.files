@@ -66,4 +66,7 @@ if [ -t 2 ]; then _a2=TTY; else _a2=NOTTY; fi
         "$_a1" "$_a2" "$TERM" "$PWD"
 } >> ~/.local/state/noctty-shell.log 2>/dev/null
 
-exec /usr/bin/zsh -l
+# ログインシェルは passwd から引く（環境ごとにパスが違うため固定しない）
+_shell="$(getent passwd "$(id -u)" 2>/dev/null | cut -d: -f7)"
+[ -n "$_shell" ] && [ -x "$_shell" ] || _shell=/bin/sh
+exec "$_shell" -l
