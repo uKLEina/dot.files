@@ -1842,7 +1842,7 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :pin melpa
   :custom
   (gptel-api-key (getenv "OPENAI_API_KEY"))
-  (gptel-model 'gpt-5.4))
+  (gptel-model 'gpt-5.6-terra))
 
 (use-package gptel-magit
   :ensure t
@@ -1982,7 +1982,34 @@ feat(editor): hideshowを有効化し全体トグルを追加
     message)
   (advice-add 'gptel-magit--format-commit-message :override
               #'my-gptel-magit--format-commit-message)
-  (setq gptel-magit-model 'gpt-5.4-mini))
+  ;; gptelはコールバックを文字列以外でも呼ぶ。
+  ;; - エラー時: nil -> magitがnil引数を除去し `git commit --message --edit` になる
+  ;; - 推論モデル: (reasoning . TEXT) -> 引数にシンボルが混入して sequencep エラー
+  ;; どちらも生成失敗として弾き、コミット処理まで進ませない。
+  (defun my-gptel-magit--guard-callback (orig callback)
+    (funcall orig
+             (lambda (msg)
+               (cond
+                ((and (stringp msg) (not (string-blank-p msg)))
+                 (funcall callback msg))
+                ;; 推論ブロックは本文の前に届くので黙って捨てる
+                ((and (consp msg) (eq (car msg) 'reasoning)))
+                (t (message "gptel-magit: コミットメッセージの生成に失敗しました"))))))
+  (advice-add 'gptel-magit--generate :around
+              #'my-gptel-magit--guard-callback)
+  ;; 推論モデルでは reasoning.effort=none を指定し、そもそも推論ブロックを
+  ;; 生成させない。コミットメッセージ生成に推論は不要で、遅延と料金の無駄。
+  ;; gpt-4.1 等の非推論モデルはこのパラメータで400になるため gpt-5 系限定。
+  (defun my-gptel-magit--no-reasoning (orig &rest args)
+    (let ((gptel--request-params
+           (if (string-prefix-p "gpt-5" (format "%s" (or gptel-magit-model gptel-model)))
+               (plist-put (copy-sequence gptel--request-params)
+                          :reasoning '(:effort "none"))
+             gptel--request-params)))
+      (apply orig args)))
+  (advice-add 'gptel-magit--request :around
+              #'my-gptel-magit--no-reasoning)
+  (setq gptel-magit-model 'gpt-5.6-luna))
 
 (use-package emojify
   :ensure t
