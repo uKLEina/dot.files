@@ -1978,27 +1978,69 @@ feat(editor): hideshowを有効化し全体トグルを追加
   (setopt gptel-magit-diff-explain-prompt
           (concat gptel-magit-diff-explain-prompt
                   " Use Japanase for the answer."))
+  ;; --- gptel-magit のローカルパッチ ---------------------------------------
+  ;; 本体は2025-05以降更新が止まっており、以下の問題が残っている。
+  ;;   1. LLM応答の整形(fill-region)が日本語のコミットメッセージを壊す
+  ;;   2. コールバックが文字列以外(nil / (reasoning . TEXT))で呼ばれる想定がなく、
+  ;;      nilだとmagitがnil引数を除去して `git commit --message --edit` が走り、
+  ;;      "--edit" というメッセージで無確認コミットされる
+  ;;   3. 常に `git diff --cached` を見るため、リワード時にdiffが空になる
+  ;;   4. 生成結果を既存メッセージの先頭に挿入するため、リワード時に新旧が混ざる
+
+  ;; 1. 整形を無効化する
   (defun my-gptel-magit--format-commit-message (message)
     message)
   (advice-add 'gptel-magit--format-commit-message :override
               #'my-gptel-magit--format-commit-message)
-  ;; gptelはコールバックを文字列以外でも呼ぶ。
-  ;; - エラー時: nil -> magitがnil引数を除去し `git commit --message --edit` になる
-  ;; - 推論モデル: (reasoning . TEXT) -> 引数にシンボルが混入して sequencep エラー
-  ;; どちらも生成失敗として弾き、コミット処理まで進ませない。
-  (defun my-gptel-magit--guard-callback (orig callback)
-    (funcall orig
-             (lambda (msg)
-               (cond
-                ((and (stringp msg) (not (string-blank-p msg)))
-                 (funcall callback msg))
-                ;; 推論ブロックは本文の前に届くので黙って捨てる
-                ((and (consp msg) (eq (car msg) 'reasoning)))
-                (t (message "gptel-magit: コミットメッセージの生成に失敗しました"))))))
-  (advice-add 'gptel-magit--generate :around
-              #'my-gptel-magit--guard-callback)
-  ;; 推論モデルでは reasoning.effort=none を指定し、そもそも推論ブロックを
-  ;; 生成させない。コミットメッセージ生成に推論は不要で、遅延と料金の無駄。
+
+  ;; 2+3. diffの取得元を状況に応じて切り替え、応答は文字列のみ通す
+  (defun my-gptel-magit--diff ()
+    "Return the diff to describe.
+Use the staged diff normally, and the diff of HEAD itself while rewording."
+    (let ((staged (magit-git-output "diff" "--cached")))
+      (if (string-blank-p staged)
+          (magit-git-output "show" "--format=" "HEAD")
+        staged)))
+
+  (defun my-gptel-magit--generate (callback)
+    "Generate a commit message and invoke CALLBACK with it."
+    (gptel-magit--request (my-gptel-magit--diff)
+      :system gptel-magit-commit-prompt
+      :context nil
+      :callback
+      (lambda (response _info)
+        (cond
+         ((and (stringp response) (not (string-blank-p response)))
+          (funcall callback (gptel-magit--format-commit-message response)))
+         ;; 推論ブロックは本文より先に届くので黙って捨てる
+         ((and (consp response) (eq (car response) 'reasoning)))
+         (t (message "gptel-magit: コミットメッセージの生成に失敗しました"))))))
+  (advice-add 'gptel-magit--generate :override #'my-gptel-magit--generate)
+
+  ;; 4. 既存メッセージ(コメント行より前)を消してから挿入する
+  (defun my-gptel-magit-generate-message ()
+    "Generate a commit message, replacing the existing one."
+    (interactive)
+    (unless (magit-commit-message-buffer)
+      (user-error "No commit in progress"))
+    (gptel-magit--generate
+     (lambda (message)
+       (with-current-buffer (magit-commit-message-buffer)
+         (save-excursion
+           (goto-char (point-min))
+           (delete-region
+            (point-min)
+            (if (re-search-forward (concat "^" comment-start) nil t)
+                (max (point-min) (- (point) 2))
+              (point-max)))
+           (goto-char (point-min))
+           (insert message)))))
+    (message "gptel-magit: コミットメッセージを生成中..."))
+  (advice-add 'gptel-magit-generate-message :override
+              #'my-gptel-magit-generate-message)
+
+  ;; 推論モデルでは reasoning.effort=none を指定し、推論ブロック自体を作らせない。
+  ;; コミットメッセージ生成に推論は不要で、遅延と料金の無駄。
   ;; gpt-4.1 等の非推論モデルはこのパラメータで400になるため gpt-5 系限定。
   (defun my-gptel-magit--no-reasoning (orig &rest args)
     (let ((gptel--request-params
@@ -2009,6 +2051,7 @@ feat(editor): hideshowを有効化し全体トグルを追加
       (apply orig args)))
   (advice-add 'gptel-magit--request :around
               #'my-gptel-magit--no-reasoning)
+
   (setq gptel-magit-model 'gpt-5.6-luna))
 
 (use-package emojify
