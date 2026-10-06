@@ -518,20 +518,42 @@ focus-stealing prevention so the frame actually comes to the front."
 (add-hook 'emacs-startup-hook
           (lambda () (run-with-timer 60 my/agenda-mirror-interval #'my/agenda-mirror)))
 
-(defun my/org-agenda-skip-unless-stuck ()
-  "TODO はあるのに NEXT・WAIT が無い見出し以外を飛ばす。子孫だけを見る。"
-  (let ((end (save-excursion (org-end-of-subtree t) (point)))
-        todo active)
-    (save-excursion
-      (while (and (outline-next-heading) (< (point) end))
-        (pcase (org-get-todo-state)
-          ("TODO" (setq todo t))
-          ((or "NEXT" "WAIT") (setq active t)))))
-    (unless (and todo (not active)) end)))
+;; agenda の行の頭の %-12(...) は文字数で揃えるので、日本語が入るとずれる。
+;; 行の頭に出す関数は、見た目の幅で揃えた文字列を返す
+(defun my/org-agenda-pad (s width &optional right)
+  "S を見た目の幅 WIDTH に揃える。長ければ「…」で切る。RIGHT なら右寄せ。"
+  ;; 全角の途中で切ると WIDTH に届かないことがあり、切ったあとは埋めてくれないので、自分で埋める
+  (let* ((s (truncate-string-to-width (or s "") width nil nil "…"))
+         (pad (make-string (max 0 (- width (string-width s))) ?\s)))
+    (if right (concat pad s) (concat s pad))))
 
 (defun my/org-agenda-waiting-on ()
   "agenda の行の頭に出す、待ち相手（:WAITING_ON:）。"
-  (or (org-entry-get nil "WAITING_ON") ""))
+  (my/org-agenda-pad (org-entry-get nil "WAITING_ON") 14))
+
+(defun my/org-agenda-waiting-days ()
+  "agenda の行の頭に出す、待ちになってからの日数。
+いちばん新しい状態のメモ（State \"WAIT\"）の日付から数える。メモが無ければ空白。"
+  (my/org-agenda-pad
+   (save-excursion
+     (org-back-to-heading t)
+     (let ((end (save-excursion (or (outline-next-heading) (point-max)))))
+       ;; 状態のメモは新しいものが上（org-log-states-order-reversed）なので、最初に見つかったものを使う
+       (when (re-search-forward
+              "^[ \t]*- State \"WAIT\"[ \t]+from .*?\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}[^]]*\\)\\]" end t)
+         (format "%d日" (- (org-today) (time-to-days (org-time-string-to-time (match-string 1))))))))
+   5 t))
+
+(defun my/org-agenda-format-date (date)
+  "agenda の日付の行。system-time-locale が \"C\" だと曜日が英語になるので、自分で書く。"
+  (format "%d年%d月%d日（%s）" (nth 2 date) (car date) (nth 1 date)
+          (aref ["日" "月" "火" "水" "木" "金" "土"] (calendar-day-of-week date))))
+
+(defun my/org-agenda-waited-by ()
+  "agenda の行の頭に出す、自分を待っている人（:WAITED_BY:）と期限。"
+  (let ((deadline (org-entry-get nil "DEADLINE")))
+    (concat (my/org-agenda-pad (org-entry-get nil "WAITED_BY") 14) " "
+            (my/org-agenda-pad (and deadline (format-time-string "%m/%d" (org-time-string-to-time deadline))) 5))))
 
 (use-package org
   :bind
@@ -572,14 +594,27 @@ focus-stealing prevention so the frame actually comes to the front."
   :bind (:map org-agenda-mode-map
               ("M" . my/agenda-mirror))
   :custom
+  ;; 画面の言葉を日本語にそろえる。行の頭の言葉は、見た目の幅を12桁にそろえる
+  (org-agenda-format-date #'my/org-agenda-format-date)
+  (org-agenda-scheduled-leaders '("予定        " "予定 %2d日前 "))
+  (org-agenda-deadline-leaders '("期限        " "期限まで%2d日" "期限%2d日超過"))
+  (org-agenda-current-time-string "← 今")
   (org-agenda-custom-commands
+   ;; 朝イチ・作業の切れ目・休憩中に開いて、全体を掴んで次を決める画面。大事な順に並べる
    '(("d" "まとめた画面"
-      ((agenda "" ((org-agenda-span 'day)))
+      ((tags-todo "WAITED_BY<>\"\""
+                  ((org-agenda-overriding-header "待たせているもの")
+                   (org-agenda-prefix-format "  %-14:c%(my/org-agenda-waited-by) ")
+                   (org-agenda-sorting-strategy '(deadline-up category-keep))))
+       (agenda "" ((org-agenda-span 'day)
+                   (org-agenda-overriding-header "今日の予定")
+                   ;; 待ちは下の「待ち」のブロックに日数つきで出るので、ここでは出さない
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))))
        (todo "NEXT" ((org-agenda-overriding-header "次にやること")))
        (todo "WAIT" ((org-agenda-overriding-header "待ち")
-                     (org-agenda-prefix-format "  %-14:c%-12(my/org-agenda-waiting-on) ")))
-       (tags "LEVEL=1" ((org-agenda-overriding-header "止まっている区切り（TODO はあるのに NEXT・WAIT が無い）")
-                        (org-agenda-skip-function #'my/org-agenda-skip-unless-stuck))))))))
+                     (org-agenda-prefix-format "  %-14:c%(my/org-agenda-waiting-days) %(my/org-agenda-waiting-on) ")))
+       (alltodo "" ((org-agenda-overriding-header "inbox に残っているもの")
+                    (org-agenda-files (list (expand-file-name "inbox.org" my/task-agenda-dir))))))))))
 
 (use-package ox
   :custom
