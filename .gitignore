@@ -40,7 +40,8 @@ xelatex
 !/.Xresources
 !/.zshenv
 !/.zprofile
-!/.gitignore_global
+!/.config/git/
+!/.config/git/ignore
 !/launch-emacs.vbs
 
 ## emacs

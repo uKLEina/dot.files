@@ -12,6 +12,7 @@ rm -fr ~/.zsh
 rm -fr ~/bin
 rm -f ~/.aspell.conf
 rm -f ~/.gitignore
+rm -f ~/.config/git/ignore
 rm -f ~/.gitmodules
 rm -f ~/.latexmkrc
 rm -f ~/.tmux.conf
@@ -26,7 +27,8 @@ rm -f ~/nihongo.nodoka
 # ln -s ~/dot.files/.config/flake8 ~/.config/flake8
 # ln -s ~/dot.files/.config/pep8 ~/.config/pep8
 # ln -s ~/dot.files/.config/pylintrc ~/.config/pylintrc
-ln -s ~/dot.files/.gitignore_global ~/.gitignore_global
+mkdir -p ~/.config/git
+ln -s ~/dot.files/.config/git/ignore ~/.config/git/ignore
 # ln -s ~/dot.files/nihongo.kanata.lisp ~/.config/nihongo.kanata.lisp
 
 # Emacs
