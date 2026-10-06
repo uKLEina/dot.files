@@ -461,7 +461,7 @@ focus-stealing prevention so the frame actually comes to the front."
   :if my/linux-p
   :mode
   (("\\.json\\'" . json-ts-mode))
-  :custom (json-ts-mode-indent-offset 4))
+  :custom (json-ts-mode-indent-offset 2))
 
 (use-package org
   :bind
@@ -539,6 +539,11 @@ focus-stealing prevention so the frame actually comes to the front."
 (use-package js
   :if my/linux-p
   :mode (("\\.js\\'" . js-ts-mode)))
+
+(use-package typescript-ts-mode
+  :if my/linux-p
+  :mode
+  (("\\.ts\\'" . typescript-ts-mode)))
 
 (when (eq system-type 'gnu/linux)
 ;;; Fix copy/paste in Wayland
@@ -1095,12 +1100,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
         ("j" . xref-next-line)
         ("k" . xref-prev-line)))
 
-(use-package flycheck
-  :if my/linux-p
-  :ensure t
-  :pin melpa
-  :custom
-  (flycheck-disabled-checkers '(python-ruff)))
+;; (use-package flycheck
+;;   :if my/linux-p
+;;   :ensure t
+;;   :pin melpa
+;;   :custom
+;;   (flycheck-disabled-checkers '(python-ruff)))
 
 (use-package highlight-indent-guides
   :ensure t
@@ -1139,264 +1144,264 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
     (shell-command-to-string (format "ruff format %s" (buffer-file-name)))
     (revert-buffer t t t)))
 
-(use-package lsp-mode
-  :if my/linux-p
-  :ensure t
-  ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
-  :custom
-  (lsp-diagnostics-provider :auto)
-  (lsp-completion-provider :none)
-  :init
-  (with-eval-after-load 'tramp
-    (add-to-list 'tramp-remote-path "/workspace/.venv/bin"))
-  :hook
-  (lsp-mode . (lambda () (when (file-remote-p default-directory)
-                           (setq-local lsp-enable-file-watchers nil))))
-  :config
-  ;; lsp-booster
-  (defun lsp-booster--advice-json-parse (old-fn &rest args)
-    "Try to parse bytecode instead of json."
-    (or
-     (when (equal (following-char) ?#)
-       (let ((bytecode (read (current-buffer))))
-         (when (byte-code-function-p bytecode)
-           (funcall bytecode))))
-     (apply old-fn args)))
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and (not test?)                             ;; for check lsp-server-present?
-               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-               lsp-use-plists
-               (not (functionp 'json-rpc-connection))  ;; native json-rpc
-               (executable-find "emacs-lsp-booster"))
-          (progn
-            (when-let* ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-              (setcar orig-result command-from-exec-path))
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (cons "emacs-lsp-booster" orig-result))
-        orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  (dolist (re '("[/\\\\]\\.aws-sam\\'"
-                "[/\\\\]\\.cache\\'"
-                "[/\\\\]\\.claude\\'"
-                "[/\\\\]\\.devcontainer\\'"
-                "[/\\\\]\\.ruff_cache\\'"
-                "[/\\\\]\\.serena\\'"
-                "[/\\\\][^/\\\\]+\\.dist-info\\'"
-                "[/\\\\][^/\\\\]+\\.egg-info\\'"))
-    (add-to-list 'lsp-file-watch-ignored-directories re)))
+;; (use-package lsp-mode
+;;   :if my/linux-p
+;;   :ensure t
+;;   ;; :hook (lsp-after-open . my-reorder-eldoc-functions)
+;;   :custom
+;;   (lsp-diagnostics-provider :auto)
+;;   (lsp-completion-provider :none)
+;;   :init
+;;   (with-eval-after-load 'tramp
+;;     (add-to-list 'tramp-remote-path "/workspace/.venv/bin"))
+;;   :hook
+;;   (lsp-mode . (lambda () (when (file-remote-p default-directory)
+;;                            (setq-local lsp-enable-file-watchers nil))))
+;;   :config
+;;   ;; lsp-booster
+;;   (defun lsp-booster--advice-json-parse (old-fn &rest args)
+;;     "Try to parse bytecode instead of json."
+;;     (or
+;;      (when (equal (following-char) ?#)
+;;        (let ((bytecode (read (current-buffer))))
+;;          (when (byte-code-function-p bytecode)
+;;            (funcall bytecode))))
+;;      (apply old-fn args)))
+;;   (advice-add (if (progn (require 'json)
+;;                          (fboundp 'json-parse-buffer))
+;;                   'json-parse-buffer
+;;                 'json-read)
+;;               :around
+;;               #'lsp-booster--advice-json-parse)
+;;   (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+;;     "Prepend emacs-lsp-booster command to lsp CMD."
+;;     (let ((orig-result (funcall old-fn cmd test?)))
+;;       (if (and (not test?)                             ;; for check lsp-server-present?
+;;                (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+;;                lsp-use-plists
+;;                (not (functionp 'json-rpc-connection))  ;; native json-rpc
+;;                (executable-find "emacs-lsp-booster"))
+;;           (progn
+;;             (when-let* ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+;;               (setcar orig-result command-from-exec-path))
+;;             (message "Using emacs-lsp-booster for %s!" orig-result)
+;;             (cons "emacs-lsp-booster" orig-result))
+;;         orig-result)))
+;;   (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+;;   (dolist (re '("[/\\\\]\\.aws-sam\\'"
+;;                 "[/\\\\]\\.cache\\'"
+;;                 "[/\\\\]\\.claude\\'"
+;;                 "[/\\\\]\\.devcontainer\\'"
+;;                 "[/\\\\]\\.ruff_cache\\'"
+;;                 "[/\\\\]\\.serena\\'"
+;;                 "[/\\\\][^/\\\\]+\\.dist-info\\'"
+;;                 "[/\\\\][^/\\\\]+\\.egg-info\\'"))
+;;     (add-to-list 'lsp-file-watch-ignored-directories re)))
 
-(use-package lsp-pyright
-  :if my/linux-p
-  :ensure t
-  :hook
-  ((python-mode python-ts-mode) . start-lsp-for-python)
-  :init
-  (defun start-lsp-for-python ()
-    (require 'lsp-pyright)
-    (lsp-deferred))
-  :custom
-  (lsp-pyright-langserver-command "basedpyright")
-  ;; disable basedpyright specific features
-  (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
-  (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
-  (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
-  (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
+;; (use-package lsp-pyright
+;;   :if my/linux-p
+;;   :ensure t
+;;   :hook
+;;   ((python-mode python-ts-mode) . start-lsp-for-python)
+;;   :init
+;;   (defun start-lsp-for-python ()
+;;     (require 'lsp-pyright)
+;;     (lsp-deferred))
+;;   :custom
+;;   (lsp-pyright-langserver-command "basedpyright")
+;;   ;; disable basedpyright specific features
+;;   (lsp-pyright-basedpyright-inlay-hints-variable-types nil)
+;;   (lsp-pyright-basedpyright-inlay-hints-call-argument-names nil)
+;;   (lsp-pyright-basedpyright-inlay-hints-function-return-types nil)
+;;   (lsp-pyright-basedpyright-inlay-hints-generic-types nil))
 
-(use-package lsp-ruff
-  :if my/linux-p
-  :custom
-  (lsp-ruff-log-level "debug"))
+;; (use-package lsp-ruff
+;;   :if my/linux-p
+;;   :custom
+;;   (lsp-ruff-log-level "debug"))
 
-(use-package lsp-java
-  :if my/linux-p
-  :ensure t
-  :hook (java-ts-mode . lsp-deferred)
-  :custom
-  (lsp-java-java-path "/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
-  :config
-  (setq lsp-java-configuration-runtimes
-        `[(:name "JavaSE-1.8" :path "/usr/lib/jvm/java-1.8.0-amazon-corretto" :default t)
-          (:name "JavaSE-21"  :path "/usr/lib/jvm/java-21-openjdk-amd64")]))
+;; (use-package lsp-java
+;;   :if my/linux-p
+;;   :ensure t
+;;   :hook (java-ts-mode . lsp-deferred)
+;;   :custom
+;;   (lsp-java-java-path "/usr/lib/jvm/java-21-openjdk-amd64/bin/java")
+;;   :config
+;;   (setq lsp-java-configuration-runtimes
+;;         `[(:name "JavaSE-1.8" :path "/usr/lib/jvm/java-1.8.0-amazon-corretto" :default t)
+;;           (:name "JavaSE-21"  :path "/usr/lib/jvm/java-21-openjdk-amd64")]))
 
-(use-package lsp-ui
-  :if my/linux-p
-  :ensure t
-  :after lsp-mode
-  :init
-  (defun kle/lsp-ui-doc-dwim ()
-    (interactive)
-    (if (lsp-ui-doc--frame-visible-p)
-        (lsp-ui-doc-hide)
-      (lsp-ui-doc-show)))
-  :bind
-  (:map lsp-ui-mode-map
-        ("C-l C-d" . kle/lsp-ui-doc-dwim))
-  :custom
-  (lsp-ui-doc-header t)
-  (lsp-ui-doc-include-signature t)
-  (lsp-ui-doc-alignment 'window)
-  (lsp-ui-doc-position 'top)
-  (lsp-ui-doc-max-width 150)
-  (lsp-ui-doc-max-height 30)
-  :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  ;; sidelineの日本語対応
-  ;; 幅2の文字を考慮しておらず表示が崩れるので、関連している関数を全部書き直す
-  (defun lsp-ui-sideline--make-display-string (info symbol current)
-    "Make final string to display in buffer.
-     INFO is the information to display.
-     SYMBOL is the symbol associated with the info.
-     CURRENT is non-nil when the point is on the symbol."
-    (let* ((face (if current 'lsp-ui-sideline-current-symbol 'lsp-ui-sideline-symbol))
-           (str (if lsp-ui-sideline-show-symbol
-                    (concat info " " (propertize (concat " " symbol " ") 'face face))
-                  info))
-           (ch-len (length str))         ;; 文字数はプロパティ付与のために保持
-           (vis-len (string-width str))  ;; 表示幅は string-width
-           (margin (lsp-ui-sideline--margin-width)))
-      (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil str)
-      (concat
-       (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align vis-len margin))))
-       (propertize str 'display (lsp-ui-sideline--compute-height)))))
+;; (use-package lsp-ui
+;;   :if my/linux-p
+;;   :ensure t
+;;   :after lsp-mode
+;;   :init
+;;   (defun kle/lsp-ui-doc-dwim ()
+;;     (interactive)
+;;     (if (lsp-ui-doc--frame-visible-p)
+;;         (lsp-ui-doc-hide)
+;;       (lsp-ui-doc-show)))
+;;   :bind
+;;   (:map lsp-ui-mode-map
+;;         ("C-l C-d" . kle/lsp-ui-doc-dwim))
+;;   :custom
+;;   (lsp-ui-doc-header t)
+;;   (lsp-ui-doc-include-signature t)
+;;   (lsp-ui-doc-alignment 'window)
+;;   (lsp-ui-doc-position 'top)
+;;   (lsp-ui-doc-max-width 150)
+;;   (lsp-ui-doc-max-height 30)
+;;   :config
+;;   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+;;   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+;;   ;; sidelineの日本語対応
+;;   ;; 幅2の文字を考慮しておらず表示が崩れるので、関連している関数を全部書き直す
+;;   (defun lsp-ui-sideline--make-display-string (info symbol current)
+;;     "Make final string to display in buffer.
+;;      INFO is the information to display.
+;;      SYMBOL is the symbol associated with the info.
+;;      CURRENT is non-nil when the point is on the symbol."
+;;     (let* ((face (if current 'lsp-ui-sideline-current-symbol 'lsp-ui-sideline-symbol))
+;;            (str (if lsp-ui-sideline-show-symbol
+;;                     (concat info " " (propertize (concat " " symbol " ") 'face face))
+;;                   info))
+;;            (ch-len (length str))         ;; 文字数はプロパティ付与のために保持
+;;            (vis-len (string-width str))  ;; 表示幅は string-width
+;;            (margin (lsp-ui-sideline--margin-width)))
+;;       (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil str)
+;;       (concat
+;;        (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align vis-len margin))))
+;;        (propertize str 'display (lsp-ui-sideline--compute-height)))))
 
-  ;; markdown-mode 側の special 変数の前方宣言。
-  ;; 下の let で一時的に動的束縛しているが、markdown-mode 未ロード状態で
-  ;; lexical-binding 下でバイトコンパイルされるとただのレキシカル変数になり
-  ;; 効果が消えるので、同じ :config ブロック内で defvar しておく。
-  (defvar markdown-hr-display-char)
+;;   ;; markdown-mode 側の special 変数の前方宣言。
+;;   ;; 下の let で一時的に動的束縛しているが、markdown-mode 未ロード状態で
+;;   ;; lexical-binding 下でバイトコンパイルされるとただのレキシカル変数になり
+;;   ;; 効果が消えるので、同じ :config ブロック内で defvar しておく。
+;;   (defvar markdown-hr-display-char)
 
-  ;; push-info: final-string の長さ（表示幅）を string-width で計算する
-  (defun lsp-ui-sideline--push-info (win-width symbol bounds info bol eol)
-    (let* ((markdown-hr-display-char nil)
-           (info (or (alist-get info lsp-ui-sideline--cached-infos)
-                     (-some--> (lsp:hover-contents info)
-                       (lsp-ui-sideline--extract-info it)
-                       (lsp-ui-sideline--format-info it win-width)
-                       (progn (push (cons info it) lsp-ui-sideline--cached-infos) it))))
-           (current (and (>= (point) (car bounds)) (<= (point) (cdr bounds)))))
-      (when (and info
-                 (> (string-width info) 0)
-                 (lsp-ui-sideline--check-duplicate symbol info))
-        (let* ((visible (if lsp-ui-sideline-show-symbol
-                            (concat info " " (concat " " symbol " "))
-                          info))
-               (vis-w (string-width visible))
-               (final-string (lsp-ui-sideline--make-display-string info symbol current))
-               (pos-ov (lsp-ui-sideline--find-line vis-w bol eol))
-               (ov (when pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
-          (when pos-ov
-            (overlay-put ov 'info info)
-            (overlay-put ov 'symbol symbol)
-            (overlay-put ov 'bounds bounds)
-            (overlay-put ov 'current current)
-            (overlay-put ov 'after-string final-string)
-            (overlay-put ov 'before-string " ")
-            (overlay-put ov 'window (get-buffer-window))
-            (overlay-put ov 'kind 'info)
-            (overlay-put ov 'position (car pos-ov))
-            (push ov lsp-ui-sideline--ovs))))))
+;;   ;; push-info: final-string の長さ（表示幅）を string-width で計算する
+;;   (defun lsp-ui-sideline--push-info (win-width symbol bounds info bol eol)
+;;     (let* ((markdown-hr-display-char nil)
+;;            (info (or (alist-get info lsp-ui-sideline--cached-infos)
+;;                      (-some--> (lsp:hover-contents info)
+;;                        (lsp-ui-sideline--extract-info it)
+;;                        (lsp-ui-sideline--format-info it win-width)
+;;                        (progn (push (cons info it) lsp-ui-sideline--cached-infos) it))))
+;;            (current (and (>= (point) (car bounds)) (<= (point) (cdr bounds)))))
+;;       (when (and info
+;;                  (> (string-width info) 0)
+;;                  (lsp-ui-sideline--check-duplicate symbol info))
+;;         (let* ((visible (if lsp-ui-sideline-show-symbol
+;;                             (concat info " " (concat " " symbol " "))
+;;                           info))
+;;                (vis-w (string-width visible))
+;;                (final-string (lsp-ui-sideline--make-display-string info symbol current))
+;;                (pos-ov (lsp-ui-sideline--find-line vis-w bol eol))
+;;                (ov (when pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+;;           (when pos-ov
+;;             (overlay-put ov 'info info)
+;;             (overlay-put ov 'symbol symbol)
+;;             (overlay-put ov 'bounds bounds)
+;;             (overlay-put ov 'current current)
+;;             (overlay-put ov 'after-string final-string)
+;;             (overlay-put ov 'before-string " ")
+;;             (overlay-put ov 'window (get-buffer-window))
+;;             (overlay-put ov 'kind 'info)
+;;             (overlay-put ov 'position (car pos-ov))
+;;             (push ov lsp-ui-sideline--ovs))))))
 
-  ;; diagnostics: msg の幅を string-width で使う
-  (defun lsp-ui-sideline--diagnostics (buffer bol eol)
-    "Show diagnostics belonging to the current line."
-    (when (and (bound-and-true-p flycheck-mode)
-               (bound-and-true-p lsp-ui-sideline-mode)
-               lsp-ui-sideline-show-diagnostics
-               (eq (current-buffer) buffer))
-      (lsp-ui-sideline--delete-kind 'diagnostics)
-      (dolist (e (flycheck-overlay-errors-in bol (1+ eol)))
-        (let* ((lines (--> (flycheck-error-format-message-and-id e)
-                           (split-string it "\n")
-                           (lsp-ui-sideline--split-long-lines it)))
-               (display-lines (butlast lines (- (length lines) lsp-ui-sideline-diagnostic-max-lines)))
-               (offset 1))
-          (dolist (line (nreverse display-lines))
-            (let* ((msg (string-trim (replace-regexp-in-string "[\t ]+" " " line)))
-                   (msg (replace-regexp-in-string " " " " msg))
-                   (ch-len (length msg))
-                   (w-len (string-width msg))
-                   (level (flycheck-error-level e))
-                   (face (if (eq level 'info) 'success level))
-                   (margin (lsp-ui-sideline--margin-width))
-                   (msg (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil msg)
-                               (add-face-text-property 0 ch-len face nil msg)
-                               msg))
-                   (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align w-len margin))))
-                                   (propertize msg 'display (lsp-ui-sideline--compute-height))))
-                   (pos-ov (lsp-ui-sideline--find-line w-len bol eol t offset))
-                   (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
-              (when pos-ov
-                (setq offset (1+ (car (cdr pos-ov))))
-                (overlay-put ov 'after-string string)
-                (overlay-put ov 'kind 'diagnostics)
-                (overlay-put ov 'before-string " ")
-                (overlay-put ov 'position (car pos-ov))
-                (push ov lsp-ui-sideline--ovs))))))))
+;;   ;; diagnostics: msg の幅を string-width で使う
+;;   (defun lsp-ui-sideline--diagnostics (buffer bol eol)
+;;     "Show diagnostics belonging to the current line."
+;;     (when (and (bound-and-true-p flycheck-mode)
+;;                (bound-and-true-p lsp-ui-sideline-mode)
+;;                lsp-ui-sideline-show-diagnostics
+;;                (eq (current-buffer) buffer))
+;;       (lsp-ui-sideline--delete-kind 'diagnostics)
+;;       (dolist (e (flycheck-overlay-errors-in bol (1+ eol)))
+;;         (let* ((lines (--> (flycheck-error-format-message-and-id e)
+;;                            (split-string it "\n")
+;;                            (lsp-ui-sideline--split-long-lines it)))
+;;                (display-lines (butlast lines (- (length lines) lsp-ui-sideline-diagnostic-max-lines)))
+;;                (offset 1))
+;;           (dolist (line (nreverse display-lines))
+;;             (let* ((msg (string-trim (replace-regexp-in-string "[\t ]+" " " line)))
+;;                    (msg (replace-regexp-in-string " " " " msg))
+;;                    (ch-len (length msg))
+;;                    (w-len (string-width msg))
+;;                    (level (flycheck-error-level e))
+;;                    (face (if (eq level 'info) 'success level))
+;;                    (margin (lsp-ui-sideline--margin-width))
+;;                    (msg (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil msg)
+;;                                (add-face-text-property 0 ch-len face nil msg)
+;;                                msg))
+;;                    (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align w-len margin))))
+;;                                    (propertize msg 'display (lsp-ui-sideline--compute-height))))
+;;                    (pos-ov (lsp-ui-sideline--find-line w-len bol eol t offset))
+;;                    (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+;;               (when pos-ov
+;;                 (setq offset (1+ (car (cdr pos-ov))))
+;;                 (overlay-put ov 'after-string string)
+;;                 (overlay-put ov 'kind 'diagnostics)
+;;                 (overlay-put ov 'before-string " ")
+;;                 (overlay-put ov 'position (car pos-ov))
+;;                 (push ov lsp-ui-sideline--ovs))))))))
 
-  ;; code-actions: タイトル幅を string-width で計算、画像は幅1とみなす
-  (defun lsp-ui-sideline--code-actions (actions bol eol)
-    "Show code ACTIONS."
-    (let ((inhibit-modification-hooks t))
-      (when lsp-ui-sideline-actions-kind-regex
-        (setq actions (seq-filter (-lambda ((&CodeAction :kind?))
-                                    (or (not kind?)
-                                        (s-match lsp-ui-sideline-actions-kind-regex kind?)))
-                                  actions)))
-      (setq lsp-ui-sideline--code-actions actions)
-      (lsp-ui-sideline--delete-kind 'actions)
-      (seq-doseq (action actions)
-        (-let* ((title (->> (lsp:code-action-title action)
-                            (replace-regexp-in-string "[\n\t ]+" " ")
-                            (replace-regexp-in-string " " " ")
-                            (concat (unless lsp-ui-sideline-actions-icon
-                                      lsp-ui-sideline-code-actions-prefix))))
-                (image (lsp-ui-sideline--code-actions-image action))
-                (margin (lsp-ui-sideline--margin-width))
-                (keymap (let ((map (make-sparse-keymap)))
-                          (define-key map [down-mouse-1] (lambda () (interactive)
-                                                           (save-excursion
-                                                             (lsp-execute-code-action action))))
-                          map))
-                (ch-len (length title))
-                (w-len (string-width title))
-                (img-w (if image 1 0))
-                (title (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil title)
-                              (add-face-text-property 0 ch-len 'lsp-ui-sideline-code-action nil title)
-                              (add-text-properties 0 ch-len `(keymap ,keymap mouse-face highlight) title)
-                              title))
-                (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align (+ w-len img-w) margin))))
-                                image
-                                (propertize title 'display (lsp-ui-sideline--compute-height))))
-                (pos-ov (lsp-ui-sideline--find-line (+ 1 w-len img-w) bol eol t))
-                (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
-          (when pos-ov
-            (overlay-put ov 'after-string string)
-            (overlay-put ov 'before-string " ")
-            (overlay-put ov 'kind 'actions)
-            (overlay-put ov 'position (car pos-ov))
-            (push ov lsp-ui-sideline--ovs)))))
-    )
-  )
+;;   ;; code-actions: タイトル幅を string-width で計算、画像は幅1とみなす
+;;   (defun lsp-ui-sideline--code-actions (actions bol eol)
+;;     "Show code ACTIONS."
+;;     (let ((inhibit-modification-hooks t))
+;;       (when lsp-ui-sideline-actions-kind-regex
+;;         (setq actions (seq-filter (-lambda ((&CodeAction :kind?))
+;;                                     (or (not kind?)
+;;                                         (s-match lsp-ui-sideline-actions-kind-regex kind?)))
+;;                                   actions)))
+;;       (setq lsp-ui-sideline--code-actions actions)
+;;       (lsp-ui-sideline--delete-kind 'actions)
+;;       (seq-doseq (action actions)
+;;         (-let* ((title (->> (lsp:code-action-title action)
+;;                             (replace-regexp-in-string "[\n\t ]+" " ")
+;;                             (replace-regexp-in-string " " " ")
+;;                             (concat (unless lsp-ui-sideline-actions-icon
+;;                                       lsp-ui-sideline-code-actions-prefix))))
+;;                 (image (lsp-ui-sideline--code-actions-image action))
+;;                 (margin (lsp-ui-sideline--margin-width))
+;;                 (keymap (let ((map (make-sparse-keymap)))
+;;                           (define-key map [down-mouse-1] (lambda () (interactive)
+;;                                                            (save-excursion
+;;                                                              (lsp-execute-code-action action))))
+;;                           map))
+;;                 (ch-len (length title))
+;;                 (w-len (string-width title))
+;;                 (img-w (if image 1 0))
+;;                 (title (progn (add-face-text-property 0 ch-len 'lsp-ui-sideline-global nil title)
+;;                               (add-face-text-property 0 ch-len 'lsp-ui-sideline-code-action nil title)
+;;                               (add-text-properties 0 ch-len `(keymap ,keymap mouse-face highlight) title)
+;;                               title))
+;;                 (string (concat (propertize " " 'display `(space :align-to (- right-fringe ,(lsp-ui-sideline--align (+ w-len img-w) margin))))
+;;                                 image
+;;                                 (propertize title 'display (lsp-ui-sideline--compute-height))))
+;;                 (pos-ov (lsp-ui-sideline--find-line (+ 1 w-len img-w) bol eol t))
+;;                 (ov (and pos-ov (make-overlay (car pos-ov) (car pos-ov)))))
+;;           (when pos-ov
+;;             (overlay-put ov 'after-string string)
+;;             (overlay-put ov 'before-string " ")
+;;             (overlay-put ov 'kind 'actions)
+;;             (overlay-put ov 'position (car pos-ov))
+;;             (push ov lsp-ui-sideline--ovs)))))
+;;     )
+;;   )
 
 
 
-(use-package dap-mode
-  :if my/linux-p
-  :ensure t
-  :after lsp-mode
-  :config
-  (require 'dap-python)
-  (dap-auto-configure-mode 1)
-  (setq dap-python-debugger 'debugpy))
+;; (use-package dap-mode
+;;   :if my/linux-p
+;;   :ensure t
+;;   :after lsp-mode
+;;   :config
+;;   (require 'dap-python)
+;;   (dap-auto-configure-mode 1)
+;;   (setq dap-python-debugger 'debugpy))
 
 ;;; dired
 (use-package lv :if my/linux-p :ensure t)
@@ -1672,9 +1677,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
          ;; ("\\.js\\'" . web-mode)
          ))
 
-(use-package typescript-mode
-  :if my/linux-p
-  :ensure t)
+;; (use-package typescript-mode
+;;   :if my/linux-p
+;;   :ensure t)
 
 (use-package tuareg
   :if my/linux-p
@@ -1713,40 +1718,40 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   :if my/linux-p
   :ensure t)
 
-(use-package rust-mode
+(use-package rust-ts-mode
   :if my/linux-p
-  :ensure t
+  :mode (("\\.rs\\'" . rust-ts-mode))
   :hook
   ((rust-mode . smartparens-mode)
    (rust-mode . electric-operator-mode))
   :custom
   (rust-format-on-save t))
 
-(use-package auctex
-  :if my/linux-p
-  :ensure t
-  :mode (("\\.tex\\'" . TeX-tex-mode)
-         ("\\.latex\\'" . TeX-tex-mode))
-  :custom
-  (TeX-auto-save t)
-  (TeX-parse-self t)
-  ;; use tectonic as tex engine
-  (TeX-engine-alist '((tectonic                          ; engine symbol
-                       "Tectonic"                        ; engine name
-                       "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
-                       "tectonic -X watch"               ; shell command for compiling LaTeX documents
-                       nil                               ; shell command for compiling ConTeXt documents
-                       )))
-  (TeX-engine 'tectonic)
-  (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
-  (TeX-check-TeX nil)
-  :config
-  (use-package tex
-    :config
-    (let ((tex-list (assoc "TeX" TeX-command-list))
-          (latex-list (assoc "LaTeX" TeX-command-list)))
-      (setf (cadr tex-list) "%(tex)"
-            (cadr latex-list) "%l"))))
+;; (use-package auctex
+;;   :if my/linux-p
+;;   :ensure t
+;;   :mode (("\\.tex\\'" . TeX-tex-mode)
+;;          ("\\.latex\\'" . TeX-tex-mode))
+;;   :custom
+;;   (TeX-auto-save t)
+;;   (TeX-parse-self t)
+;;   ;; use tectonic as tex engine
+;;   (TeX-engine-alist '((tectonic                          ; engine symbol
+;;                        "Tectonic"                        ; engine name
+;;                        "tectonic -X compile -f plain %T" ; shell command for compiling plain TeX documents
+;;                        "tectonic -X watch"               ; shell command for compiling LaTeX documents
+;;                        nil                               ; shell command for compiling ConTeXt documents
+;;                        )))
+;;   (TeX-engine 'tectonic)
+;;   (LaTeX-command-style '(("" "%(latex) %(extraopts)")))
+;;   (TeX-check-TeX nil)
+;;   :config
+;;   (use-package tex
+;;     :config
+;;     (let ((tex-list (assoc "TeX" TeX-command-list))
+;;           (latex-list (assoc "LaTeX" TeX-command-list)))
+;;       (setf (cadr tex-list) "%(tex)"
+;;             (cadr latex-list) "%l"))))
 
 (use-package vimrc-mode
   :if my/linux-p
