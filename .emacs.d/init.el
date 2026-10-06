@@ -555,6 +555,63 @@ focus-stealing prevention so the frame actually comes to the front."
     (concat (my/org-agenda-pad (org-entry-get nil "WAITED_BY") 14) " "
             (my/org-agenda-pad (and deadline (format-time-string "%m/%d" (org-time-string-to-time deadline))) 5))))
 
+(defun my/dashboard-open-agenda ()
+  "まとめた画面を開く。"
+  (interactive)
+  (org-agenda nil "d"))
+
+(defun my/dashboard-insert-today (_list-size)
+  "dashboard の Today's Agenda の欄。まとめた画面のうち、朝イチに要る所だけを出す。
+待たせているものと今日の予定は1件ずつ、期限切れ・待ち・inbox は件数だけ。
+dashboard のほかの欄に合わせて、言葉は英語にする。"
+  (require 'org)
+  (dashboard-insert-heading "Today's Agenda:" "a")
+  (insert "\n")
+  (condition-case err
+      (let ((today (org-today))
+            (inbox-file (expand-file-name "inbox.org" my/task-agenda-dir))
+            waited scheduled (overdue 0) (waiting 0) (inbox 0))
+        (my/org-agenda-update-files)
+        (org-map-entries
+         (lambda ()
+           (unless (or (null (org-get-todo-state)) (org-entry-is-done-p))
+             (let* ((state (org-get-todo-state))
+                    (sched (org-entry-get nil "SCHEDULED"))
+                    (sd (and sched (time-to-days (org-time-string-to-time sched))))
+                    (dl (org-entry-get nil "DEADLINE"))
+                    (dd (and dl (time-to-days (org-time-string-to-time dl))))
+                    (who (org-entry-get nil "WAITED_BY"))
+                    (cat (my/org-agenda-pad (org-get-category) 12))
+                    (title (org-link-display-format (org-get-heading t t t t))))
+               (when who
+                 (push (list (or dd most-positive-fixnum)
+                             (concat cat " " (my/org-agenda-pad who 14) " "
+                                     (my/org-agenda-pad (and dl (format-time-string "%m/%d" (org-time-string-to-time dl))) 5)
+                                     "  " title))
+                       waited))
+               ;; まとめた画面の今日の予定と同じく、待ちは件数だけにする
+               (cond
+                ((equal state "WAIT") (setq waiting (1+ waiting)))
+                ((or (eql sd today) (eql dd today))
+                 (let ((label (cond ((and (eql sd today) (string-match "[0-9]+:[0-9]+" sched)) (match-string 0 sched))
+                                    ((eql dd today) "Due")
+                                    (t "Sched"))))
+                   ;; 並べる順の鍵: 時刻のあるものは時刻順、そのあと期限、予定
+                   (push (list (cond ((string-match-p ":" label) (concat "0" label)) ((equal label "Due") "1") (t "2"))
+                               (concat cat " " (my/org-agenda-pad label 6) " " title))
+                         scheduled)))
+                ((or (and sd (< sd today)) (and dd (< dd today))) (setq overdue (1+ overdue))))
+               (when (file-equal-p (buffer-file-name) inbox-file) (setq inbox (1+ inbox))))))
+         nil 'agenda)
+        (insert "  Waiting on me\n")
+        (dolist (w (or (sort waited (lambda (a b) (< (car a) (car b)))) '((nil "None"))))
+          (insert "    " (cadr w) "\n"))
+        (insert "  Today\n")
+        (dolist (e (or (sort scheduled (lambda (a b) (string< (car a) (car b)))) '((nil "None"))))
+          (insert "    " (cadr e) "\n"))
+        (insert (format "  Also: %d overdue / %d waiting / %d in inbox\n" overdue waiting inbox)))
+    (error (insert (format "  Could not build Today's Agenda: %s\n" (error-message-string err))))))
+
 (use-package org
   :bind
   ("C-l C-o l" . org-store-link)
@@ -1958,8 +2015,14 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
       (unless (search-forward search-label (point-max) t)
         (search-backward search-label (point-min) t))
       (back-to-indentation)))
+  :custom
+  ;; Today's Agenda の欄は、案件をまたいだタスク管理の段の my/dashboard-insert-today
+  (dashboard-items '((recents . 5) (my/today . 0)))
   :config
+  (add-to-list 'dashboard-item-generators '(my/today . my/dashboard-insert-today))
+  (keymap-set dashboard-mode-map "a" #'my/dashboard-open-agenda)
   (with-eval-after-load 'evil
+    (evil-define-key 'normal dashboard-mode-map (kbd "a") 'my/dashboard-open-agenda)
     (evil-define-key 'normal dashboard-mode-map (kbd "j") 'dashboard-next-line)
     (evil-define-key 'normal dashboard-mode-map (kbd "k") 'dashboard-previous-line)
     (evil-define-key 'normal dashboard-mode-map (kbd "r") 'dashboard-jump-to-recent-files)))
