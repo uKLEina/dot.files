@@ -463,21 +463,123 @@ focus-stealing prevention so the frame actually comes to the front."
   (("\\.json\\'" . json-ts-mode))
   :custom (json-ts-mode-indent-offset 2))
 
+;;; 案件をまたいだタスク管理（~/Project/task-agenda の README.md）
+(defvar my/project-root (expand-file-name "~/Project/")
+  "案件のディレクトリを置く場所。案件のタスクリストは <案件>/tasks.org。")
+(defvar my/task-agenda-dir (expand-file-name "task-agenda/" my/project-root)
+  "案件をまたいだタスク管理のリポジトリ。")
+
+(defun my/org-project-task-files ()
+  "各案件のタスクリスト。"
+  (file-expand-wildcards (expand-file-name "*/tasks.org" my/project-root)))
+
+(defun my/org-agenda-update-files (&rest _)
+  "案件が増えても agenda に入るよう、org-agenda-files を作り直す。"
+  (setq org-agenda-files
+        (append (my/org-project-task-files)
+                (list (expand-file-name "inbox.org" my/task-agenda-dir))
+                (file-expand-wildcards (expand-file-name "external/*.org" my/task-agenda-dir)))))
+
+(defun my/task-agenda-run (name &optional on-exit)
+  "task-agenda の bin/NAME を裏で動かす。出力があればメッセージに出す。
+動いている間は、もう1つは動かさない。ON-EXIT は終わったときに呼ぶ。"
+  (unless (process-live-p (get-process name))
+    (let ((buf (get-buffer-create (format " *%s*" name))))
+      (with-current-buffer buf (erase-buffer))
+      (make-process
+       :name name :buffer buf :noquery t
+       :command (list (expand-file-name (concat "bin/" name) my/task-agenda-dir))
+       :sentinel (lambda (proc _event)
+                   (unless (process-live-p proc)
+                     (let ((out (string-trim (with-current-buffer (process-buffer proc) (buffer-string)))))
+                       (unless (string-empty-p out) (message "%s: %s" name out)))
+                     (when on-exit (funcall on-exit))))))))
+
+(defun my/agenda-backup-after-save ()
+  "案件のタスクリストを保存したら、projects/ にコピーして commit する。"
+  (when (and buffer-file-name
+             (string-match-p (concat "\\`" (regexp-quote my/project-root) "[^/]+/tasks\\.org\\'")
+                             (file-truename buffer-file-name)))
+    (my/task-agenda-run "agenda-backup")))
+(add-hook 'after-save-hook #'my/agenda-backup-after-save)
+
+(defun my/agenda-mirror ()
+  "外部トラッカーの写しを取り直し、終わったら開いている agenda を描き直す。"
+  (interactive)
+  (my/task-agenda-run
+   "agenda-mirror"
+   (lambda ()
+     (dolist (buf (buffer-list))
+       (with-current-buffer buf
+         (when (derived-mode-p 'org-agenda-mode)
+           (org-agenda-redo t)))))))
+(defvar my/agenda-mirror-interval (* 30 60)
+  "外部トラッカーの写しを取り直す間隔（秒）。")
+(add-hook 'emacs-startup-hook
+          (lambda () (run-with-timer 60 my/agenda-mirror-interval #'my/agenda-mirror)))
+
+(defun my/org-agenda-skip-unless-stuck ()
+  "TODO はあるのに NEXT・WAIT が無い見出し以外を飛ばす。子孫だけを見る。"
+  (let ((end (save-excursion (org-end-of-subtree t) (point)))
+        todo active)
+    (save-excursion
+      (while (and (outline-next-heading) (< (point) end))
+        (pcase (org-get-todo-state)
+          ("TODO" (setq todo t))
+          ((or "NEXT" "WAIT") (setq active t)))))
+    (unless (and todo (not active)) end)))
+
+(defun my/org-agenda-waiting-on ()
+  "agenda の行の頭に出す、待ち相手（:WAITING_ON:）。"
+  (or (org-entry-get nil "WAITING_ON") ""))
+
 (use-package org
   :bind
   ("C-l C-o l" . org-store-link)
   ("C-l C-o a" . org-agenda)
   ("C-l C-o c" . org-capture)
+  :init
+  ;; タイムスタンプの曜日を英語で書く。Claude Code や batch の Emacs が書くものと揃える
+  (setq system-time-locale "C")
   :custom
   (org-latex-packages-alist
    '(("" "fontspec" t)
      ("" "xeCJK" t)))
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@)" "|" "DONE(d)" "CANCELED(c@)")))
+  ;; 別ファイル（tasks.org_archive）にすると、共有リポジトリに入りうる・agenda-backup が
+  ;; コピーしない・clocktable の範囲から外れるので、同じファイルの見出しに移す
+  (org-archive-location "::* アーカイブ")
+  (org-capture-templates
+   `(("i" "inbox" entry (file ,(expand-file-name "inbox.org" my/task-agenda-dir))
+      "* TODO %?\n%U")))
+  (org-refile-targets '((my/org-project-task-files :maxlevel . 2)))
+  ;; どの案件も tasks.org なので、ファイル名ではなくパスで見分ける
+  (org-refile-use-outline-path 'full-file-path)
+  (org-outline-path-complete-in-steps nil)
+  (org-refile-allow-creating-parent-nodes 'confirm)
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
      (python . t)
      (sql . t))))
+
+(my/org-agenda-update-files)
+(advice-add 'org-agenda :before #'my/org-agenda-update-files)
+
+(use-package org-agenda
+  :bind (:map org-agenda-mode-map
+              ("M" . my/agenda-mirror))
+  :custom
+  (org-agenda-custom-commands
+   '(("d" "まとめた画面"
+      ((agenda "" ((org-agenda-span 'day)))
+       (todo "NEXT" ((org-agenda-overriding-header "次にやること")))
+       (todo "WAIT" ((org-agenda-overriding-header "待ち")
+                     (org-agenda-prefix-format "  %-14:c%-12(my/org-agenda-waiting-on) ")))
+       (tags "LEVEL=1" ((org-agenda-overriding-header "止まっている区切り（TODO はあるのに NEXT・WAIT が無い）")
+                        (org-agenda-skip-function #'my/org-agenda-skip-unless-stuck))))))))
 
 (use-package ox
   :custom

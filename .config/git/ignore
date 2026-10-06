@@ -116,3 +116,6 @@ $RECYCLE.BIN/
 
 # Claude Code の個人設定
 **/.claude/settings.local.json
+
+# 案件のタスクリスト。履歴は ~/Project/task-agenda が持つので、共有リポジトリには入れない
+tasks.org
