@@ -535,18 +535,22 @@ Claude Code が書いた :ID: も :BLOCKED_BY: のリンク先として見つか
   "agenda の行の頭に出す、待ち相手（:WAITING_ON:）。"
   (my/org-agenda-pad (org-entry-get nil "WAITING_ON") 14))
 
+(defun my/org-state-days (state)
+  "今の見出しが STATE になってからの日数。
+いちばん新しい状態のメモ（State \"STATE\"）の日付から数える。メモが無ければ nil。"
+  (save-excursion
+    (org-back-to-heading t)
+    (let ((end (save-excursion (or (outline-next-heading) (point-max)))))
+      ;; 状態のメモは新しいものが上（org-log-states-order-reversed）なので、最初に見つかったものを使う
+      (when (re-search-forward
+             (concat "^[ \t]*- State \"" (regexp-quote state)
+                     "\"[ \t]+from .*?\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}[^]]*\\)\\]")
+             end t)
+        (- (org-today) (time-to-days (org-time-string-to-time (match-string 1))))))))
+
 (defun my/org-agenda-waiting-days ()
-  "agenda の行の頭に出す、待ちになってからの日数。
-いちばん新しい状態のメモ（State \"WAIT\"）の日付から数える。メモが無ければ空白。"
-  (my/org-agenda-pad
-   (save-excursion
-     (org-back-to-heading t)
-     (let ((end (save-excursion (or (outline-next-heading) (point-max)))))
-       ;; 状態のメモは新しいものが上（org-log-states-order-reversed）なので、最初に見つかったものを使う
-       (when (re-search-forward
-              "^[ \t]*- State \"WAIT\"[ \t]+from .*?\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}[^]]*\\)\\]" end t)
-         (format "%d日" (- (org-today) (time-to-days (org-time-string-to-time (match-string 1))))))))
-   5 t))
+  "agenda の行の頭に出す、待ちになってからの日数。メモが無ければ空白。"
+  (my/org-agenda-pad (let ((d (my/org-state-days "WAIT"))) (and d (format "%d日" d))) 5 t))
 
 (defun my/org-agenda-format-date (date)
   "agenda の日付の行。system-time-locale が \"C\" だと曜日が英語になるので、自分で書く。"
@@ -626,7 +630,7 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
 
 (defun my/org-blocked-by-done-p (change)
   "org-blocker-hook に足す関数。:BLOCKED_BY: のリンク先が1つでも済んでいなければ、DONE にさせない。
-agenda でブロックされているものを薄く出したり、「次にできそう」から外したりするのも、この判定を使う。
+agenda でブロックされているものを薄く出すのも、この判定を使う。
 リンク先が見つからないときは止めない。"
   (let ((to (plist-get change :to)))
     (if (not (and (eq (plist-get change :type) 'todo-state-change)
@@ -643,15 +647,120 @@ agenda でブロックされているものを薄く出したり、「次にで�
                    (set-marker m nil)))))
          (my/org-blocked-by-ids))))))
 
-(defun my/org-agenda-skip-unless-ready ()
-  "まとめた画面の「次にできそう」に出さないものを飛ばす。
-ブロックされているもの、先の予定日が付いているもの、人を待たせているもの（いちばん上に出る）、inbox のもの。"
-  (let ((sched (org-entry-get nil "SCHEDULED")))
-    (when (or (org-entry-blocked-p)
-              (and sched (> (time-to-days (org-time-string-to-time sched)) (org-today)))
-              (org-entry-get nil "WAITED_BY")
-              (equal (org-get-category) "inbox"))
-      (save-excursion (or (outline-next-heading) (point-max))))))
+(defvar my/project-watch-days 3
+  "待ち・着手中がこの日数以上続いたら、気にすべきことに出す。期限が近い未着手も、この日数以内を出す。")
+
+(defvar-local my/project-watch-file nil
+  "気にすべきことの画面が見ている tasks.org。")
+
+(defun my/project-watch--file ()
+  "agenda の行か今のバッファから、案件の tasks.org を決める。
+外部トラッカーの写しの行なら、同じ案件名の tasks.org にする。"
+  (cond
+   ((derived-mode-p 'org-agenda-mode)
+    (let* ((marker (or (org-get-at-bol 'org-hd-marker) (org-get-at-bol 'org-marker)))
+           (category (org-get-at-bol 'org-category))
+           (f (and category (expand-file-name (concat category "/tasks.org") my/project-root))))
+      (cond ((and f (file-exists-p f)) f)
+            (marker (buffer-file-name (marker-buffer marker)))
+            (t (user-error "この行には案件が無い")))))
+   ((derived-mode-p 'my/project-watch-mode) my/project-watch-file)
+   ((and buffer-file-name (derived-mode-p 'org-mode)) buffer-file-name)
+   (t (user-error "agenda か org のバッファで呼ぶ"))))
+
+(defun my/project-watch--collect (file)
+  "FILE の、済んでいないタスクのうち気にすべきものを集める。アーカイブとレーンの外（概要）は見ない。
+返すのは ((項目 . 行の一覧) ...)。行は (マーカー レーン 印 見出し)。"
+  (let* ((today (org-today)) (n my/project-watch-days) found lane
+         (add (lambda (key mark text) (push (list (point-marker) lane mark text) (alist-get key found)))))
+    (progn
+      (with-current-buffer (find-file-noselect file)
+        (org-map-entries
+         (lambda ()
+           (let ((state (org-get-todo-state))
+                 (title (org-link-display-format (org-get-heading t t t t))))
+             (when (= (org-current-level) 1)
+               (setq lane (unless (equal title "アーカイブ") title)))
+             (when (and lane state (not (org-entry-is-done-p)) (not (member "someday" (org-get-tags))))
+               (let* ((dl (org-entry-get nil "DEADLINE"))
+                      (dd (and dl (- (time-to-days (org-time-string-to-time dl)) today)))
+                      (sc (org-entry-get nil "SCHEDULED"))
+                      (sd (and sc (- today (time-to-days (org-time-string-to-time sc)))))
+                      (who (org-entry-get nil "WAITED_BY")))
+                 ;; 期限と予定日は、重い方にだけ出す（期限切れ → 期限が近い未着手 → 予定日を過ぎた）
+                 (cond ((and dd (< dd 0)) (funcall add 'overdue (format "期限%d日超過" (- dd)) title))
+                       ((and dd (equal state "TODO") (<= dd n))
+                        (funcall add 'due-soon (if (= dd 0) "今日が期限" (format "期限まで%d日" dd)) title))
+                       ((and sd (> sd 0)) (funcall add 'slipped (format "予定%d日前" sd) title)))
+                 (when (equal state "WAIT")
+                   (let ((d (my/org-state-days "WAIT")))
+                     (when (and d (>= d n))
+                       (funcall add 'long-wait (format "%d日 %s" d (or (org-entry-get nil "WAITING_ON") "")) title))))
+                 (when (equal state "NOW")
+                   (let ((d (my/org-state-days "NOW")))
+                     (when (and d (>= d n)) (funcall add 'stale-now (format "%d日" d) title))))
+                 (when who
+                   (funcall add 'waited-by (concat who (if dl (format-time-string " %m/%d" (org-time-string-to-time dl)) "")) title))))))
+         nil 'file)))
+    (mapcar (lambda (c) (cons (car c) (nreverse (cdr c)))) found)))
+
+(defun my/project-watch--render ()
+  "気にすべきことの画面を書き直す。"
+  (let* ((inhibit-read-only t)
+         (found (my/project-watch--collect my/project-watch-file))
+         (n my/project-watch-days)
+         (sections `((overdue . "期限切れ")
+                     (due-soon . ,(format "期限が近い未着手（%d日以内）" n))
+                     (slipped . "予定日を過ぎた")
+                     (long-wait . ,(format "長い待ち（%d日以上）" n))
+                     (stale-now . ,(format "止まっている着手中（%d日以上）" n))
+                     (waited-by . "人を待たせている")))
+         (cat (with-current-buffer (find-file-noselect my/project-watch-file) (org-get-category (point-min))))
+         ;; 列の幅は、出ている中でいちばん長いものに合わせる（切らずに揃える）
+         (items (apply #'append (mapcar #'cdr found)))
+         (lane-w (apply #'max 0 (mapcar (lambda (it) (string-width (nth 1 it))) items)))
+         (mark-w (apply #'max 0 (mapcar (lambda (it) (string-width (nth 2 it))) items))))
+    (erase-buffer)
+    (insert (format "%s で気にすべきこと\n" cat))
+    (dolist (sec sections)
+      (let ((items (alist-get (car sec) found)))
+        (insert (format "\n%s%s\n" (cdr sec) (if items (format "（%d）" (length items)) "")))
+        (if (null items)
+            (insert "  特になし\n")
+          (dolist (it items)
+            (insert (propertize (concat "  " (my/org-agenda-pad (nth 1 it) lane-w) "  "
+                                        (my/org-agenda-pad (nth 2 it) mark-w) "  " (nth 3 it))
+                                'my/marker (nth 0 it))
+                    "\n")))))
+    (goto-char (point-min))))
+
+(defun my/project-watch-visit ()
+  "気にすべきことの画面の行のタスクへ飛ぶ。"
+  (interactive)
+  ;; 行のどこにカーソルがあっても飛べるよう、行の頭の飛び先を見る
+  (let ((m (get-text-property (line-beginning-position) 'my/marker)))
+    (unless m (user-error "この行には飛び先が無い"))
+    (pop-to-buffer (marker-buffer m))
+    (goto-char m)
+    (org-fold-reveal t)
+    (org-fold-show-entry)))
+
+(define-derived-mode my/project-watch-mode special-mode "気にすべきこと"
+  "案件の tasks.org の、気にすべきタスクの一覧。RET で飛ぶ、g で見直す、q で閉じる。"
+  (setq-local revert-buffer-function (lambda (&rest _) (my/project-watch--render))))
+(keymap-set my/project-watch-mode-map "RET" #'my/project-watch-visit)
+
+(defun my/project-watch ()
+  "agenda の行（か今のバッファ）の案件で、気にすべきタスクを横に出す。
+期限切れ・期限が近い未着手・予定日を過ぎたもの・長い待ち・止まっている着手中・人を待たせているもの。"
+  (interactive)
+  (let* ((file (my/project-watch--file))
+         (buf (get-buffer-create (format "*気にすべきこと: %s*" (file-name-nondirectory (directory-file-name (file-name-directory file)))))))
+    (with-current-buffer buf
+      (my/project-watch-mode)
+      (setq my/project-watch-file file)
+      (my/project-watch--render))
+    (pop-to-buffer buf)))
 
 (use-package org
   :bind
@@ -666,7 +775,8 @@ agenda でブロックされているものを薄く出したり、「次にで�
    '(("" "fontspec" t)
      ("" "xeCJK" t)))
   (org-todo-keywords
-   '((sequence "TODO(t)" "NOW(n)" "WAIT(w@)" "|" "DONE(d)" "CANCELED(c@)")))
+   ;; NOW は日時を記録する（気にすべきことの「止まっている着手中」で日数を数える）
+   '((sequence "TODO(t)" "NOW(n!)" "WAIT(w@)" "|" "DONE(d)" "CANCELED(c@)")))
   ;; :ORDERED: の付いたまとまりは、手前の子が済むまで後ろの子を DONE にさせない
   (org-enforce-todo-dependencies t)
   ;; 別ファイル（tasks.org_archive）にすると、共有リポジトリに入りうる・agenda-backup が
@@ -693,7 +803,8 @@ agenda でブロックされているものを薄く出したり、「次にで�
 
 (use-package org-agenda
   :bind (:map org-agenda-mode-map
-              ("M" . my/agenda-mirror))
+              ("M" . my/agenda-mirror)
+              ("o" . my/project-watch))
   :custom
   ;; 画面の言葉を日本語にそろえる。行の頭の言葉は、見た目の幅を12桁にそろえる
   (org-agenda-format-date #'my/org-agenda-format-date)
@@ -714,9 +825,6 @@ agenda でブロックされているものを薄く出したり、「次にで�
        ;; 人を待たせているものは、いちばん上の「待たせているもの」にだけ出す
        (todo "NOW" ((org-agenda-overriding-header "着手中")
                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":WAITED_BY:"))))
-       (tags-todo "-someday/TODO"
-                  ((org-agenda-overriding-header "次にできそう")
-                   (org-agenda-skip-function #'my/org-agenda-skip-unless-ready)))
        (todo "WAIT" ((org-agenda-overriding-header "待ち")
                      (org-agenda-prefix-format "  %-14:c%(my/org-agenda-waiting-days) %(my/org-agenda-waiting-on) ")))
        (alltodo "" ((org-agenda-overriding-header "inbox に残っているもの")
