@@ -474,11 +474,15 @@ focus-stealing prevention so the frame actually comes to the front."
   (file-expand-wildcards (expand-file-name "*/tasks.org" my/project-root)))
 
 (defun my/org-agenda-update-files (&rest _)
-  "案件が増えても agenda に入るよう、org-agenda-files を作り直す。"
+  "案件が増えても agenda に入るよう、org-agenda-files を作り直す。
+Claude Code が書いた :ID: も :BLOCKED_BY: のリンク先として見つかるよう、ID の場所も読み直す。"
   (setq org-agenda-files
         (append (my/org-project-task-files)
                 (list (expand-file-name "inbox.org" my/task-agenda-dir))
-                (file-expand-wildcards (expand-file-name "external/*.org" my/task-agenda-dir)))))
+                (file-expand-wildcards (expand-file-name "external/*.org" my/task-agenda-dir))))
+  (when (featurep 'org)
+    (require 'org-id)
+    (org-id-update-id-locations org-agenda-files t)))
 
 (defun my/task-agenda-run (name &optional on-exit)
   "task-agenda の bin/NAME を裏で動かす。出力があればメッセージに出す。
@@ -612,6 +616,43 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
         (insert (format "  Also: %d overdue / %d waiting / %d in inbox\n" overdue waiting inbox)))
     (error (insert (format "  Could not build Today's Agenda: %s\n" (error-message-string err))))))
 
+(defun my/org-blocked-by-ids ()
+  "今の見出しの :BLOCKED_BY: に書いた、待っているタスクの ID の一覧。"
+  (let ((v (or (org-entry-get nil "BLOCKED_BY") "")) (start 0) ids)
+    (while (string-match "\\[\\[id:\\([^]]+\\)\\]" v start)
+      (push (match-string 1 v) ids)
+      (setq start (match-end 0)))
+    (nreverse ids)))
+
+(defun my/org-blocked-by-done-p (change)
+  "org-blocker-hook に足す関数。:BLOCKED_BY: のリンク先が1つでも済んでいなければ、DONE にさせない。
+agenda でブロックされているものを薄く出したり、「次にできそう」から外したりするのも、この判定を使う。
+リンク先が見つからないときは止めない。"
+  (let ((to (plist-get change :to)))
+    (if (not (and (eq (plist-get change :type) 'todo-state-change)
+                  (or (eq to 'done) (member to org-done-keywords))))
+        t
+      (save-excursion
+        (goto-char (plist-get change :position))
+        (seq-every-p
+         (lambda (id)
+           (let ((m (org-id-find id 'marker)))
+             (or (null m)
+                 (prog1 (with-current-buffer (marker-buffer m)
+                          (save-excursion (goto-char m) (org-entry-is-done-p)))
+                   (set-marker m nil)))))
+         (my/org-blocked-by-ids))))))
+
+(defun my/org-agenda-skip-unless-ready ()
+  "まとめた画面の「次にできそう」に出さないものを飛ばす。
+ブロックされているもの、先の予定日が付いているもの、人を待たせているもの（いちばん上に出る）、inbox のもの。"
+  (let ((sched (org-entry-get nil "SCHEDULED")))
+    (when (or (org-entry-blocked-p)
+              (and sched (> (time-to-days (org-time-string-to-time sched)) (org-today)))
+              (org-entry-get nil "WAITED_BY")
+              (equal (org-get-category) "inbox"))
+      (save-excursion (or (outline-next-heading) (point-max))))))
+
 (use-package org
   :bind
   ("C-l C-o l" . org-store-link)
@@ -625,7 +666,9 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
    '(("" "fontspec" t)
      ("" "xeCJK" t)))
   (org-todo-keywords
-   '((sequence "TODO(t)" "NEXT(n)" "WAIT(w@)" "|" "DONE(d)" "CANCELED(c@)")))
+   '((sequence "TODO(t)" "NOW(n)" "WAIT(w@)" "|" "DONE(d)" "CANCELED(c@)")))
+  ;; :ORDERED: の付いたまとまりは、手前の子が済むまで後ろの子を DONE にさせない
+  (org-enforce-todo-dependencies t)
   ;; 別ファイル（tasks.org_archive）にすると、共有リポジトリに入りうる・agenda-backup が
   ;; コピーしない・clocktable の範囲から外れるので、同じファイルの見出しに移す
   (org-archive-location "::* アーカイブ")
@@ -638,6 +681,7 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
   (org-outline-path-complete-in-steps nil)
   (org-refile-allow-creating-parent-nodes 'confirm)
   :config
+  (add-hook 'org-blocker-hook #'my/org-blocked-by-done-p)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -667,7 +711,12 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
                    (org-agenda-overriding-header "今日の予定")
                    ;; 待ちは下の「待ち」のブロックに日数つきで出るので、ここでは出さない
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo '("WAIT")))))
-       (todo "NEXT" ((org-agenda-overriding-header "次にやること")))
+       ;; 人を待たせているものは、いちばん上の「待たせているもの」にだけ出す
+       (todo "NOW" ((org-agenda-overriding-header "着手中")
+                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":WAITED_BY:"))))
+       (tags-todo "-someday/TODO"
+                  ((org-agenda-overriding-header "次にできそう")
+                   (org-agenda-skip-function #'my/org-agenda-skip-unless-ready)))
        (todo "WAIT" ((org-agenda-overriding-header "待ち")
                      (org-agenda-prefix-format "  %-14:c%(my/org-agenda-waiting-days) %(my/org-agenda-waiting-on) ")))
        (alltodo "" ((org-agenda-overriding-header "inbox に残っているもの")
