@@ -476,10 +476,12 @@ focus-stealing prevention so the frame actually comes to the front."
 (defun my/org-agenda-update-files (&rest _)
   "案件が増えても agenda に入るよう、org-agenda-files を作り直す。
 Claude Code が書いた :ID: も :BLOCKED_BY: のリンク先として見つかるよう、ID の場所も読み直す。"
+  ;; 無いファイルが入っていると、org が消すかどうかをキー入力で尋ねてくる
   (setq org-agenda-files
-        (append (my/org-project-task-files)
-                (list (expand-file-name "inbox.org" my/task-agenda-dir))
-                (file-expand-wildcards (expand-file-name "external/*.org" my/task-agenda-dir))))
+        (seq-filter #'file-exists-p
+                    (append (my/org-project-task-files)
+                            (list (expand-file-name "inbox.org" my/task-agenda-dir))
+                            (file-expand-wildcards (expand-file-name "external/*.org" my/task-agenda-dir)))))
   (when (featurep 'org)
     (require 'org-id)
     (org-id-update-id-locations org-agenda-files t)))
@@ -575,50 +577,55 @@ dashboard のほかの欄に合わせて、言葉は英語にする。"
   (require 'org)
   (dashboard-insert-heading "Today's Agenda:" "a")
   (insert "\n")
-  (condition-case err
-      (let ((today (org-today))
-            (inbox-file (expand-file-name "inbox.org" my/task-agenda-dir))
-            waited scheduled (overdue 0) (waiting 0) (inbox 0))
-        (my/org-agenda-update-files)
-        (org-map-entries
-         (lambda ()
-           (unless (or (null (org-get-todo-state)) (org-entry-is-done-p))
-             (let* ((state (org-get-todo-state))
-                    (sched (org-entry-get nil "SCHEDULED"))
-                    (sd (and sched (time-to-days (org-time-string-to-time sched))))
-                    (dl (org-entry-get nil "DEADLINE"))
-                    (dd (and dl (time-to-days (org-time-string-to-time dl))))
-                    (who (org-entry-get nil "WAITED_BY"))
-                    (cat (my/org-agenda-pad (org-get-category) 12))
-                    (title (org-link-display-format (org-get-heading t t t t))))
-               (when who
-                 (push (list (or dd most-positive-fixnum)
-                             (concat cat " " (my/org-agenda-pad who 14) " "
-                                     (my/org-agenda-pad (and dl (format-time-string "%m/%d" (org-time-string-to-time dl))) 5)
-                                     "  " title))
-                       waited))
-               ;; まとめた画面の今日の予定と同じく、待ちは件数だけにする
-               (cond
-                ((equal state "WAIT") (setq waiting (1+ waiting)))
-                ((or (eql sd today) (eql dd today))
-                 (let ((label (cond ((and (eql sd today) (string-match "[0-9]+:[0-9]+" sched)) (match-string 0 sched))
-                                    ((eql dd today) "Due")
-                                    (t "Sched"))))
-                   ;; 並べる順の鍵: 時刻のあるものは時刻順、そのあと期限、予定
-                   (push (list (cond ((string-match-p ":" label) (concat "0" label)) ((equal label "Due") "1") (t "2"))
-                               (concat cat " " (my/org-agenda-pad label 6) " " title))
-                         scheduled)))
-                ((or (and sd (< sd today)) (and dd (< dd today))) (setq overdue (1+ overdue))))
-               (when (file-equal-p (buffer-file-name) inbox-file) (setq inbox (1+ inbox))))))
-         nil 'agenda)
-        (insert "  Waiting on me\n")
-        (dolist (w (or (sort waited (lambda (a b) (< (car a) (car b)))) '((nil "None"))))
-          (insert "    " (cadr w) "\n"))
-        (insert "  Today\n")
-        (dolist (e (or (sort scheduled (lambda (a b) (string< (car a) (car b)))) '((nil "None"))))
-          (insert "    " (cadr e) "\n"))
-        (insert (format "  Also: %d overdue / %d waiting / %d in inbox\n" overdue waiting inbox)))
-    (error (insert (format "  Could not build Today's Agenda: %s\n" (error-message-string err))))))
+  ;; dashboard は画面を描かずにこの欄を作るので、ここでキー入力を尋ねられると、
+  ;; 何も映らないまま止まる。尋ねてくる所は通さない
+  (if (not (file-directory-p my/task-agenda-dir))
+      (insert "  No task-agenda\n")
+    (condition-case err
+	(let ((today (org-today))
+              (inbox-file (expand-file-name "inbox.org" my/task-agenda-dir))
+              (org-agenda-skip-unavailable-files t)
+              waited scheduled (overdue 0) (waiting 0) (inbox 0))
+          (my/org-agenda-update-files)
+          (org-map-entries
+           (lambda ()
+             (unless (or (null (org-get-todo-state)) (org-entry-is-done-p))
+               (let* ((state (org-get-todo-state))
+                      (sched (org-entry-get nil "SCHEDULED"))
+                      (sd (and sched (time-to-days (org-time-string-to-time sched))))
+                      (dl (org-entry-get nil "DEADLINE"))
+                      (dd (and dl (time-to-days (org-time-string-to-time dl))))
+                      (who (org-entry-get nil "WAITED_BY"))
+                      (cat (my/org-agenda-pad (org-get-category) 12))
+                      (title (org-link-display-format (org-get-heading t t t t))))
+		 (when who
+                   (push (list (or dd most-positive-fixnum)
+                               (concat cat " " (my/org-agenda-pad who 14) " "
+                                       (my/org-agenda-pad (and dl (format-time-string "%m/%d" (org-time-string-to-time dl))) 5)
+                                       "  " title))
+			 waited))
+		 ;; まとめた画面の今日の予定と同じく、待ちは件数だけにする
+		 (cond
+                  ((equal state "WAIT") (setq waiting (1+ waiting)))
+                  ((or (eql sd today) (eql dd today))
+                   (let ((label (cond ((and (eql sd today) (string-match "[0-9]+:[0-9]+" sched)) (match-string 0 sched))
+                                      ((eql dd today) "Due")
+                                      (t "Sched"))))
+                     ;; 並べる順の鍵: 時刻のあるものは時刻順、そのあと期限、予定
+                     (push (list (cond ((string-match-p ":" label) (concat "0" label)) ((equal label "Due") "1") (t "2"))
+				 (concat cat " " (my/org-agenda-pad label 6) " " title))
+                           scheduled)))
+                  ((or (and sd (< sd today)) (and dd (< dd today))) (setq overdue (1+ overdue))))
+		 (when (file-equal-p (buffer-file-name) inbox-file) (setq inbox (1+ inbox))))))
+           nil 'agenda)
+          (insert "  Waiting on me\n")
+          (dolist (w (or (sort waited (lambda (a b) (< (car a) (car b)))) '((nil "None"))))
+            (insert "    " (cadr w) "\n"))
+          (insert "  Today\n")
+          (dolist (e (or (sort scheduled (lambda (a b) (string< (car a) (car b)))) '((nil "None"))))
+            (insert "    " (cadr e) "\n"))
+          (insert (format "  Also: %d overdue / %d waiting / %d in inbox\n" overdue waiting inbox)))
+      (error (insert (format "  Could not build Today's Agenda: %s\n" (error-message-string err)))))))
 
 (defun my/org-blocked-by-ids ()
   "今の見出しの :BLOCKED_BY: に書いた、待っているタスクの ID の一覧。"
