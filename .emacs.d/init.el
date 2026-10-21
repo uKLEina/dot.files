@@ -2456,8 +2456,8 @@ Use the staged diff normally, and the diff of HEAD itself while rewording."
       (if arg
           (ghostel)
         (if-let* ((buf (seq-find (lambda (b) (eq (buffer-local-value 'major-mode b) 'ghostel-mode))
-                                (buffer-list)))
-                 (win (get-buffer-window buf)))
+                                 (buffer-list)))
+                  (win (get-buffer-window buf)))
             (delete-window win)
           (let ((display-buffer-overriding-action
                  '((display-buffer-in-direction) (direction . below) (window-height . 0.3))))
