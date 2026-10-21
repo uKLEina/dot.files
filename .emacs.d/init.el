@@ -2444,6 +2444,9 @@ Use the staged diff normally, and the diff of HEAD itself while rewording."
   :custom
   (emojify-emoji-styles '(unicode github)))
 
+(use-package notmuch
+  :ensure t)
+
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
   (use-package ghostel
