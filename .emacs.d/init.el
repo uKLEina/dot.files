@@ -1841,9 +1841,12 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
   (skk-show-annotation t)
   (skk-annotation-delay 0.01)
   (skk-show-candidates-nth-henkan-char 3)
+  (skk-egg-like-newline t)
+  (skk-dcomp-multiple-activate t)
+  (skk-check-okurigana-on-touroku 'auto)
+  (skk-henkan-strict-okuri-precedence t)
+  (skk-show-mode-show t)
   :config
-  (use-package skk-hint)
-  (use-package skk-study)
   ;; Isearch setting.
   (defun skk-isearch-setup-maybe ()
     (require 'skk-vars)
@@ -1861,6 +1864,17 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
 
   (add-hook 'isearch-mode-hook #'skk-isearch-setup-maybe)
   (add-hook 'isearch-mode-end-hook #'skk-isearch-cleanup-maybe))
+
+(use-package skk-hint
+  :after skk
+  :demand t)
+
+(use-package skk-study
+  :after skk
+  :demand t)
+
+(use-package context-skk
+  :hook (prog-mode . context-skk-mode))
 
 (use-package imenu-list
   :if my/linux-p
