@@ -2444,8 +2444,27 @@ Use the staged diff normally, and the diff of HEAD itself while rewording."
   :custom
   (emojify-emoji-styles '(unicode github)))
 
+;; Gmailとの同期はlieer（gmi）が担う。notmuch-pollのnotmuch newから
+;; ~/.mail/.notmuch/hooks/pre-newでgmi syncを呼ぶ。
 (use-package notmuch
-  :ensure t)
+  :ensure t
+  :commands notmuch
+  :custom
+  (notmuch-search-oldest-first nil)
+  (notmuch-show-logo nil)
+  ;; 送信済みはGmail側に残るので、ローカルにはコピーしない
+  (notmuch-fcc-dirs nil)
+  (notmuch-saved-searches
+   '((:name "inbox"   :query "tag:inbox"                :key "i")
+     (:name "unread"  :query "tag:inbox and tag:unread" :key "u")
+     (:name "flagged" :query "tag:flagged"              :key "f")
+     (:name "sent"    :query "tag:sent"                 :key "t")
+     (:name "all"     :query "*"                        :key "a")))
+  ;; 送信はgmi sendに渡す。message.elが付ける-oi・-fはgmiが無視し、-tはmessage.elが付ける
+  (message-send-mail-function #'message-send-mail-with-sendmail)
+  (sendmail-program "gmi")
+  (message-sendmail-extra-arguments '("send" "--quiet" "-C" "~/.mail/account.gmail"))
+  (message-kill-buffer-on-exit t))
 
 ;;; Linux specific setup
 (when (eq system-type 'gnu/linux)
