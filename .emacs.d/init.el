@@ -570,6 +570,11 @@ Claude Code が書いた :ID: も :BLOCKED_BY: のリンク先として見つか
   (interactive)
   (org-agenda nil "d"))
 
+(defun my/dashboard-insert-agenda-hint (_list-size)
+  "dashboard の Agenda の欄。org を読むと起動が遅くなるので、開き方だけを出す。"
+  (dashboard-insert-heading "Agenda:" "a")
+  (insert "\n    Press a to open"))
+
 (defun my/org-blocked-by-ids ()
   "今の見出しの :BLOCKED_BY: に書いた、待っているタスクの ID の一覧。"
   (let ((v (or (org-entry-get nil "BLOCKED_BY") "")) (start 0) ids)
@@ -721,6 +726,9 @@ agenda でブロックされているものを薄く出すのも、この判定�
   ;; タイムスタンプの曜日を英語で書く。Claude Code や batch の Emacs が書くものと揃える
   (setq system-time-locale "C")
   :custom
+  ;; 初期値のリンク機能（ol-gnus など）は org を初めて開くときに gnus まで読み込んで重い。
+  ;; 使うリンクができたら (with-eval-after-load 'org (require 'ol-info)) のように読み込む
+  (org-modules nil)
   (org-latex-packages-alist
    '(("" "fontspec" t)
      ("" "xeCJK" t)))
@@ -2137,8 +2145,9 @@ For visual-char ('v') or visual-block ('C-v'), places cursors at the column."
         (search-backward search-label (point-min) t))
       (back-to-indentation)))
   :custom
-  (dashboard-items '((recents . 5)))
+  (dashboard-items '((recents . 5) (my/agenda . 0)))
   :config
+  (add-to-list 'dashboard-item-generators '(my/agenda . my/dashboard-insert-agenda-hint))
   (keymap-set dashboard-mode-map "a" #'my/dashboard-open-agenda)
   (with-eval-after-load 'evil
     (evil-define-key 'normal dashboard-mode-map (kbd "a") 'my/dashboard-open-agenda)
