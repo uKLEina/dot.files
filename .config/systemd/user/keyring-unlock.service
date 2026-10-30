@@ -1,0 +1,9 @@
+[Unit]
+Description=GNOME Keyring を起動し、1Password のパスワードで login を開く
+
+[Service]
+Type=forking
+ExecStart=%h/bin/keyring-unlock
+
+[Install]
+WantedBy=default.target

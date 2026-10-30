@@ -20,6 +20,11 @@ rm -f ~/.zshrc
 rm -f ~/.zshenv
 rm -f ~/hhkb.nodoka
 rm -f ~/nihongo.nodoka
+rm -f ~/.config/systemd/user/keyring-unlock.service
+rm -f ~/.config/systemd/user/secret-sync.service
+rm -f ~/.config/secret-sync/secrets.tsv
+rm -f ~/.local/share/dbus-1/services/org.freedesktop.secrets.service
+rm -f ~/.local/share/dbus-1/services/org.gnome.keyring.service
 
 # .config/
 # mkdir -p ~/.config
@@ -50,6 +55,18 @@ ln -s ~/dot.files/.tmux.conf ~/.tmux.conf
 
 # scripts
 ln -s ~/dot.files/bin ~/bin
+
+# keyring（1Password の秘密情報の写しを GNOME Keyring に置く。要 gnome-keyring と libsecret-tools）
+mkdir -p ~/.config/systemd/user ~/.config/secret-sync ~/.local/share/dbus-1/services
+ln -s ~/dot.files/.config/systemd/user/keyring-unlock.service ~/.config/systemd/user/keyring-unlock.service
+ln -s ~/dot.files/.config/systemd/user/secret-sync.service ~/.config/systemd/user/secret-sync.service
+ln -s ~/dot.files/.config/secret-sync/secrets.tsv ~/.config/secret-sync/secrets.tsv
+ln -s ~/dot.files/.local/share/dbus-1/services/org.freedesktop.secrets.service ~/.local/share/dbus-1/services/org.freedesktop.secrets.service
+ln -s ~/dot.files/.local/share/dbus-1/services/org.gnome.keyring.service ~/.local/share/dbus-1/services/org.gnome.keyring.service
+# 標準のデーモンは keyring を開けないので止め、keyring-unlock.service に任せる
+systemctl --user mask gnome-keyring-daemon.socket gnome-keyring-daemon.service
+systemctl --user daemon-reload
+systemctl --user enable keyring-unlock.service secret-sync.service
 
 # git
 git config --global alias.co checkout

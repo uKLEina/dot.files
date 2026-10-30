@@ -1,0 +1,21 @@
+#!/bin/bash
+# GNOME Keyring を起動し、1Password にあるパスワードで login のkeyringを開く。
+#
+# systemd のユーザーサービス keyring-unlock.service から呼ぶ。D-Bus で
+# org.freedesktop.secrets を求められたときも、このサービスが起動する
+# （~/.local/share/dbus-1/services/ の上書き）。
+#
+# WSL にはログインが無く、PAM が login のkeyringを開いてくれないので、
+# PAM と同じ順番で開く: --login でパスワードを渡して起動し、--start で初期化する。
+# 1Password から読めないときは、デーモンを起動せずに失敗する。ロックされたままの
+# デーモンが動くと、ツールが別のkeyringを作ろうとするため。
+set -euo pipefail
+
+REF='op://Employee/qj6tsq6z5ath6rdhdhnprzttda/password'  # 1Password の「WSL keyring」
+OP=${OP:-/mnt/c/Users/kobayashi.naohiro/AppData/Local/Microsoft/WinGet/Packages/AgileBits.1Password.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe/op.exe}
+CTL="$XDG_RUNTIME_DIR/keyring"
+
+pw=$("$OP" read "$REF" </dev/null) || { echo "keyring-unlock: 1Password からパスワードを読めない" >&2; exit 1; }
+printf '%s' "$pw" | gnome-keyring-daemon --daemonize --login --control-directory="$CTL" >/dev/null
+unset pw
+gnome-keyring-daemon --start --components=secrets --control-directory="$CTL" >/dev/null

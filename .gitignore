@@ -42,6 +42,13 @@ xelatex
 !/.zprofile
 !/.config/git/
 !/.config/git/ignore
+!/.config/systemd/
+!/.config/secret-sync/
+!/.local/
+/.local/*
+!/.local/share/
+/.local/share/*
+!/.local/share/dbus-1/
 !/launch-emacs.vbs
 
 ## emacs
