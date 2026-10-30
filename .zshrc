@@ -38,9 +38,11 @@ alias sudo='sudo '
 ## 完全に削除。
 alias rr="command rm -rf"
 ## ファイル操作を確認する。
-alias rm="rm -i"
-alias cp="cp -i"
-alias mv="mv -i"
+if [[ -z "$CLAUDECODE" ]]; then
+  alias rm='rm -i'
+  alias cp="cp -i"
+  alias mv="mv -i"
+fi
 
 alias ls='ls -hF --color=always --show-control-chars --group-directories-first'
 alias la='ls -hFA --color=always --show-control-chars --group-directories-first'
