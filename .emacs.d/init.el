@@ -351,49 +351,50 @@ consult-jq は :vc (git経由) でインストールされるためこのリス�
       (call-process "wmctrl" nil nil nil "-i" "-R"
                     (frame-parameter (or frame (selected-frame)) 'outer-window-id)))
     (advice-add 'raise-frame :after #'raise-frame-with-wmctrl))
-  (defvar my/claude-code-frame nil
-    "Dedicated GUI frame for Claude Code-originated emacsclient sessions.
-Lazily created on the first edit and reused via make-frame-invisible /
-make-frame-visible so we never destroy/recreate the GTK widget — that
-avoids the new-frame focus-in use-after-free crash on WSLg.")
-  (defvar my/claude-code-session-active nil
-    "Non-nil while a Claude Code-originated emacsclient session is active.")
+  ;; Claude Code からの編集は、別フレームを作らずメインのフレームに出す。
+  ;; pgtk/Wayland ではアプリからフレームの位置を決められず、最小化を解くこともできない。
+  ;; そこでメインのフレームを一度隠して出し直して前に出し、最大化して見た目の位置をそろえる。
+  (defun my/claude-code-remap-frame (frame)
+    "Bring FRAME to the front by unmapping and remapping it, maximized."
+    (make-frame-invisible frame t)
+    ;; 最大化は隠している間に指定し、出したときに最大化された状態で現れるようにする
+    (set-frame-parameter frame 'fullscreen nil)
+    (set-frame-parameter frame 'fullscreen 'maximized)
+    (make-frame-visible frame))
   (defvar my/claude-code-pending nil
     "Non-nil when next emacsclient session is from Claude Code.")
-  (defun my/claude-code-show-frame ()
-    "Bring the dedicated Claude Code frame forward, creating it if needed.
-On pgtk/Wayland an unmap+remap roundtrip is used to bypass Mutter's
-focus-stealing prevention so the frame actually comes to the front."
-    (if (and my/claude-code-frame (frame-live-p my/claude-code-frame))
-        (progn
-          (make-frame-invisible my/claude-code-frame)
-          (make-frame-visible my/claude-code-frame))
-      (setq my/claude-code-frame
-            (make-frame '((name . "claude-code"))))))
+  (defvar my/claude-code-window-configuration nil
+    "Claude Code のバッファを出す前の、メインのフレームの窓の分け方。
+編集を終えたらこれに戻す。nil でなければ Claude Code の編集中。")
   (defun my/claude-code-server-setup ()
-    "Move Claude Code session into the dedicated frame; enable Evil + SKK."
+    "Show the Claude Code buffer full-frame in the main frame; enable Evil + SKK."
     (when my/claude-code-pending
-      (setq my/claude-code-pending nil
-            my/claude-code-session-active t)
+      (setq my/claude-code-pending nil)
       (let ((buf (current-buffer)))
-        (my/claude-code-show-frame)
-        ;; Keep the main frame's working buffer intact
+        ;; server が切り替える前の状態を保存してから、全面に出す
         (switch-to-prev-buffer)
-        (select-frame-set-input-focus my/claude-code-frame)
-        (switch-to-buffer buf))
+        (setq my/claude-code-window-configuration (current-window-configuration))
+        (switch-to-buffer buf)
+        (delete-other-windows)
+        (my/claude-code-remap-frame (selected-frame))
+        (select-frame-set-input-focus (selected-frame)))
       (goto-char (point-max))
       (evil-insert-state)
       (skk-mode 1)))
+  (defun my/claude-code-restore-and-iconify (config)
+    "Restore window configuration CONFIG and iconify its frame."
+    (when (frame-live-p (window-configuration-frame config))
+      (set-window-configuration config)
+      (iconify-frame (window-configuration-frame config))))
   (defun iconify-emacs-when-server-is-done ()
     (cond
      (server-clients)
-     (my/claude-code-session-active
-      (setq my/claude-code-session-active nil)
-      (when (and my/claude-code-frame (frame-live-p my/claude-code-frame))
-        ;; make-frame-invisible だとフォーカスの受け渡しがコンポジタ任せになり、
-        ;; 本体フレームにフォーカスが飛ぶことがある。iconify-frame は最小化の意図が
-        ;; WM に伝わるため、直前のウィンドウ (Windows Terminal 側) に戻りやすい。
-        (iconify-frame my/claude-code-frame)))
+     (my/claude-code-window-configuration
+      (let ((config my/claude-code-window-configuration))
+        (setq my/claude-code-window-configuration nil)
+        ;; server-done-hook のあとで server がバッファを切り替えるので、
+        ;; 窓の分け方はその処理が終わってから戻す
+        (run-at-time 0 nil #'my/claude-code-restore-and-iconify config)))
      (t (iconify-frame))))
   (defun my/server-visit-setup-keybindings ()
     "Setup C-c C-c to save and finish in emacsclient buffers."
