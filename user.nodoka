@@ -1,0 +1,142 @@
+# user.nodoka - 本体キーボード(Surface) と HHKB を1ファイルで扱う設定
+# 経緯・ハマりどころは dot.files リポジトリの nodoka.md を参照。
+#
+# kbdaddid.sys でキー入力元のキーボードを識別し、K1-/K2- モディファイヤで
+# キーボードごとの差分を書き分ける。K を指定しない key 定義は全キーボード共通
+# (デフォルトモディファイヤでは K0-～K3- は「どちらでも良い」扱いのため)。
+#
+#   K1: 本体キーボード (Surface HID Keyboard)
+#   K2: HHKB (Bluetooth, VID 04FE / PID 0022)
+#   K0: 上記以外 (Logicool Bolt レシーバ等。キーボードではないので特に設定なし)
+#
+# ExtraInfo の値は kbdaddid の DeviceInstanceId mode のもの。
+# 再ペアリング等で値が変わった(K0- になった)ら、キー入力時のログに出る
+#   kbdaddid: unregistered hi=0x...  Add to .nodoka: def option UnitID = Kx ExtraInfo 0x....
+# を見て書き直す。
+# ※ HHKB は読み込み時のデバイス一覧に出る値(0xBA780000)と、実際のキー入力に
+#   付く値(0x2220000)が異なる。実際に効くのは後者。
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# キーボードの識別
+#
+
+# 本体キーボードは3つのコレクションに分かれて見えるので全て K1 にする
+def option UnitID = K1 ExtraInfo 0xBA5C0000	# HID\Target_SAM&Category_HID
+def option UnitID = K1 ExtraInfo 0x7EF90000	# HID\HID_DEVICE_SYSTEM_VHF
+def option UnitID = K1 ExtraInfo 0x3DB50000	# HID\ConvertedDevice
+def option UnitID = K2 ExtraInfo 0x2220000	# HHKB (キー入力時の実際の値)
+def option UnitID = K2 ExtraInfo 0xBA780000	# HHKB (デバイス一覧上の値)
+
+
+include "109.nodoka"
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 共通の定義
+#
+
+keyseq $WindowClose = A-F4
+
+# デフォルトのキーマップの定義
+keymap  KeymapDefault = &Default
+
+# コントロールの設定
+include "emacsedit.nodoka"
+
+window  EditControl     /:(Edit|TEdit|RichEdit(20[AW])?)$/ : EmacsEdit
+window  SysListView32   /:SysListView32$/ : EmacsMove
+window  SysTreeView32   /:SysTreeView32$/ : EmacsMove
+window  ComboBox        /:ComboBox(:Edit)?$/ : EmacsEdit
+ key M-N M-P            = A-Down					# ドロップダウンメニューを開く
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Windows の一般的設定
+#
+
+window  DialogBox       /:#32770:/ : Global
+ key C-G                = Escape
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 各アプリケーションの設定
+#
+
+# のどか ......................................................................
+
+window  NodokaInvestigate /nodoka\.exe:#32770:nodokaFocus$/ : KeymapDefault
+
+window  NodokaLog ( /nodoka\.exe:#32770:Button/ \
+                && /ログ - のどか/ ) : Global
+ key C-G                = $WindowClose
+ key Esc                = $WindowClose
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Emacs-keybind apps
+#
+
+keymap2 MyEmacsC-X : EmacsC-X
+ key H = C-A &Prefix(MyEmacsC-X)					# 全選択
+
+# メモ帳専用の C-x プレフィックス
+keymap2 NotepadC-X : MyEmacsC-X
+ key C-S               = C-S						# 上書き保存
+
+keymap MyEmacsEdit : EmacsEdit
+ key C-X       = &Prefix(MyEmacsC-X)
+ key C-J       = &Default
+ key C-Q       = &Default
+
+window MSWord   /WINWORD\.EXE/  : MyEmacsEdit
+window Skype    /Skype\.exe/   : MyEmacsEdit
+window Slack    /slack\.exe/   : MyEmacsEdit
+
+window Chrome   /chrome\.exe/  : MyEmacsEdit
+ key C-T = &Default
+ key C-W = &Default
+window Firefox  /firefox\.exe/ : MyEmacsEdit
+ key C-T = &Default
+ key C-W = &Default
+
+window obsidian /Obsidian\.exe/  : MyEmacsEdit
+window PgAdmin  /pgAdmin4\.exe/  : MyEmacsEdit
+ key C-Solidus = &Default
+window Explorer /Explorer\.exe/  : MyEmacsEdit
+
+window  Notepad /Notepad\.exe/   : MyEmacsEdit
+ key C-X               = &Prefix(NotepadC-X)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# キー入力の基本設定
+#
+
+keymap Global
+
+# SansS
+mod shift += !!Space
+key R-*Space = &Ignore
+
+# 無変換 -> Alt
+# 本体KBの無変換はスキャンコードが非標準で入力自体が来ないため、実質HHKBのみ
+# 有効。物理 Alt キーもそのまま Alt として使える(HHKB では Alt が2つになる)。
+mod alt += !無変換
+key *無変換		= *LAlt
+
+# 変換 -> CapsLock (英数を Ctrl にしているキーボードでも CapsLock を切り替えられるように)
+key 変換		= $CapsLock
+
+# 本体KB: 英数(Caps の位置) -> LControl
+# mod 文はキーボード単位で書き分けられないため、英数は全キーボードで
+# のどか内部の control モディファイヤになる(HHKB の英数も C- 扱い)。
+# Windows へ LControl を送るのは本体KBのみ。
+# ※ def subst K1-*英数 = *LControl では、送信キーは置き換わるが、のどかの
+#   モディファイヤ判定は置き換え前の英数で行われるため C- にならず不可だった。
+mod control += 英数
+key K1-*英数		= *LControl
+
+# 本体KB: Esc と 半角/全角 の入れ替え
+# (全アプリ共通。Win版Emacs や MyEmacsEdit 対象アプリでも打ち消さない)
+key K1-*半角/全角	= *Esc
+key K1-*Esc		= *半角/全角

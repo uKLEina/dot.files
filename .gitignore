@@ -11,6 +11,7 @@
 !/.zshrc
 !/.zshrc.local.wsl
 !/*.nodoka
+!/nodoka.md
 !/.aspell.conf
 !/.config/
 /.config/*
